@@ -1,0 +1,145 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load get_response %}
+{% load to_int %}
+{% load is_response %}
+{% load score %}
+{% block extrastyle %}
+
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <div class="row ">
+        <div class="col-lg-12 col-md-12 ">
+            <h5 class="card-title">{{response.responder.full_name}} -> Response</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card px-3 py-0 pt-3 mb-1">
+                <div class="d-flex justify-content-between">
+                    <div class="pagetitle mb-0">
+                        <h1>{{form.title}}</h1>
+                    </div>
+                    <!-- {% if form.is_quiz %}
+                    <h4 class="small my-auto">Score: {{score}} / {{total_score}}</h4>
+                    {% endif %} -->
+                </div>
+                <span class="card-text">{{form.description|linebreaksbr}}</span>
+                <hr>
+                {% for question in form.questions.all %}
+                <div class="question mb-3">
+                    <div class="d-flex ">
+                        <span class="card-title p-0 my-auto">Q.{{forloop.counter}}&emsp; {{question.question}} </span>
+                        {% if question.required %}
+                        <span class="require-star">*</span>
+                        {% endif %}
+                    </div>
+                    {% if question.question_type == "short" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 my-auto">Ans.&emsp13;</span>
+                            <span class="my-auto">{{response|get_response:question.pk}}</span>
+                        </div>
+                    {% elif question.question_type == "paragraph" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 my-auto">Ans.&emsp13;</span>
+                            <span class="my-auto">{{response|get_response:question.pk}}</span>
+                        </div>
+                    {% elif question.question_type == "date" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 my-auto">Ans.&emsp13;</span>
+                            <span class="my-auto">{{response|get_response:question.pk}}</span>
+                        </div>
+                    {% elif question.question_type == "time" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 my-auto">Ans.&emsp13;</span>
+                            <span class="my-auto">{{response|get_response:question.pk}}</span>
+                        </div>
+                    {% elif question.question_type == "fileupload" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 ">Ans.&emsp13;</span>
+                            <span class="my-auto">
+                                {% if response|get_file_ext:question.pk|upper == ".JPG" or response|get_file_ext:question.pk|upper == ".JPEG" or response|get_file_ext:question.pk|upper == ".PNG" %}
+                                    <img src="{{response|get_response_file:question.pk}}" height="100" alt="">
+                                {% elif response|get_file_ext:question.pk|upper == ".MP4" or response|get_file_ext:question.pk|upper == ".AVI" or response|get_file_ext:question.pk|upper == ".MKV" %}
+                                    <video width="220" height="140" src="{{response|get_response_file:question.pk}}"  controls controlsList="nodownload"></video>
+                                {% elif response|get_file_ext:question.pk|upper == ".PDF" or response|get_file_ext:question.pk|upper == ".TXT" or response|get_file_ext:question.pk|upper == ".XLSX" or response|get_file_ext:question.pk|upper == ".DOCX" or response|get_file_ext:question.pk|upper == ".PPTX" %}
+                                    <iframe src="{{response|get_response_file:question.pk}}" style="width:600px; height:500px;" frameborder="0"></iframe>
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                    {% elif question.question_type == "multiple choice" %}
+                    <div class="d-flex ">
+                        <span class="card-sub-title">Ans.&emsp13;</span>
+                        <span class="my-auto">
+                            {% for choice in question.choices.all %}
+                            <div class="multiple-choice">
+                                {% if response|get_response:question.pk|to_int == choice.pk|to_int %}
+                                    <input type="radio" name="{{question.id}}" id="{{choice.id}}" checked>
+                                {% else %}
+                                    <input type="radio" name="{{question.id}}" id="{{choice.id}}" disabled>
+                                {% endif %}
+                                <label for="{{choice.id}}" class="txtClr">{{choice.choice}}</label>
+                            </div>
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% if form.is_quiz %}
+                    <div class="d-flex ">
+                        <span class="card-sub-title my-auto">Answer Key -&emsp13;</span>
+                        <span class="my-auto">
+                            {% for i in question.choices.all %}
+                                {% if i.is_answer %}
+                                <label class="small" for="choice-{{i.id}}">{{i.choice}}</label>
+                                {% endif %}
+                            {% endfor %}
+                            
+                        </span>
+                    </div>
+                    {% endif %}
+                        
+                    {% elif question.question_type == "dropdown" %}
+                        <div class="d-flex ">
+                            <span class="card-title p-0 ">Ans.&emsp13;</span>
+                            <span class="my-auto">
+                                {% for choice in question.choices.all %}
+                                <div class="multiple-choice">
+                                    {% if response|get_response:question.pk|to_int == choice.pk|to_int %}
+                                        <input type="radio" name="{{question.id}}" id="{{choice.id}}" checked>
+                                    {% else %}
+                                        <input type="radio" name="{{question.id}}" id="{{choice.id}}" disabled>
+                                    {% endif %}
+                                    <label for="{{choice.id}}" class="txtClr">{{choice.choice}}</label>
+                                </div>
+                                {% endfor %}
+                            </span>
+                        </div>
+                        
+                    {% elif question.question_type == "checkbox" %}
+                    <div class="d-flex ">
+                        <span class="card-title p-0">Ans.&emsp13;</span>
+                        <span class="my-auto">
+                            {% for choice in question.choices.all %}
+                            <div class="multiple-choice">
+                                {% if response|get_responses:question.pk|is_response:choice.pk %}
+                                    <input type="checkbox" name="{{question.id}}" id="{{choice.id}}" value="{{choice.id}}" checked onclick="return false">
+                                {% else %}
+                                    <input type="checkbox" name="{{question.id}}" id="{{choice.id}}" value="{{choice.id}}" disabled>
+                                {% endif %}
+                                <label for="{{choice.id}}" class="txtClr">{{choice.choice}}</label>
+                            </div>
+                            {% endfor %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

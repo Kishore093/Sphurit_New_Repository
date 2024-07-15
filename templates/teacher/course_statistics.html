@@ -1,0 +1,76 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+    .ratings{
+        margin-right:10px;
+    }
+
+    .ratings i{
+        color:#cecece;
+        font-size:20px;
+    }
+
+    .rating-color{
+        color:#fbc634 !important;
+    }
+    .card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h4 class="card-title">Courses Purchased</h4>
+        </div>
+        <!-- <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <a href="{% url 'add_course' %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> New Course</a>
+        </div> -->
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                          <th scope="col">SN</th>
+                          <th scope="col">Timestamp</th>
+                          <th scope="col">Course Name</th>
+                          <th scope="col">Student Name</th>
+                          <th scope="col">Paid Amount</th>
+                          <th scope="col">Payout Amount</th>
+                          <th scope="col">GST Amount</th>
+                          <th scope="col">TDS Amount</th>
+                          <th scope="col">File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in account_info %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ obj.created_at }}</td>
+                          <td>{{ obj.course.course_name }}</td>
+                          <td>{{ obj.user.full_name }}</td>
+                          <td>{{ obj.course.discount_fee }}</td>
+                          <td>{{ obj.course.discount_fee }}</td>
+                          <td>{{public_config.GST_RATE}}%</td>
+                          <td>0%</td>
+                          <td><a href="{% url 'createInvoice' obj.id %}" class="btn btn-primary btn-sm" title="Invoice"><i class="bi bi-file-earmark-text"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+ 
+    </div>
+</main>
+{% endblock content %}

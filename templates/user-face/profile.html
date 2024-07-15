@@ -1,0 +1,105 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <section class="section profile">
+        <div class="row">
+            <div class="col-xl-6">
+            <div class="card">
+                <div class="card">
+                    <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                      {% if user_details.profile_image %}
+                        <img src="{{ user_details.profile_image.url }}" alt="Profile" class="rounded-circle">
+                      {% else %}
+                      <img src="{% static 'img/user.png' %}" class="rounded-circle" alt="">
+                      {% endif %}
+                        <h2>{{ user_details.full_name }}</h2>
+                    
+                        <div class="social-links mt-2">
+                        <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body px-4">
+                <h5 class="card-title">Profile Details</h5>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 label ">Full Name</div>
+                    <div class="col-lg-8 col-md-8">{{ user_details.full_name }}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 label">Phone</div>
+                    <div class="col-lg-8 col-md-8">{{ user_details.mobile }}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 label">Email</div>
+                    <div class="col-lg-8 col-md-8">{{ user_details.email }}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 label">Date Of Birth</div>
+                    <div class="col-lg-8 col-md-8">{{ user_details.date_of_birth|default_if_none:"&nbsp;" }}</div>
+                </div>
+
+                <!-- <h5 class="card-title">About</h5>
+                <p class="small fst-italic">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</p> -->
+
+                </div>
+            </div>
+
+            </div>
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-body px-4">
+                        <h5 class="card-title">Purchased Course</h5>
+
+                        {% for pc in user_details.user_purchased.all %}
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                              <div class="col-md-4" style="margin: auto;">
+                                <img src="{{pc.course.thumb_image.url}}"  class="img-fluid" alt="...">
+                              </div>
+                              <div class="col-md-8">
+                                <div class="card-body">
+                                  <h5 class="card-title">{{ pc.course.course_name }} | <span class="text-muted small">{{ pc.course.category.category_name }}</span></h5>
+                                  <h6 class="card-text">{{pc.course.description}}</h6>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <!-- <div class="card mb-3">
+                            <div class="row g-0">
+                              <div class="col-md-4">
+                                <img src="{% static 'img/cat-4.jpg' %}" class="img-fluid rounded-start" alt="...">
+                              </div>
+                              <div class="col-md-8">
+                                <div class="card-body">
+                                  <h5 class="card-title">Card with an image on left</h5>
+                                  <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                </div>
+                              </div>
+                            </div>
+                        </div> -->
+
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main><!-- End #main -->
+{% endblock content %}

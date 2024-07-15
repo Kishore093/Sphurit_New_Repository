@@ -1,0 +1,1320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+    <title>SPHURIT</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+  
+    <!-- Favicons -->
+    <!-- <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
+  
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'teacher/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+
+    
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+  
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="{% static 'teacher/css/style.css' %}" rel="stylesheet">
+    <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+    
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+    
+</head>
+
+<body>
+  <main>
+      
+    <div class="container-fluid">
+      <!-- Spinner Start -->
+      <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+          <!-- <span class="sr-only">Loading...</span> -->
+        </div>
+      </div>
+      <!-- Spinner End -->
+      {% if messages %}
+        <div class="messages alert-fixed">
+        {% for message in messages %}
+        <script>
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            animation:false,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "{{ message.tags }}",
+            title: "{{message}}"
+          });
+        </script>
+        {% endfor %}
+        </div>
+      {% endif %}
+      <!-- resitration section -->
+      
+      <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        {% if request.session.type == "instructor" %}
+          <form class="card" action="{% url 'instructor_registration' %}" method="post" enctype="multipart/form-data" onsubmit="openLoader()">
+            {% csrf_token %}
+            <div class="text-center my-4">
+              <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a>
+              <h5 class="card-title mb-0 py-1">Become an instructor</h5>
+            </div>
+            
+            <div class="row">
+              <div class="col-lg-6 col-md-6 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Basic Informations</p>
+                    <div class="row">
+                      <div class="col-6">
+                        <label for="first_name" class="form-label small">First Name<span class="text-danger">*</span></label>
+                        <input type="text" name="first_name" class="form-control" id="first_name" required {% if request.user.is_authenticated %}  readonly value="{{request.user.first_name}}" {% endif %}>
+                      </div>
+                      <div class="col-6">
+                          <label for="last_name" class="form-label small">Last Name<span class="text-danger">*</span></label>
+                          <input type="text" name="last_name" class="form-control" id="last_name" required {% if request.user.is_authenticated %} readonly value="{{request.user.last_name}}" {% endif %}>
+                      </div>
+                      <div class="col-12">
+                        <label for="mobile" class="form-label small">Phone Number<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="number" maxlength="10" name="mobile" class="form-control" id="mobile" required {% if request.user.is_authenticated %} readonly value="{{request.user.mobile}}" {% endif %}>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <label for="email" class="form-label small">Email<span class="text-danger">*</span></label>
+                        <input type="email" name="email" class="form-control" id="email" required {% if request.user.is_authenticated %} readonly value="{{request.user.email}}" {% endif %}>
+                      </div>
+                      <div class="col-12">
+                        <label for="dob" class="form-label">Date Of Birth*</label>
+                        <input type="date" name="date_of_birth" class="form-control date-of-birth" id="dob" required>
+                        <div class="invalid-feedback">Please, enter date of birth!</div>
+                      </div>
+                      <div class="col-12">
+                        <label for="tag-input">Intrest Of Area</label>
+                        
+                        <select class="js-select2" multiple="multiple" name="tags">
+                          <option value="Pyhton" data-badge="">Pyhton</option>
+                          <option value="Django" data-badge="">Django</option>
+                          <option value="HTML" data-badge="">HTML</option>
+                          <option value="CSS" data-badge="">CSS</option>
+                          <option value="Bootstrap" data-badge="">Bootstrap</option>
+                          <option value="JavaScript" data-badge="">JavaScript</option>
+                          <option value="Java" data-badge="">Java</option>
+                          <option value="PHP" data-badge="">PHP</option>
+                          <option value="Flutter" data-badge="">Flutter</option>
+                          <option value="C++" data-badge="">C++</option>
+                          <option value="MySql" data-badge="">MySql</option>
+                        </select>
+                        
+                      </div>
+                      
+                      
+                      <div class="col-6">
+                        <label for="gender" class="form-label small">Gender<span class="text-danger">*</span></label>
+                        <select type="text" name="gender" class="form-select" id="gender" required>
+                          <option value="">Select Gender</option>
+                          <option value="Male" {% if request.user.is_authenticated and request.user.gender == 'Male' %} selected {% endif %}>Male</option>
+                          <option value="Female" {% if request.user.is_authenticated and request.user.gender == 'Female' %} selected {% endif %}>Female</option>
+                          <option value="others" {% if request.user.is_authenticated and request.user.gender == 'others' %} selected {% endif %}>Other's</option>
+                        </select>
+                      </div>
+                      <div class="col-6">
+                          <label for="experience" class="form-label small">Experience<span class="text-danger">*</span></label>
+                          <select type="text" name="experience" class="form-select" id="experience" required>
+                            <option value="">Select Experience</option>
+                            <option value="1 Year">1 Year</option>
+                            <option value="2 Years">2 Years</option>
+                            <option value="3+ Years">3+ Years</option>
+                          </select>
+                      </div>
+                      <div class="col-12">
+                        <label for="address" class="form-label small">Address</label>
+                        <textarea type="text" name="address" class="form-control" id="address"></textarea>
+                      </div>
+                      <div class="col-12">
+                        <label for="about" class="form-label small">Bio</label>
+                        <textarea type="text" name="about" class="form-control" id="about"></textarea>
+                      </div>
+                      <div class="col-12">
+                        <label for="profile_image" class="form-label small">Profile Image</label>
+                        <input type="file" name="profile_image" class="form-control" id="profile_image">
+                      </div>
+                   
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add KYC Document's</p>
+                    <p class="card-text fw-bold">Adhar Card KYC</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="adhar_number" class="form-label small">Adhar Number<span class="text-danger">*</span></label>
+                        <input input type="text" name="adhar_number" class="form-control aadhaar number_input" onkeypress="if (this.value.length >= 12) return false;" id="adhar_number" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="adhar_image_front" class="form-label small">Adhar Front Image<span class="text-danger">*</span></label>
+                        <input type="file" name="adhar_image_front" class="form-control" id="adhar_image_front" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="adhar_image_back" class="form-label small">Adhar Back Image<span class="text-danger">*</span></label>
+                        <input type="file" name="adhar_image_back" class="form-control" id="adhar_image_back" required>
+                      </div>
+                    </div>
+                    <p class="card-text fw-bold mt-3">Pan Card KYC</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="pan_number" class="form-label small">Pan Number<span class="text-danger">*</span></label>
+                        <input type="text"  name="pan_number" class="form-control pan" id="pan_number" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="pan_image_front" class="form-label small">Pan Front Image<span class="text-danger">*</span></label>
+                        <input type="file" name="pan_image_front" class="form-control" id="pan_image_front" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="pan_image_back" class="form-label small">Pan Back Image<span class="text-danger">*</span></label>
+                        <input type="file" name="pan_image_back" class="form-control" id="pan_image_back" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add School/College Qualification</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="institution_name" class="form-label small">School Name<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="text" name="institution_name" class="form-control" id="institution_name" required>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <label for="institution_address" class="form-label small">College Name<span class="text-danger">*</span></label>
+                        <input type="text" name="institution_address" class="form-control" id="institution_address" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="subject" class="form-label small">Subject/Degree<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="text" name="subject" class="form-control" id="subject" required>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <label for="grade" class="form-label small">Grade<span class="text-danger">*</span></label>
+                        <input type="text" name="grade" class="form-control" id="grade" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="year" class="form-label small">Month and Year<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="date" name="year" class="form-control month-and-year" id="year" required>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add Bank Details</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="bank_name" class="form-label small">Your Bank Name<span class="text-danger">*</span></label>
+                        <input type="text" name="bank_name" class="form-control" id="bank_name" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="bank_user_name" class="form-label small">Account Holder Name<span class="text-danger">*</span></label>
+                        <input type="text" name="bank_user_name" class="form-control" id="bank_user_name" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="acno1" class="form-label small">Your Account Number<span class="text-danger">*</span></label>
+                        <input type="password" name="account_number" class="form-control" id="acno1" required onpaste="return false" oncopy="return false" oncut="return false" >
+                        <script>
+                          document.getElementById("acno1").addEventListener("keypress", function(evt){
+                            if (evt.which < 48 || evt.which > 57){evt.preventDefault();}
+                          });
+                        </script>
+                      </div>
+                      <div class="col-12">
+                        <label for="acno2" class="form-label small">Confirm Account Number<span class="text-danger">*</span></label>
+                        <input type="number" name="account_number1" class="form-control" id="acno2" oninput="matchAccountNo()" required onpaste="return false" oncopy="return false" oncut="return false" >
+                        <div id="acno"></div>
+                        
+                      </div>
+                      <div class="col-12">
+                        <label for="ifsc_code" class="form-label small">Bank IFSC Code<span class="text-danger">*</span></label>
+                        <input type="text" name="ifsc_code" class="form-control ifsc" id="ifsc_code" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 text-center mb-4">
+                <button class="btn btn-primary px-5" type="submit">Submit</button>
+              </div>
+            </div>
+          </form>
+
+        
+        {% elif request.session.type == 'user' %}
+        <div class="container-fluid">
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+              <div class="signup_img_sec">
+               <img src="{% static 'img/sign_up.jpg' %}" alt="sign up image">
+             </div>
+             </div>
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center signup_right_sec">
+              <div class="card p-4" style="background-color: #fff;">
+                <div class="card-body">
+                  <div class="pb-2 text-left">
+                    <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a>
+                    <h5 class="card-title pb-0 fs-5">Create an Account</h5>
+                  </div>
+                  <form action="{% url 'user_registration' %}" method="post" class="row g-3 needs-validation signup_form_sec" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="col-6">
+                      <label for="firstName" class="form-label">First Name*</label>
+                      <input type="text" name="first_name" class="form-control" id="firstName" required>
+                      <div class="invalid-feedback">Please, enter first name!</div>
+                    </div>
+                    <div class="col-6">
+                        <label for="lastName" class="form-label">Last Name*</label>
+                        <input type="text" name="last_name" class="form-control" id="lastName" required>
+                        <div class="invalid-feedback">Please, enter last name!</div>
+                    </div>
+                    <div class="col-12">
+                      <label for="yourEmail" class="form-label">Email*</label>
+                      <input type="email" name="email" class="form-control" id="yourEmail" required>
+                      <div class="invalid-feedback">Please enter a valid Email adddress!</div>
+                    </div>
+                    <div class="col-12">
+                      <label for="phoneNumber" class="form-label">Phone Number*</label>
+                      <div class="input-group has-validation">
+                        <input type="text" name="mobile" class="form-control number_input" onkeypress="if (this.value.length >= 10) return false;" id="phoneNumber" required>
+                        <div class="invalid-feedback">Please enter a valid phone number!.</div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <label for="dob" class="form-label">Date Of Birth*</label>
+                      <input type="date" name="date_of_birth" class="form-control date-of-birth" id="dob" required>
+                      <div class="invalid-feedback">Please, enter date of birth!</div>
+                    </div>
+                    <div class="col-6">
+                      <label for="gender" class="form-label">Gender*</label>
+                      <select name="gender" class="form-select" id="gender" required>
+                        <option disabled selected value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <label for="tag-input">Intrest Of Area</label>
+                      <!-- <input name="tags" type="text" class="form-control" id="tag-input" data-role="tagsinput" required> -->
+
+                      <select class="js-select2" multiple="multiple" name="tags">
+                        <option value="Pyhton" data-badge="">Pyhton</option>
+                        <option value="Django" data-badge="">Django</option>
+                        <option value="HTML" data-badge="">HTML</option>
+                        <option value="CSS" data-badge="">CSS</option>
+                        <option value="Bootstrap" data-badge="">Bootstrap</option>
+                        <option value="JavaScript" data-badge="">JavaScript</option>
+                        <option value="Java" data-badge="">Java</option>
+                        <option value="PHP" data-badge="">PHP</option>
+                        <option value="Flutter" data-badge="">Flutter</option>
+                        <option value="C++" data-badge="">C++</option>
+                        <option value="MySql" data-badge="">MySql</option>
+                      </select>
+                      
+                    </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">Sign Up</button>
+                    </div>
+                    
+                    <div class="col-12 text-center">
+                      <p class="small mb-0">Already have an account? <a href="{% url 'user_login' %}">Log in</a></p>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </section>
+    </div>
+  </main><!-- End #main -->
+<script>
+  function openLoader() {
+    document.getElementById("spinner").classList.add('show');
+  }
+
+  function matchAccountNo() {  
+    var pw1 = document.getElementById("acno1").value;
+    var pw2 = document.getElementById("acno2").value;
+
+    if(parseInt(pw1) === parseInt(pw2)){
+        document.getElementById('acno').innerHTML = "<small class='text-success'>Account Number Matched</small>";
+    }else{  
+        document.getElementById('acno').innerHTML = "<small class='text-danger'>Account Number Not Matched</small>"
+    }
+  }
+
+  $(document).ready(function(){
+    $(".number_input").keypress(function(event) {
+      var key = event.keyCode;
+      // Only allow numbers to be entered
+      if (key < 48 || key > 57) {
+        event.preventDefault();
+      }
+    });
+
+    $(".pan").change(function () {
+      var inputvalues = $(this).val();
+      var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if(!regex.test(inputvalues)){
+        // $(".pan").val("");
+        alert("invalid PAN no");
+        return regex.test(inputvalues);
+      }
+    });
+
+    $(".aadhaar").change(function () {
+      var inputvalues = $(this).val();
+      var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      var expr = /^([0-9]{4}[0-9]{4}[0-9]{4}$)|([0-9]{4}\s[0-9]{4}\s[0-9]{4}$)|([0-9]{4}-[0-9]{4}-[0-9]{4}$)/;
+      if(!expr.test(inputvalues)){
+        // $(".aadhaar").val("");
+        alert("invalid Adhaar no");
+        return regex.test(inputvalues);
+      }
+    });
+
+    $(".ifsc").change(function () {
+      var inputvalues = $(this).val();
+      var reg = /[A-Z]{4}[0][A-Z0-9]{6}$/;
+      if (inputvalues.match(reg)) {
+        return true;
+      }
+      else {
+        // $(".ifsc").val("");
+        alert("You entered invalid IFSC code");
+        //document.getElementById("txtifsc").focus();
+        return false;
+      }
+    });
+
+    $(".date-of-birth").change(function () {
+      var today = new Date();
+      var nowyear = today.getFullYear();
+      var nowmonth = today.getMonth();
+      var nowday = today.getDate();
+      var dob = $(this).val();
+      var birth = new Date(dob);
+
+      var birthyear = birth.getFullYear();
+      var birthmonth = birth.getMonth();
+      var birthday = birth.getDate();
+
+      var age = nowyear - birthyear;
+      var age_month = nowmonth - birthmonth;
+      var age_day = nowday - birthday;
+      if ((age == 10 && age_month <= 0 && age_day <= 0) || age < 10) {
+        alert("Age should be more than 10 years.Please enter a valid Date of Birth");
+        $(this).val('');
+        return false;
+      }
+    });
+  
+    $(".month-and-year").change(function () {
+      var today = new Date();
+      var dt = new Date($(this).val());
+      
+      if (dt > today) {
+        alert("Date should be less then today. Please enter a valid Date");
+        $(this).val('');
+        return false;
+      }
+    });
+  });
+</script>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS' Files -->
+  <script src="{% static 'teacher/vendor/apexcharts/apexcharts.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/chart.js/chart.umd.js' %}"></script>
+  <script src="{% static 'teacher/vendor/echarts/echarts.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/quill/quill.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/simple-datatables/simple-datatables.js' %}"></script>
+  <script src="{% static 'teacher/vendor/tinymce/tinymce.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/php-email-form/validate.js' %}"></script>
+  <!-- Template Main JS File -->
+  <script src="{% static 'teacher/js/main.js' %}"></script>
+  <!-- JavaScript Libraries -->
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+ <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+ <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+ <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+ <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+ <!-- Template Javascript -->
+ <script src="{% static 'js/main.js' %}"></script>
+ <script src="{% static 'lib/cookie.min.js' %}" defer></script>
+</body>
+</html>
+
+
+
+{% comment %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+    <title>SPHURIT</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+  
+    <!-- Favicons -->
+    <!-- <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
+  
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'teacher/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+
+    
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+  
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="{% static 'teacher/css/style.css' %}" rel="stylesheet">
+    <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+          crossorigin="anonymous"></script>
+    
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+    <!-- Bootstrap 5.1 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <style>
+
+    .card {
+      border: none;
+      margin-bottom: 10px;
+  }
+  
+  .steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+  }
+  
+  .step-item {
+      margin-left: 5px;
+      display: flex;
+      justify-content: space-between;
+      text-align: center;
+      position: relative;
+  }
+  
+  .step-button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      outline: none;
+  }
+  
+  .step-number {
+      display: block;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 50%;
+      background-color: gray;
+      color: #fff;
+      font-size: 16px;
+      margin-left: -438px;   
+      margin-bottom: 20px;
+  }
+  
+  .step-title {
+      font-size: 14px;
+  }
+  
+  .step-item.completed .step-number {
+      background-color: blue;
+  }
+  
+  .progress-bar {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      height: 2px;
+      background-color: yellow;
+      z-index: -1;
+  }
+  
+  .step-item:not(:last-child) .progress-bar {
+      width: calc(100% - 45px);
+      margin-left: 22.5px;
+  }
+  
+  .collapse {
+      display: none;
+  }
+  
+  .collapse.show {
+      display: block;
+  }
+  
+  progress#progress {
+      width: calc(100% - 774px); /* Adjusted width for responsive layout */
+      margin-bottom: 20px;
+      margin-left: 360px;
+  }
+  
+  @media (max-width: 768px) {
+      .steps {
+          flex-direction: column;
+          align-items: flex-start;
+      }
+  
+      .step-item {
+          margin-left: 0;
+          margin-bottom: 10px;
+      }
+  
+      .step-number {
+          margin-left: 0;
+          margin-bottom: 0;
+      }
+  
+      progress#progress {
+          width: 100%; /* Full width for progress bar on mobile */
+          margin-left: 0;
+      }
+  }
+  
+  </style>
+  </head>
+
+<body>
+  <main>
+      
+    <div class="container-fluid">
+      <!-- Spinner Start -->
+      <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+          <!-- <span class="sr-only">Loading...</span> -->
+        </div>
+      </div>
+      <!-- Spinner End -->
+      {% if messages %}
+        <div class="messages alert-fixed">
+        {% for message in messages %}
+        <script>
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            animation:false,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "{{ message.tags }}",
+            title: "{{message}}"
+          });
+        </script>
+        {% endfor %}
+        </div>
+      {% endif %}
+      <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+        {% if request.session.type == "instructor" %}
+          <form class="card" action="{% url 'instructor_registration' %}" method="post" enctype="multipart/form-data" onsubmit="openLoader()">
+            {% csrf_token %}
+            <div class="text-center my-4">
+              <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a>
+              <h5 class="card-title mb-0 py-1">Become an instructor</h5>
+            </div>
+
+            <div class="container">
+              <div class="accordion" id="accordionExample">
+                  <div class="steps">
+                      <progress id="progress" value="0" max="100"></progress>
+                       <div class="step-item">
+                          <button class="step-button text-center"  type="button" data-bs-toggle="collapse"
+                                  data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" disabled>
+                                  <span class="step-number">1</span>
+                          </button>
+                          
+                          
+                          
+                      </div>
+                      <div class="progress-bar"></div>
+                      <div class="step-item">
+                          <button class="step-button text-center collapsed" type="" data-bs-toggle="collapse"
+                                  data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" disabled>
+                                  <span class="step-number">2</span>
+                          </button>
+                         
+                          
+                      </div>
+                      <div class="progress-bar"></div>
+                      <div class="step-item">
+                          <button class="step-button text-center collapsed" type="" data-bs-toggle="collapse"
+                                  data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" disabled>
+                                  <span class="step-number">3</span>
+                          </button>
+                          
+                          
+                      </div>
+                      <div class="progress-bar"></div>
+                      <div class="step-item">
+                          <button class="step-button text-center collapsed" type="" data-bs-toggle="collapse"
+                                  data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour" disabled>
+                               <span class="step-number">4</span>
+                          </button>
+                          
+                          
+                      </div>
+                      <div class="progress-bar"></div>
+                  </div> 
+                
+          
+          <div class="card">
+              <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                    data-bs-parent="#accordionExample">
+                  <div class="card-body">
+                   <div class="row">
+                    <div class="col-lg-12 col-md-12 ">
+                      <div class="card py-2 px-4 mb-4 shadow-none">
+                        <div class="card-body">
+                          <p class="card-sub-title">Basic Informations</p>
+                          <div class="row">
+                            <div class="col-6">
+                              <label for="first_name" class="form-label small">First Name<span class="text-danger">*</span></label>
+                              <input type="text" name="first_name" class="form-control" id="first_name" required {% if request.user.is_authenticated %}  readonly value="{{request.user.first_name}}" {% endif %}>
+                            </div>
+                            <div class="col-6">
+                                <label for="last_name" class="form-label small">Last Name<span class="text-danger">*</span></label>
+                                <input type="text" name="last_name" class="form-control" id="last_name" required {% if request.user.is_authenticated %} readonly value="{{request.user.last_name}}" {% endif %}>
+                            </div>
+                            <div class="col-12">
+                              <label for="mobile" class="form-label small">Phone Number<span class="text-danger">*</span></label>
+                              <div class="input-group has-validation">
+                                <input type="number" maxlength="10" name="mobile" class="form-control" id="mobile" required {% if request.user.is_authenticated %} readonly value="{{request.user.mobile}}" {% endif %}>
+                              </div>
+                            </div>
+                            <div class="col-12">
+                              <label for="email" class="form-label small">Email<span class="text-danger">*</span></label>
+                              <input type="email" name="email" class="form-control" id="email" required {% if request.user.is_authenticated %} readonly value="{{request.user.email}}" {% endif %}>
+                            </div>
+                            <div class="col-12">
+                              <label for="dob" class="form-label">Date Of Birth*</label>
+                              <input type="date" name="date_of_birth" class="form-control date-of-birth" id="dob" required>
+                              <div class="invalid-feedback">Please, enter date of birth!</div>
+                            </div>
+                            <div class="col-12">
+                              <label for="tag-input">Intrest Of Area</label>
+                              
+                              <select class="js-select2" multiple="multiple" name="tags">
+                                <option value="Pyhton" data-badge="">Pyhton</option>
+                                <option value="Django" data-badge="">Django</option>
+                                <option value="HTML" data-badge="">HTML</option>
+                                <option value="CSS" data-badge="">CSS</option>
+                                <option value="Bootstrap" data-badge="">Bootstrap</option>
+                                <option value="JavaScript" data-badge="">JavaScript</option>
+                                <option value="Java" data-badge="">Java</option>
+                                <option value="PHP" data-badge="">PHP</option>
+                                <option value="Flutter" data-badge="">Flutter</option>
+                                <option value="C++" data-badge="">C++</option>
+                                <option value="MySql" data-badge="">MySql</option>
+                              </select>
+                              
+                            </div>
+                            
+                            
+                            <div class="col-6">
+                              <label for="gender" class="form-label small">Gender<span class="text-danger">*</span></label>
+                              <select type="text" name="gender" class="form-select" id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male" {% if request.user.is_authenticated and request.user.gender == 'Male' %} selected {% endif %}>Male</option>
+                                <option value="Female" {% if request.user.is_authenticated and request.user.gender == 'Female' %} selected {% endif %}>Female</option>
+                                <option value="others" {% if request.user.is_authenticated and request.user.gender == 'others' %} selected {% endif %}>Other's</option>
+                              </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="experience" class="form-label small">Experience<span class="text-danger">*</span></label>
+                                <select type="text" name="experience" class="form-select" id="experience" required>
+                                  <option value="">Select Experience</option>
+                                  <option value="1 Year">1 Year</option>
+                                  <option value="2 Years">2 Years</option>
+                                  <option value="3+ Years">3+ Years</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                              <label for="address" class="form-label small">Address</label>
+                              <textarea type="text" name="address" class="form-control" id="address"></textarea>
+                            </div>
+                            <div class="col-12">
+                              <label for="about" class="form-label small">Bio</label>
+                              <textarea type="text" name="about" class="form-control" id="about"></textarea>
+                            </div>
+                            <div class="col-12">
+                              <label for="profile_image" class="form-label small">Profile Image</label>
+                              <input type="file" name="profile_image" class="form-control" id="profile_image">
+                            </div>
+                            &emsp14;
+                            <div class="col-12 text-center mb-4">
+                              <div class="row justify-content-end">
+                                  <div class="col-auto">
+                                      <button class="btn btn-primary px-5" id="nextButton" type="">Next</button>
+                                  </div>
+                              </div>
+                          </div>
+                          
+                          </div>
+                        </div>
+                      </div>
+                    </div>                    
+                  </div>
+              </div>
+          </div>
+  
+    <div class="card">
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="card-body">
+              <div class="col-lg-12 col-md-12 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add KYC Document's</p>
+                    <p class="card-text fw-bold">Adhar Card KYC</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="adhar_number" class="form-label small">Adhar Number<span class="text-danger">*</span></label>
+                        <input input type="text" name="adhar_number" class="form-control aadhaar number_input" onkeypress="if (this.value.length >= 12) return false;" id="adhar_number" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="adhar_image_front" class="form-label small">Adhar Front Image<span class="text-danger">*</span></label>
+                        <input type="file" name="adhar_image_front" class="form-control" id="adhar_image_front" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="adhar_image_back" class="form-label small">Adhar Back Image<span class="text-danger">*</span></label>
+                        <input type="file" name="adhar_image_back" class="form-control" id="adhar_image_back" required>
+                      </div>
+                    </div>
+                    <p class="card-text fw-bold mt-3">Pan Card KYC</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="pan_number" class="form-label small">Pan Number<span class="text-danger">*</span></label>
+                        <input type="text"  name="pan_number" class="form-control pan" id="pan_number" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="pan_image_front" class="form-label small">Pan Front Image<span class="text-danger">*</span></label>
+                        <input type="file" name="pan_image_front" class="form-control" id="pan_image_front" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="pan_image_back" class="form-label small">Pan Back Image<span class="text-danger">*</span></label>
+                        <input type="file" name="pan_image_back" class="form-control" id="pan_image_back" required>
+                      </div>
+                      &emsp14;                      
+                      <div class="col-12 text-center mb-4">
+                        <div class="row justify-content-between">
+                            <div class="col-auto">
+                              <button class="btn btn-primary px-5" id="prevButton"  type="">Previous</button>                            </div>
+                            <div class="col-auto">
+                              <button class="btn btn-primary px-5" id="nextButton1" type="">Next</button>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree"
+              data-bs-parent="#accordionExample">
+            <div class="card-body">
+              <div class="col-lg-12 col-md-12 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add School/College Qualification</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="institution_name" class="form-label small">School Name<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="text" name="institution_name" class="form-control" id="institution_name" required>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <label for="institution_address" class="form-label small">College Name<span class="text-danger">*</span></label>
+                        <input type="text" name="institution_address" class="form-control" id="institution_address" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="subject" class="form-label small">Subject/Degree<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="text" name="subject" class="form-control" id="subject" required>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <label for="grade" class="form-label small">Grade<span class="text-danger">*</span></label>
+                        <input type="text" name="grade" class="form-control" id="grade" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="year" class="form-label small">Month and Year<span class="text-danger">*</span></label>
+                        <div class="input-group has-validation">
+                          <input type="date" name="year" class="form-control month-and-year" id="year" required>
+                        </div>
+                      </div>
+                      &emsp14;                      
+                      <div class="col-12 text-center mb-4">
+                        <div class="row justify-content-between">
+                            <div class="col-auto">
+                                <button class="btn btn-primary px-5" id="prevButton1" type="">Previous</button>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary px-5" id="nextButton2" type="">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+          </div>
+      </div>
+  </div>
+
+  <div class="card">
+      <div id="collapseFour" class="collapse" aria-labelledby="headingFour"
+            data-bs-parent="#accordionExample">
+          <div class="card-body">
+            
+              <div class="col-lg-12 col-md-12 ">
+                <div class="card py-2 px-4 mb-4 shadow-none">
+                  <div class="card-body">
+                    <p class="card-sub-title">Add Bank Details</p>
+                    <div class="row">
+                      <div class="col-12">
+                        <label for="bank_name" class="form-label small">Your Bank Name<span class="text-danger">*</span></label>
+                        <input type="text" name="bank_name" class="form-control" id="bank_name" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="bank_user_name" class="form-label small">Account Holder Name<span class="text-danger">*</span></label>
+                        <input type="text" name="bank_user_name" class="form-control" id="bank_user_name" required>
+                      </div>
+                      <div class="col-12">
+                        <label for="acno1" class="form-label small">Your Account Number<span class="text-danger">*</span></label>
+                        <input type="password" name="account_number" class="form-control" id="acno1" required onpaste="return false" oncopy="return false" oncut="return false" >
+                        <script>
+                          document.getElementById("acno1").addEventListener("keypress", function(evt){
+                            if (evt.which < 48 || evt.which > 57){evt.preventDefault();}
+                          });
+                        </script>
+                      </div>
+                      <div class="col-12">
+                        <label for="acno2" class="form-label small">Confirm Account Number<span class="text-danger">*</span></label>
+                        <input type="number" name="account_number1" class="form-control" id="acno2" oninput="matchAccountNo()" required onpaste="return false" oncopy="return false" oncut="return false" >
+                        <div id="acno"></div>
+                        
+                      </div>
+                      <div class="col-12">
+                        <label for="ifsc_code" class="form-label small">Bank IFSC Code<span class="text-danger">*</span></label>
+                        <input type="text" name="ifsc_code" class="form-control ifsc" id="ifsc_code" required>
+                      </div>
+                      &emsp14;                      
+  
+                      <div class="col-12 text-center mb-4">
+                        <div class="row justify-content-between">
+                            <div class="col-auto">
+                              <button class="btn btn-primary px-5" id="prevButton2" type="">Previous</button>
+                            </div>
+                            <div class="col-auto">
+                              <button class="btn btn-primary px-5" type="submit">Submit</button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+</form>
+
+<script>
+  const prevButton = document.getElementById('prevButton');
+  const nextButton = document.getElementById('nextButton');
+  const prevButton1 = document.getElementById('prevButton1');
+  const nextButton1 = document.getElementById('nextButton1');
+  const prevButton2 = document.getElementById('prevButton2');
+  const nextButton2 = document.getElementById('nextButton2');
+  const stepButtons = document.querySelectorAll('.step-button');
+  const progress = document.querySelector('#progress');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Function to validate required fields in the current step
+  function validateStep() {
+      let currentStep = document.querySelector('.collapse.show');
+      let requiredFields = currentStep.querySelectorAll('[required]');
+      let isValid = true;
+      requiredFields.forEach(field => {
+          if (!field.value.trim()) {
+              isValid = false;
+          }
+      });
+      return isValid;
+  }
+
+  // Function to handle showing/hiding steps
+  function handleStepNavigation(direction) {
+      if (direction === 'next' && !validateStep()) {
+          // Validation failed, don't proceed to the next step
+          return;
+      }
+      
+      let currentStep = document.querySelector('.collapse.show');
+      let currentIndex = Array.from(document.querySelectorAll('.collapse')).indexOf(currentStep);
+      let nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1;
+      
+      if (nextIndex >= 0 && nextIndex < stepButtons.length) {
+          document.querySelectorAll('.collapse').forEach((step, index) => {
+              if (index === nextIndex) {
+                  step.classList.add('show');
+              } else {
+                  step.classList.remove('show');
+              }
+          });
+          
+          progress.setAttribute('value', (nextIndex * 100) / (stepButtons.length - 1));
+          
+          stepButtons.forEach((item, secindex) => {
+              if (nextIndex > secindex) {
+                  item.classList.add('done');
+              } else {
+                  item.classList.remove('done');
+              }
+          });
+          
+          if (nextIndex === stepButtons.length - 1) {
+              submitBtn.style.display = 'block';
+          } else {
+              submitBtn.style.display = 'none';
+          }
+          
+      }
+  }
+
+  // Event listeners for previous buttons
+  prevButton.addEventListener('click', () => {
+      handleStepNavigation('prev');
+  });
+  prevButton1.addEventListener('click', () => {
+      handleStepNavigation('prev');
+  });
+  prevButton2.addEventListener('click', () => {
+      handleStepNavigation('prev');
+  });
+
+  // Event listeners for next buttons
+  nextButton.addEventListener('click', () => {
+      handleStepNavigation('next');
+  });
+  nextButton1.addEventListener('click', () => {
+      handleStepNavigation('next');
+  });
+  nextButton2.addEventListener('click', () => {
+      handleStepNavigation('next');
+  });
+
+</script>
+
+
+
+        {% elif request.session.type == 'user' %}
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+              <div class="card p-4" style="background-color: #E2FAFF;">
+                <div class="card-body">
+                  <div class="pb-2 text-center">
+                    <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a>
+                    <h5 class="card-title pb-0 fs-5">Create an Account</h5>
+                  </div>
+                  <form action="{% url 'user_registration' %}" method="post" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="col-6">
+                      <label for="firstName" class="form-label">First Name*</label>
+                      <input type="text" name="first_name" class="form-control" id="firstName" required>
+                      <div class="invalid-feedback">Please, enter first name!</div>
+                    </div>
+                    <div class="col-6">
+                        <label for="lastName" class="form-label">Last Name*</label>
+                        <input type="text" name="last_name" class="form-control" id="lastName" required>
+                        <div class="invalid-feedback">Please, enter last name!</div>
+                    </div>
+                    <div class="col-12">
+                      <label for="yourEmail" class="form-label">Email*</label>
+                      <input type="email" name="email" class="form-control" id="yourEmail" required>
+                      <div class="invalid-feedback">Please enter a valid Email adddress!</div>
+                    </div>
+                    <div class="col-12">
+                      <label for="phoneNumber" class="form-label">Phone Number*</label>
+                      <div class="input-group has-validation">
+                        <input type="text" name="mobile" class="form-control number_input" onkeypress="if (this.value.length >= 10) return false;" id="phoneNumber" required>
+                        <div class="invalid-feedback">Please enter a valid phone number!.</div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <label for="dob" class="form-label">Date Of Birth*</label>
+                      <input type="date" name="date_of_birth" class="form-control date-of-birth" id="dob" required>
+                      <div class="invalid-feedback">Please, enter date of birth!</div>
+                    </div>
+                    <div class="col-6">
+                      <label for="gender" class="form-label">Gender*</label>
+                      <select name="gender" class="form-select" id="gender" required>
+                        <option disabled selected value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Others">Others</option>
+                      </select>
+                    </div>
+                    <div class="col-12">
+                      <label for="tag-input">Intrest Of Area</label>
+                      <!-- <input name="tags" type="text" class="form-control" id="tag-input" data-role="tagsinput" required> -->
+
+                      <select class="js-select2" multiple="multiple" name="tags">
+                        <option value="Pyhton" data-badge="">Pyhton</option>
+                        <option value="Django" data-badge="">Django</option>
+                        <option value="HTML" data-badge="">HTML</option>
+                        <option value="CSS" data-badge="">CSS</option>
+                        <option value="Bootstrap" data-badge="">Bootstrap</option>
+                        <option value="JavaScript" data-badge="">JavaScript</option>
+                        <option value="Java" data-badge="">Java</option>
+                        <option value="PHP" data-badge="">PHP</option>
+                        <option value="Flutter" data-badge="">Flutter</option>
+                        <option value="C++" data-badge="">C++</option>
+                        <option value="MySql" data-badge="">MySql</option>
+                      </select>
+                      
+                    </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">Get started</button>
+                    </div>
+                    
+                    <div class="col-12 text-center">
+                      <p class="small mb-0">Already have an account? <a href="{% url 'user_login' %}">Log in</a></p>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </section>
+    </div>
+  </main>
+<script>
+  function openLoader() {
+    document.getElementById("spinner").classList.add('show');
+  }
+
+  function matchAccountNo() {  
+    var pw1 = document.getElementById("acno1").value;
+    var pw2 = document.getElementById("acno2").value;
+
+    if(parseInt(pw1) === parseInt(pw2)){
+        document.getElementById('acno').innerHTML = "<small class='text-success'>Account Number Matched</small>";
+    }else{  
+        document.getElementById('acno').innerHTML = "<small class='text-danger'>Account Number Not Matched</small>"
+    }
+  }
+
+  $(document).ready(function(){
+    $(".number_input").keypress(function(event) {
+      var key = event.keyCode;
+      // Only allow numbers to be entered
+      if (key < 48 || key > 57) {
+        event.preventDefault();
+      }
+    });
+
+    $(".pan").change(function () {
+      var inputvalues = $(this).val();
+      var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if(!regex.test(inputvalues)){
+        // $(".pan").val("");
+        alert("invalid PAN no");
+        return regex.test(inputvalues);
+      }
+    });
+
+    $(".aadhaar").change(function () {
+      var inputvalues = $(this).val();
+      var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      var expr = /^([0-9]{4}[0-9]{4}[0-9]{4}$)|([0-9]{4}\s[0-9]{4}\s[0-9]{4}$)|([0-9]{4}-[0-9]{4}-[0-9]{4}$)/;
+      if(!expr.test(inputvalues)){
+        // $(".aadhaar").val("");
+        alert("invalid Adhaar no");
+        return regex.test(inputvalues);
+      }
+    });
+
+    $(".ifsc").change(function () {
+      var inputvalues = $(this).val();
+      var reg = /[A-Z]{4}[0][A-Z0-9]{6}$/;
+      if (inputvalues.match(reg)) {
+        return true;
+      }
+      else {
+        // $(".ifsc").val("");
+        alert("You entered invalid IFSC code");
+        //document.getElementById("txtifsc").focus();
+        return false;
+      }
+    });
+
+    $(".date-of-birth").change(function () {
+      var today = new Date();
+      var nowyear = today.getFullYear();
+      var nowmonth = today.getMonth();
+      var nowday = today.getDate();
+      var dob = $(this).val();
+      var birth = new Date(dob);
+
+      var birthyear = birth.getFullYear();
+      var birthmonth = birth.getMonth();
+      var birthday = birth.getDate();
+
+      var age = nowyear - birthyear;
+      var age_month = nowmonth - birthmonth;
+      var age_day = nowday - birthday;
+      if ((age == 10 && age_month <= 0 && age_day <= 0) || age < 10) {
+        alert("Age should be more than 10 years.Please enter a valid Date of Birth");
+        $(this).val('');
+        return false;
+      }
+    });
+  
+    $(".month-and-year").change(function () {
+      var today = new Date();
+      var dt = new Date($(this).val());
+      
+      if (dt > today) {
+        alert("Date should be less then today. Please enter a valid Date");
+        $(this).val('');
+        return false;
+      }
+    });
+  });
+</script>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS' Files -->
+  <script src="{% static 'teacher/vendor/apexcharts/apexcharts.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/chart.js/chart.umd.js' %}"></script>
+  <script src="{% static 'teacher/vendor/echarts/echarts.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/quill/quill.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/simple-datatables/simple-datatables.js' %}"></script>
+  <script src="{% static 'teacher/vendor/tinymce/tinymce.min.js' %}"></script>
+  <script src="{% static 'teacher/vendor/php-email-form/validate.js' %}"></script>
+  <!-- Template Main JS File -->
+  <script src="{% static 'teacher/js/main.js' %}"></script>
+  <!-- JavaScript Libraries -->
+
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+ <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+ <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+ <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+ <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+ <!-- Template Javascript -->
+ <script src="{% static 'js/main.js' %}"></script>
+ <script src="{% static 'lib/cookie.min.js' %}" defer></script>
+</body>
+</html> {% endcomment %}

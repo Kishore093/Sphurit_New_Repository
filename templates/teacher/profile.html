@@ -1,0 +1,981 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block extrastyle %}
+ <style>
+  .tags-input-wrapper{
+    background: transparent;
+    padding: 10px;
+    border-radius: 4px;
+    /* max-width: 400px; */
+    border: 1px solid #ccc
+  }
+  .tags-input-wrapper input{
+      border: none;
+      background: transparent;
+      outline: none;
+      /* width: 140px; */
+      margin-left: 8px;
+  }
+  .tags-input-wrapper .tag{
+      display: inline-block;
+      background-color: #0073E4;
+      color: white;
+      border-radius: 5px;
+      padding: 0px 3px 0px 7px;
+      margin-right: 5px;
+      margin-bottom:5px;
+      /* box-shadow: 0 5px 15px -2px rgba(250 , 14 , 126 , .7) */
+  }
+  .tags-input-wrapper .tag a {
+      margin: 0 7px 3px;
+      display: inline-block;
+      cursor: pointer;
+  }
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Profile</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section profile">
+    <div class="row">
+      <!-- <div class="col-xl-4">
+
+        <div class="card">
+          <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+            {% if user.profile_image %}
+            <img src="{{ user.profile_image.url }}" alt="Profile" class="rounded-circle" id="profileImageId1">
+            {% else %}
+            <img src="assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+            {% endif %}
+
+            <h2>{{ user.full_name }}</h2>
+            <div class="social-links mt-2">
+              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+
+      </div> -->
+
+      <div class="col-xl-12">
+        <div class="card">
+          <div class="card-body pt-3">
+            <!-- Bordered Tabs -->
+            <ul class="nav nav-tabs nav-tabs-bordered">
+              <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+              </li>
+
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+              </li>
+
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#subscription">Subscription</button>
+              </li>
+
+              <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#others">Other Information</button>
+              </li>
+            </ul>
+            <div class="tab-content pt-2">
+              <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="Profile" class="border mb-3" id="profileImageId1" height="100">
+                {% else %}
+                <img src="assets/img/profile-img.jpg" alt="Profile" class="border mb-3" height="100">
+                {% endif %}
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label ">Full Name</div>
+                  <div class="col-lg-9 col-md-8">{{ user.full_name }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Phone</div>
+                  <div class="col-lg-9 col-md-8">{{ user.mobile }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Email</div>
+                  <div class="col-lg-9 col-md-8">{{ user.email }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Date Of Birth</div>
+                    <div class="col-lg-9 col-md-8">{{ user.date_of_birth|default_if_none:"&nbsp;" }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Gender</div>
+                  <div class="col-lg-9 col-md-8">{{ user.gender|default_if_none:"&nbsp;" }}</div>
+                </div>
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Intrest Of Area</div>
+                  <div class="col-lg-9 col-md-8">
+                    {% for tag in user.intrest_area.all %}
+                      <span class="badge bg-primary">{{ tag }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+                <h5 class="card-title mb-0">About</h5>
+                <p class="small fst-italic">{{user.about|default_if_none:"&nbsp;"}}</p>
+
+                <h5 class="card-title mb-0">Social Links</h5>
+                <div class="row">
+                  <div class="col-lg-3 social-links d-flex justify-content-between">
+                    <h3><a href="{%if user.youtube_link %}{{ user.youtube_link }} {% else %} # {% endif %}" class="youtube"><i class="bi bi-youtube"></i></a></h3>
+                    <h3><a href="{%if user.instagram_link %}{{ user.instagram_link }} {% else %} # {% endif %}" class="instagram"><i class="bi bi-instagram"></i></a></h3>
+                    <h3><a href="{%if user.facebook_link %}{{ user.facebook_link }} {% else %} # {% endif %}" class="facebook"><i class="bi bi-facebook"></i></a></h3>
+                    <h3><a href="{%if user.twitter_link %}{{ user.twitter_link }} {% else %} # {% endif %}" class="twitter"><i class="bi bi-twitter"></i></a></h3>
+                    <h3><a href="{%if user.linkedin_link %}{{ user.linkedin_link }} {% else %} # {% endif %}" class="linkedin"><i class="bi bi-linkedin"></i></a></h3>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+                <!-- Profile Edit Form -->
+                <form action="{% url 'uploadProfile' %}" method="post" >
+                  {% csrf_token %}
+                  <div class="row mb-3">
+                    <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                    <div class="col-md-8 col-lg-9">
+                        {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" id="profileImageId" height="100" class="border">
+                        {% else %}
+                        <img src="{% static 'img/user.png' %}" class="rounded-circle" alt="" height="100">
+                        {% endif %}
+                        <div class="pt-2">
+                            <a href="#" class="btn btn-primary btn-sm" onclick="pickFile(event)" title="Upload new profile image"><i class="bi bi-upload"></i></a>
+                            <!-- <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a> -->
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Name</label>
+                    <div class="col-md-4 col-lg-4">
+                      <input name="first_name" type="text" class="form-control" id="fullName" value="{{ user.first_name }}">
+                    </div>
+                    <div class="col-md-4 col-lg-4">
+                        <input name="last_name" type="text" class="form-control" id="fullName" value="{{ user.last_name }}">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="phone" readonly type="text" class="form-control" id="Phone" value="{{user.mobile}}">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="email" readonly type="email" class="form-control" id="Email" value="{{user.email}}">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="date_of_birth" class="col-md-4 col-lg-3 col-form-label">Date Of Birth</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="date_of_birth" type="date" class="form-control date-of-birth" id="dob" value="{{ user.date_of_birth|date:'Y-m-d' }}">
+                      <div class="invalid-feedback">Please, enter date of birth!</div>
+                    </div>
+                  </div>
+
+                  {% comment %} <div class="col-6">
+                    <label for="dob" class="form-label">Date Of Birth*</label>
+                    <input type="date" name="date_of_birth" class="form-control date-of-birth" id="dob" required>
+                    <div class="invalid-feedback">Please, enter date of birth!</div>
+                  </div> {% endcomment %}
+
+                  <div class="row mb-3">
+                    <label for="gender" class="col-md-4 col-lg-3 col-form-label">Gender</label>
+                    <div class="col-md-8 col-lg-9">
+                      <select name="gender" class="form-select" id="gender" >
+                        <option value="">Select Gender</option>
+                        <option value="Male" {% if user.gender == 'Male' %}selected{% endif %} >Male</option>
+                        <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Others" {% if user.gender == 'Others' %}selected{% endif %}>Others</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="tag-input"  class="col-md-4 col-lg-3 col-form-label">Interest of Area</label>
+                    <div class="col-md-8 col-lg-9">
+                    <select class="js-select2" multiple="multiple" name="tags" id="tag-input">
+                      {% for tag in user.intrest_area.all %}
+                      <option value="{{ tag }}" selected>{{ tag }}</option>
+                      {% endfor %}
+                        <option value="Python" data-badge="">Python</option>
+                        <option value="Django" data-badge="">Django</option>
+                        <option value="HTML" data-badge="">HTML</option>
+                        <option value="CSS" data-badge="">CSS</option>
+                        <option value="Bootstrap" data-badge="">Bootstrap</option>
+                        <option value="JavaScript" data-badge="">JavaScript</option>
+                        <option value="Java" data-badge="">Java</option>
+                        <option value="PHP" data-badge="">PHP</option>
+                        <option value="Flutter" data-badge="">Flutter</option>
+                        <option value="C++" data-badge="">C++</option>
+                        <option value="MySql" data-badge="">MySQL</option>
+                    </select>
+                  </div>
+                  </div> 
+                  
+                  
+
+                  {% comment %} <div class="row mb-3">
+                    <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                    <div class="col-md-8 col-lg-9">
+                      <textarea name="about" type="text" class="form-control" id="about">{{user.about}}</textarea>
+                    </div>
+                  </div> {% endcomment %}
+                  <div class="row mb-3">
+                    <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                    <div class="col-md-8 col-lg-9">
+                      <textarea name="about" type="text" class="form-control" id="about" style="height: 100px;">{{user.about}}</textarea>
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="youtube_link" class="col-md-4 col-lg-3 col-form-label">Youtube Link</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="youtube_link" type="url" class="form-control" id="youtube_link" value="{{ user.youtube_link }}">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="instagram_link" class="col-md-4 col-lg-3 col-form-label">Instagram Link</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="instagram_link" type="url" class="form-control" id="instagram_link" value="{{ user.instagram_link }}">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="facebook_link" class="col-md-4 col-lg-3 col-form-label">Facebook Link</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="facebook_link" type="url" class="form-control" id="facebook_link"  value="{{ user.facebook_link }}">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="twitter_link" class="col-md-4 col-lg-3 col-form-label">Twitter Link</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="twitter_link" type="url" class="form-control" id="twitter_link"  value="{{ user.twitter_link }}">
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <label for="linkedin_link" class="col-md-4 col-lg-3 col-form-label">Linkedin Link</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="linkedin_link" type="url" class="form-control" id="linkedin_link"  value="{{ user.linkedin_link }}">
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                  </div>
+                </form><!-- End Profile Edit Form -->
+
+              </div>
+
+               <script>
+                $(".date-of-birth").change(function () {
+                  var today = new Date();
+                  var nowyear = today.getFullYear();
+                  var nowmonth = today.getMonth();
+                  var nowday = today.getDate();
+                  var dob = $(this).val();
+                  var birth = new Date(dob);
+            
+                  var birthyear = birth.getFullYear();
+                  var birthmonth = birth.getMonth();
+                  var birthday = birth.getDate();
+            
+                  var age = nowyear - birthyear;
+                  var age_month = nowmonth - birthmonth;
+                  var age_day = nowday - birthday;
+                  if ((age == 10 && age_month <= 0 && age_day <= 0) || age < 10) {
+                    alert("Age should be more than 10 years.Please enter a valid Date of Birth");
+                    $(this).val('');
+                    return false;
+                  }
+                });
+              
+                $(".month-and-year").change(function () {
+                  var today = new Date();
+                  var dt = new Date($(this).val());
+                  
+                  if (dt > today) {
+                    alert("Date should be less then today. Please enter a valid Date");
+                    $(this).val('');
+                    return false;
+                  }
+                });
+              
+               </script>
+
+
+
+              <div class="tab-pane fade pt-3" id="subscription">
+                {% if user.user_subscription %}
+                  <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Plan</div>
+                      <div class="col-lg-9 col-md-8">{{ user.user_subscription.user_membership.membership.membership_type }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Amount</div>
+                    <div class="col-lg-9 col-md-8">{{ user.user_subscription.user_membership.membership.price }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Start Date</div>
+                    <div class="col-lg-9 col-md-8">{{ user.user_subscription.updated_at|date:'D d M Y' }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">End Date</div>
+                    <div class="col-lg-9 col-md-8">{{ user.user_subscription.expires_in|date:'D d M Y' }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Duration</div>
+                    <div class="col-lg-9 col-md-8">{{ user.user_subscription.user_membership.membership.duration }} {{ user.user_subscription.user_membership.membership.duration_period }}</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Refundable Type</div>
+                    <div class="col-lg-9 col-md-8">No</div>
+                  </div>
+                  <!-- <div class="row">
+                    <div class="col-lg-3 col-md-4 label">Description</div>
+                    <div class="col-lg-9 col-md-8">
+                      {{ user.user_membership.membership.description|safe }}
+                    </div>
+                  </div>  -->
+                    {% else %}
+                    <div class="">
+                        <p class="h3 text-muted my-5 text-center">No Plan Subscribe Yeat!!</p>
+                    </div>
+                    {% endif %}
+                   </div>
+
+
+{% comment %} 
+              <div class="tab-pane fade" id="others">
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">KYC Details</h5>
+                    <button class="btn btn-primary" onclick="toggleEditForm('kycEditForm')">Edit</button>
+                  </div>
+                
+                  {% if user.user_kycs.all %}
+                  <table class="table table-hover mb-1">
+                    <thead>
+                      <tr>
+                        <th>KYC Type</th>
+                        <th>KYC Number</th>
+                        <th>Mobile Number</th>
+                        <th>Front Image</th>
+                        <th>Back Image</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for obj in user.user_kycs.all %}
+                        <tr>
+                          <td><span class="card-sub-title my-auto">{{ obj.kyc_name }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.kyc_doc_number }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.linked_number }} </span></td>
+                          <td><img src="{{ obj.kyc_image_front.url }}" height="50" width="100" alt=""></td>
+                          <td><img src="{{ obj.kyc_image_back.url }}" height="50" width="100" alt=""></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% else %}
+                  <div class="">
+                    <p class="h3 text-muted my-5 text-center">No KYC Added Yeat!!</p>
+                  </div>
+                  {% endif %}
+                </div> {% endcomment %}
+
+
+
+{% comment %}               
+              <div class="tab-pane fade" id="others">
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="card-title mb-0">KYC Details</h5>
+                      <button class="btn btn-primary" onclick="toggleKYCForms('{{ user.user_kycs.all.0.kyc_name }}', '{{ user.user_kycs.all.0.pan_card_number }}', '{{ user.user_kycs.all.0.aadhar_card_number }}', '{{ user.user_kycs.all.0.linked_number }}')">Edit</button>
+                  </div>
+                  <!-- KYC details form -->
+                  <div id="kycDetailsForm">
+                    {% if user.user_kycs.all %}
+                        <table class="table table-hover mb-1">
+                            <thead>
+                                <tr>
+                                    <th>KYC Type</th>
+                                    <th>KYC Number</th>
+                                    <th>Front Image</th>
+                                    <th>Back Image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in user.user_kycs.all %}
+                                    <tr>
+                                        <td><span class="card-sub-title my-auto">{{ obj.kyc_name }} </span></td>
+                                        <td><span class="card-sub-title my-auto">{{ obj.kyc_doc_number }} </span></td>
+                                        <td><img src="{{ obj.kyc_image_front.url }}" height="50" width="100" alt=""></td>
+                                        <td><img src="{{ obj.kyc_image_back.url }}" height="50" width="100" alt=""></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="">
+                            <p class="h3 text-muted my-5 text-center">No KYC Added Yet!!</p>
+                        </div>
+                    {% endif %}
+                </div>
+        
+              
+               
+                <!-- KYC Edit Form -->
+                <div id="kycEditForm" style="display: none;">
+                  <form action="{% url 'update_kyc_details' %}" method="post">
+                      {% csrf_token %}
+                      <!-- KYC type dropdown -->
+                      <label for="kycType">KYC Type</label>
+                      <select id="kycType" name="kycType">
+                          <option value="Pan Card">PAN Card</option>
+                          <option value="Aadhar Card">Aadhar Card</option>
+                      </select>
+      
+                      <label for="kycNumber">KYC Number</label>
+                      <input type="text" id="kycNumber" name="kycNumber">
+      
+                      <label for="kycFrontImage">Front Image</label>
+                      <input type="file" id="kycFrontImage" name="kycFrontImage">
+                      <label for="kycBackImage">Back Image</label>
+                      <input type="file" id="kycBackImage" name="kycBackImage">
+      
+                      <button type="submit" class="btn btn-primary">Save</button>
+                  </form>
+              </div>
+                <script>
+                  function toggleKYCForms(kycName, panCardNumber, aadharCardNumber, linkedNumber) {
+                    var kycDetailsForm = document.getElementById("kycDetailsForm");
+                    var kycEditForm = document.getElementById("kycEditForm");
+                
+                    if (kycDetailsForm.style.display === "none" || kycDetailsForm.style.display === "") {
+                        // Show KYC edit form and hide details form
+                        kycDetailsForm.style.display = "block";
+                        kycEditForm.style.display = "none";
+                
+                        // Set KYC type and number based on the provided values
+                        var selectedKYCType = document.getElementById("kycType").value;
+                        if (selectedKYCType === "Pan Card") {
+                            document.getElementById("kycNumber").value = panCardNumber;
+                        } else if (selectedKYCType === "Aadhar Card") {
+                            document.getElementById("kycNumber").value = aadharCardNumber;
+                        }
+                    } else {
+                        kycDetailsForm.style.display = "none";
+                        kycEditForm.style.display = "block";
+                    }
+                }
+                
+                </script> {% endcomment %}
+
+                
+              <div class="tab-pane fade" id="others">
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="card-title mb-0">KYC Details</h5>
+                      <button class="btn btn-primary" onclick="toggleKYCForms('{{ user.user_kycs.all.0.kyc_name }}', '{{ user.user_kycs.all.0.pan_card_number }}', '{{ user.user_kycs.all.0.aadhar_card_number }}', '{{ user.user_kycs.all.0.linked_number }}')">Edit</button>
+                  </div>
+                  <!-- KYC details form -->
+                  <div id="kycDetailsForm">
+                    {% if user.user_kycs.all %}
+                        <table class="table table-hover mb-1">
+                            <thead>
+                                <tr>
+                                    <th>KYC Type</th>
+                                    <th>KYC Number</th>
+                                    <th>Front Image</th>
+                                    <th>Back Image</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obj in user.user_kycs.all %}
+                                    <tr>
+                                        <td><span class="card-sub-title my-auto">{{ obj.kyc_name }} </span></td>
+                                        <td><span class="card-sub-title my-auto">{{ obj.kyc_doc_number }} </span></td>
+                                        <td><img src="{{ obj.kyc_image_front.url }}" height="50" width="100" alt=""></td>
+                                        <td><img src="{{ obj.kyc_image_back.url }}" height="50" width="100" alt=""></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="">
+                            <p class="h3 text-muted my-5 text-center">No KYC Added Yet!!</p>
+                        </div>
+                    {% endif %}
+                </div>
+        
+              
+               
+                <!-- KYC Edit Form -->
+                <div id="kycEditForm" style="display: none;">
+                  <form action="{% url 'update_kyc_details' %}" method="post" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <!-- KYC type dropdown -->
+                      <label for="kycType">KYC Type</label>
+                      <select id="kycType" name="kycType">
+                          <option value="Pan Card">PAN Card</option>
+                          <option value="Aadhar Card">Aadhar Card</option>
+                      </select>
+              
+                      <label for="kycNumber">KYC Number</label>
+                      <input type="text" id="kycNumber" name="kycNumber">
+              
+                      <label for="kycFrontImage">Front Image</label>
+                      <input type="file" id="kycFrontImage" name="kycFrontImage">
+                      
+                      <label for="kycBackImage">Back Image</label>
+                      <input type="file" id="kycBackImage" name="kycBackImage">
+              
+                      <button type="submit" class="btn btn-primary">Save</button>
+                  </form>
+              </div>
+                <script>
+                  function toggleKYCForms(kycName, panCardNumber, aadharCardNumber, linkedNumber) {
+                    var kycDetailsForm = document.getElementById("kycDetailsForm");
+                    var kycEditForm = document.getElementById("kycEditForm");
+                
+                    if (kycDetailsForm.style.display === "none" || kycDetailsForm.style.display === "") {
+                        // Show KYC edit form and hide details form
+                        kycDetailsForm.style.display = "block";
+                        kycEditForm.style.display = "none";
+                
+                        // Set KYC type and number based on the provided values
+                        var selectedKYCType = document.getElementById("kycType").value;
+                        if (selectedKYCType === "Pan Card") {
+                            document.getElementById("kycNumber").value = panCardNumber;
+                        } else if (selectedKYCType === "Aadhar Card") {
+                            document.getElementById("kycNumber").value = aadharCardNumber;
+                        }
+                    } else {
+                        kycDetailsForm.style.display = "none";
+                        kycEditForm.style.display = "block";
+                    }
+                }
+                
+                </script>
+
+
+
+
+               
+                {% comment %} <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">School/College Details</h5>
+                    <button class="btn btn-primary" onclick="toggleForms()">Edit</button>
+                </div>
+                  
+                  {% if user.user_educations.all %}
+                  <table class="table table-hover mb-1">
+                    <thead>
+                      <tr>
+                        <th>School Name</th>
+                        <th>Collage</th>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                        <th>Year</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for obj in user.user_educations.all %}
+                        <tr>
+                          <td><span class="card-sub-title my-auto">{{ obj.institution_name }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.institution_address }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.subject }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.grade }} </span></td>
+                          <td><span class="card-sub-title my-auto">{{ obj.year }} </span></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% else %}
+                  <div class="">
+                    <p class="h3 text-muted my-5 text-center">No School/College Added Yeat!!</p>
+                  </div>
+                  {% endif %}
+                </div> {% endcomment %}
+
+                 
+
+
+
+{% comment %} 
+
+                <div class="mb-4">
+                  <h5 class="card-title mb-0">Bank Details</h5>
+                  {% if user.user_banks.all %}
+                  <table class="table table-hover mb-1">
+                    <thead>
+                        <tr>
+                            <th>Bank Name</th>
+                            <th>Account Number</th>
+                            <th>IFSC</th>
+                            <th>Account Holder</th>
+                            <th>Mobile Number</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in user.user_banks.all %}
+                        <tr>
+                            <td><span class="card-sub-title my-auto">{{ obj.bank_name }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.account_number }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.ifsc_code }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.account_name }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.phone_number }} </span></td>
+                            <td>
+                                {% if user.user_banks.all.count > 1 %}
+                                <a href="{% url 'deleteBank' obj.uid %}" class="btn btn-outline-danger btn-sm" ><i class="bi bi-trash"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+                  <div class="text-right">
+                    {% if user.user_banks.all.count == 1 %}
+                    <span class="text-danger small">Default account can't be delete!</span>
+                    {% endif %}
+                  </div>
+                  {% else %}
+                  <div class="">
+                    <p class="h3 text-muted my-5 text-center">No Banks Added Yeat!!</p>
+                  </div>
+                  {% endif %}
+                </div>
+              </div>  
+            </div>
+             {% endcomment %}
+
+
+
+
+
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                      <h5 class="card-title mb-0">School/College Details</h5>
+                      <button class="btn btn-primary" onclick="toggleEducationForms('educationEditForm')">Edit</button>
+                  </div>
+              
+                  <!-- Display existing school/college details -->
+                  {% if user.user_educations.all %}
+                  <div id="detailsForm">
+                      <table class="table table-hover mb-1">
+                          <thead>
+                              <tr>
+                                  <th>School Name</th>
+                                  <th>College</th>
+                                  <th>Subject</th>
+                                  <th>Grade</th>
+                                  <th>Year</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for obj in user.user_educations.all %}
+                              <tr>
+                                  <td><span class="card-sub-title my-auto">{{ obj.institution_name }} </span></td>
+                                  <td><span class="card-sub-title my-auto">{{ obj.institution_address }} </span></td>
+                                  <td><span class="card-sub-title my-auto">{{ obj.subject }} </span></td>
+                                  <td><span class="card-sub-title my-auto">{{ obj.grade }} </span></td>
+                                  <td><span class="card-sub-title my-auto">{{ obj.year }} </span></td>
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+                  {% else %}
+                  <div class="">
+                      <p class="h3 text-muted my-5 text-center">No School/College Added Yet!!</p>
+                  </div>
+                  {% endif %}
+              
+                  <!-- Edit form for school/college details -->
+                  <div id="educationEditForm" style="display: none;">
+                      <form action="{% url 'update_education_details' %}" method="post">
+                          {% csrf_token %}
+                          <!-- Add fields for editing school/college details here -->
+                          <label for="institutionName">School/College Name</label>
+                          <input type="text" id="institutionName" name="institutionName" value="{% if education_details %}{{ education_details.institution_name }}{% endif %}">
+                          <label for="institutionAddress">Address</label>
+                          <input type="text" id="institutionAddress" name="institutionAddress" value="{% if education_details %}{{ education_details.institution_address }}{% endif %}">
+                          <label for="subject">Subject</label>
+                          <input type="text" id="subject" name="subject" value="{% if education_details %}{{ education_details.subject }}{% endif %}">
+                          <label for="grade">Grade</label>
+                          <input type="text" id="grade" name="grade" value="{% if education_details %}{{ education_details.grade }}{% endif %}">
+                          <label for="year">Year</label>
+                          <input type="text" id="year" name="year" value="{% if education_details %}{{ education_details.year }}{% endif %}">
+              
+                          <button type="submit" class="btn btn-primary">Save</button>
+                      </form>
+                  </div>
+              </div>
+              <script>
+                // Function to toggle between displaying details and edit form for school/college details
+                function toggleEducationForms(formId) {
+                    var detailsForm = document.getElementById("detailsForm");
+                    var editForm = document.getElementById(formId);
+            
+                    if (detailsForm.style.display === "none" || detailsForm.style.display === "") {
+                        // Show edit form and hide details form
+                        detailsForm.style.display = "block";
+                        editForm.style.display = "none";
+            
+                        // Fill edit form with previous record's details
+                        var previousRecord = document.querySelector("#detailsForm tbody tr:last-child");
+                        var institutionName = document.getElementById("institutionName");
+                        var institutionAddress = document.getElementById("institutionAddress");
+                        var subject = document.getElementById("subject");
+                        var grade = document.getElementById("grade");
+                        var year = document.getElementById("year");
+            
+                        if (previousRecord) {
+                            var cells = previousRecord.querySelectorAll("td");
+                            institutionName.value = cells[0].textContent.trim();
+                            institutionAddress.value = cells[1].textContent.trim();
+                            subject.value = cells[2].textContent.trim();
+                            grade.value = cells[3].textContent.trim();
+                            year.value = cells[4].textContent.trim();
+                        }
+                    } else {
+                        // Show details form and hide edit form
+                        detailsForm.style.display = "none";
+                        editForm.style.display = "block";
+                    }
+                }
+            </script>
+            
+              {% comment %} <script>
+                // Function to toggle between displaying details and edit form
+                function toggleForms(formId) {
+                    var detailsForm = document.getElementById("detailsForm");
+                    var editForm = document.getElementById(formId);
+            
+                    if (detailsForm.style.display === "none" || detailsForm.style.display === "") {
+                        // Show edit form and hide details form
+                        detailsForm.style.display = "block";
+                        editForm.style.display = "none";
+            
+                        // Fill edit form with previous record's details
+                        var previousRecord = document.querySelector("#detailsForm tbody tr:last-child");
+                        var institutionName = document.getElementById("institutionName");
+                        var institutionAddress = document.getElementById("institutionAddress");
+                        var subject = document.getElementById("subject");
+                        var grade = document.getElementById("grade");
+                        var year = document.getElementById("year");
+            
+                        if (previousRecord) {
+                            var cells = previousRecord.querySelectorAll("td");
+                            institutionName.value = cells[0].textContent.trim();
+                            institutionAddress.value = cells[1].textContent.trim();
+                            subject.value = cells[2].textContent.trim();
+                            grade.value = cells[3].textContent.trim();
+                            year.value = cells[4].textContent.trim();
+                        }
+                    } else {
+                        // Show details form and hide edit form
+                        detailsForm.style.display = "none";
+                        editForm.style.display = "block";
+                    }
+                }
+            </script>
+            
+               {% endcomment %}
+
+
+             <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="card-title mb-0">Bank Details</h5>
+                  <button class="btn btn-primary" onclick="toggleForms('bankEditForm')">Edit</button>
+              </div>
+          
+              <!-- Display existing bank details -->
+              {% if user.user_banks.all %}
+              <div id="detailsForm1">
+                  <table class="table table-hover mb-1">
+                      <thead>
+                          <tr>
+                              <th>Bank Name</th>
+                              <th>Account Number</th>
+                              <th>IFSC</th>
+                              <th>Account Holder</th>
+                              <th>Mobile Number</th>
+                              <th></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for obj in user.user_banks.all %}
+                          <tr>
+                              <td><span class="card-sub-title my-auto">{{ obj.bank_name }} </span></td>
+                              <td><span class="card-sub-title my-auto">{{ obj.account_number }} </span></td>
+                              <td><span class="card-sub-title my-auto">{{ obj.ifsc_code }} </span></td>
+                              <td><span class="card-sub-title my-auto">{{ obj.account_name }} </span></td>
+                              <td><span class="card-sub-title my-auto">{{ obj.phone_number }} </span></td>
+                              <td>
+                                  {% if user.user_banks.all.count > 1 %}
+                                  <a href="{% url 'deleteBank' obj.uid %}" class="btn btn-outline-danger btn-sm" ><i class="bi bi-trash"></i></a>
+                                  {% endif %}
+                              </td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+              {% else %}
+              <div class="">
+                  <p class="h3 text-muted my-5 text-center">No Banks Added Yet!!</p>
+              </div>
+              {% endif %}
+          
+              <!-- Edit form for bank details -->
+              <div id="bankEditForm" style="display: none;">
+                  <form action="{% url 'update_bank_details' %}" method="post">
+                      {% csrf_token %}
+                      <!-- Add fields for editing bank details here -->
+                      <label for="bankName">Bank Name</label>
+                      <input type="text" id="bankName" name="bankName" value="{% if bank_details %}{{ bank_details.bank_name }}{% endif %}">
+                      <label for="accountNumber">Account Number</label>
+                      <input type="text" id="accountNumber" name="accountNumber" value="{% if bank_details %}{{ bank_details.account_number }}{% endif %}">
+                      <label for="ifscCode">IFSC Code</label>
+                      <input type="text" id="ifscCode" name="ifscCode" value="{% if bank_details %}{{ bank_details.ifsc_code }}{% endif %}">
+                      <label for="accountHolder">Account Holder</label>
+                      <input type="text" id="accountHolder" name="accountHolder" value="{% if bank_details %}{{ bank_details.account_name }}{% endif %}">
+                      <label for="mobileNumber">Mobile Number</label>
+                      <input type="text" id="mobileNumber" name="mobileNumber" value="{% if bank_details %}{{ bank_details.phone_number }}{% endif %}">
+          
+                      <button type="submit" class="btn btn-primary">Save</button>
+                  </form>
+              </div>
+          </div>
+                  <script>
+                // Function to toggle between displaying details and edit form
+                  function toggleForms(formId) {
+                      var detailsForm1 = document.getElementById("detailsForm1");
+                      var editForm = document.getElementById(formId);
+
+                      if (detailsForm1.style.display === "none" || detailsForm1.style.display === "") {
+                          // Show edit form and hide details form
+                          detailsForm1.style.display = "block";
+                          editForm.style.display = "none";
+
+                          // Fill edit form with previous record's details
+                          var previousRecord = document.querySelector("#detailsForm1 tbody tr:last-child");
+                          var bankName = document.getElementById("bankName");
+                          var accountNumber = document.getElementById("accountNumber");
+                          var ifscCode = document.getElementById("ifscCode");
+                          var accountHolder = document.getElementById("accountHolder");
+                          var mobileNumber = document.getElementById("mobileNumber");
+
+                          if (previousRecord) {
+                              var cells = previousRecord.querySelectorAll("td");
+                              bankName.value = cells[0].textContent.trim();
+                              accountNumber.value = cells[1].textContent.trim();
+                              ifscCode.value = cells[2].textContent.trim();
+                              accountHolder.value = cells[3].textContent.trim();
+                              mobileNumber.value = cells[4].textContent.trim();
+                          }
+                      } else {
+                          // Show details form and hide edit form
+                          detailsForm1.style.display = "none";
+                          editForm.style.display = "block";
+                      }
+                  }
+              </script>
+             
+            </div><!-- End Bordered Tabs -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+
+<script>
+  function pickFile(event) {
+      let input = document.createElement('input');
+      input.type = 'file';
+      input.accept="image/*";
+      input.onchange = _ => {
+          let files =   Array.from(input.files);
+          var file = files[0];
+          var img=document.getElementById("profileImageId");
+          img.file = file;    
+          var reader = new FileReader();
+          reader.onload = (function(aImg) { 
+              return function(e) { 
+                  aImg.src = e.target.result;
+              }; 
+          })(img);
+          reader.readAsDataURL(file);
+
+          console.log(file);
+          var form_data = new FormData();
+          form_data.append("image", file);
+          form_data.append("csrfmiddlewaretoken", Cookies.get('csrftoken'));
+          $.ajax({
+              url: 'uploadProfileImage',
+              dataType: 'json',
+              cache: false,
+              contentType: false,
+              processData: false,
+              data: form_data,
+              type: 'post',
+              success: function (response) {
+                  console.log(response);
+              },
+              error: function (response) {
+                  console.log(response);
+              }
+          })
+          .then(result => {
+              window.location = '/teacher/view_profile'
+          });
+      };
+      input.click();
+  }
+
+  $(document).ready(function(){
+      $(".date-of-birth").change(function () {
+        var today = new Date();
+        var nowyear = today.getFullYear();
+        var nowmonth = today.getMonth();
+        var nowday = today.getDate();
+        var dob = $(this).val();
+        var birth = new Date(dob);
+
+        var birthyear = birth.getFullYear();
+        var birthmonth = birth.getMonth();
+        var birthday = birth.getDate();
+
+        var age = nowyear - birthyear;
+        var age_month = nowmonth - birthmonth;
+        var age_day = nowday - birthday;
+        if ((age == 10 && age_month <= 0 && age_day <= 0) || age < 10) {
+          alert("Age should be more than 10 years.Please enter a valid Date of Birth");
+          $(this).val('');
+          return false;
+        }
+      });
+    });
+
+    
+</script>
+{% endblock content %}

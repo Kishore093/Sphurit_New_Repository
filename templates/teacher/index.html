@@ -1,0 +1,185 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+    .ratings{
+        margin-right:10px;
+    }
+
+    .ratings i{
+        color:#cecece;
+        font-size:20px;
+    }
+
+    .rating-color{
+        color:#fbc634 !important;
+    }
+    .card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+
+
+    <section class="section dashboard">
+      <div class="row">
+
+        <div class="col-lg-12" >
+          <div class="row">
+          
+            <div class="col-xxl-4 col-md-4">
+              <div class="card info-card sales-card">
+
+               
+                <a href="{% url 'course_list' user.id %}">
+                <div class="card-body">
+                  <h5 class="card-title">Course</h5>
+
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-book"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6>{{ user.user_course.all.count }}</h6>
+
+                    </div>
+                  </div>
+                </div>
+                </a>
+
+              </div>
+            </div>
+
+            {% comment %} <div class="col-xxl-4 col-md-4">
+              <div class="card info-card revenue-card">
+
+                <a href="{% url 'wallet_details' %}">
+                <div class="card-body">
+                  <h5 class="card-title">Revenue</h5>
+
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-currency-rupee"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6>{{ teacher_revenue  }}</h6>
+
+                    </div>
+                  </div>
+                </div>
+                </a>
+              </div>
+            </div> {% endcomment %}
+            <div class="col-xxl-4 col-md-4">
+              <div class="card info-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Revenue</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-currency-rupee"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="total-discount-fees">Loading...</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <script>
+              $(document).ready(function() {
+                $.ajax({
+                  url: '/teacher-revenue/',
+                  type: 'GET',
+                  success: function(response) {
+                    $('#total-discount-fees').text(response.total_discount_fees);
+                  },
+                  error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                  }
+                });
+              });
+            </script>
+
+            
+            <div class="col-xxl-4 col-md-4">
+
+              <div class="card info-card customers-card">
+                <a href="{% url 'course_statistics' %}">
+                  <div class="card-body">
+                    <h5 class="card-title">Enrollments</h5>
+
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6>{{ total_enroll }}</h6>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
+                <div class="card-body">
+                  <h5 class="card-title">Students</h5>
+        
+                  <table class="table table-borderless">
+                    <thead>
+                      <tr>
+                        <th scope="col">Image</th>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Mobile</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Status</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for student in students %}
+                        <tr>
+                          {% if student.profile_image %}
+                          <th scope="row"><img src="{{ student.profile_image.url }}" alt="" class="" height="40" width="40"></th>
+                          {% else %}
+                          <th scope="row"><img src="{% static 'img/icons/placeholder.png' %}" alt="" class="" height="40" width="50"></th>
+                          {% endif %}
+                          <td>{{ student.full_name }}</td>
+                          <td>{{ student.mobile }}</td>
+                          <td>{{ student.email }}</td>
+                          {% if student.is_active %}
+                          <td><span class="badge bg-success">Active</span></td>
+                          {% else %}
+                          <td><span class="badge bg-danger">Deactive</span></td>
+                          {% endif %}
+                          <td><a class="btn btn-secondary btn-sm" href="{% url 'course_list' student.id %}">View</a></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+        
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>    
+  </main>
+{% endblock content %}

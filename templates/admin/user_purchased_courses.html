@@ -1,0 +1,61 @@
+
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchased Courses</title>
+    <style>
+       
+        table {
+            width: 100%;
+        }
+        
+        table, th, td {
+            border: none;
+        }
+        
+        th {
+            background-color: #f2f2f2; 
+            text-align: left; 
+            padding: 8px; 
+        }
+        
+        td {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Purchased Courses for {{ user.full_name }}</h1>
+    <table>
+        <tr>            
+            <th>Course Name/Host Name</th>
+            <th>Type</th>
+            <th>Course Price</th>
+            <th>Created At</th>
+        </tr>
+        {% for purchased_course in purchased_courses %}
+        <tr>
+            <td>{% if purchased_course.course.course_name %} {{ purchased_course.course.course_name }} {% else %} {{ purchased_course.course.host_name }} {% endif %}</td>
+            <td>{{ purchased_course.course.type }}</td>
+            <td>{{ purchased_course.total_price_with_gst }}</td>
+            <td>{{ purchased_course.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
+
+{% endblock content %} 

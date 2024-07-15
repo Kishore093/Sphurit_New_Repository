@@ -1,0 +1,1349 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load filter %}
+
+
+
+{% block extrastyle %}
+<style>
+    h6.card-title a {
+        font-weight: bold;
+        color: #000;
+    }
+    .card {
+  margin: 0 20px 30px;
+  border: none;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+.live-course-sec .img-sec img.card-img-top {
+    border-radius: 0;
+    padding:  0px 9px;
+}
+
+.slick-slide {
+    margin: 0 10px;
+    transition: transform 0.2s ease;
+}
+.owl-item.active.center {
+    transform: scale(1.1) translateY(-5%); 
+}
+.owl-item {
+    margin-top: 31px;
+}
+/* 
+.testimonial-item.text-center.active{
+
+} */
+.countdown-value {
+    height: 60px;
+  width: 80px;
+  margin-right: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  font: normal 1.50em "Lato";
+  font-weight: 700;
+  color: chocolate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-footer h4.text-warning.fw-bold.my-auto {
+    font-size: 16px !important;
+}
+.category-course .tab-pane .container.py-4.px-5 {
+    margin-left: 0;
+    padding-left: 15px !important;
+}
+.card-title {
+    padding-bottom: 5px;
+}
+button.btn.btn-primary.btn-sm.border.my-auto.join-button {
+    background-color: chocolate;
+}
+.nav-tabs-bordered .nav-link.active {
+  background-color: #fff;
+  color: #4154f1;
+  border-bottom: 2px solid #4154f1;
+}
+.nav-tabs-bordered .nav-link {
+  color: #8f9294;
+  border-bottom: none;
+  font-weight: bold;
+}
+{% comment %}  
+.carousel-item .btn-container1 {
+    position: absolute;
+    bottom: 35px; /* Adjusted position */
+    left: 15%; /* Moved to the center horizontally */
+    transform: translateX(-50%); /* Center the buttons horizontally */
+    text-align: center; /* Center the content within the button container */
+} {% endcomment %}
+
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+{% block content %}
+    <!-- Carousel Start -->
+     <section>
+        <div class="container-fluid p-0 carousel-sec" >
+            <div id="carouselmain" class="carousel slide carousel-fade" style="height: 355px;" data-bs-ride="carousel">
+                <div class="carousel-inner carousel-sec-inner" style="height: inherit;">
+                    {% for slide in slider %}
+                        {% if slide.type == 'course' %}
+                            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                                <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                    <div class="container">
+                                        <div class="row justify-content-start">
+                                            <div class="col-sm-10 col-lg-9">
+                                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                                <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                                <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                                <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                                <a href="{% url 'category_course' cid=1 %}" class="btn btn-primary py-md-3 px-md-5 start_now_btn  animated slideInDown">Start Learning Now!</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif slide.type == 'instructor' %}
+                        <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                            <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                <div class="container">
+                                    <div class="row justify-content-start">
+                                        <div class="col-sm-10 col-lg-9">
+                                            <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                            <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                            <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                            <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                            {% comment %} <a href="{% url 'instructor_registration' %}" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInDown">Book a demo</a> {% endcomment %}
+                                            <a href="{% url 'contactus' %}" class="btn btn-light py-md-3 px-md-5 animated slideInDown">Get in touch</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                                <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                    <div class="container">
+                                        <div class="row justify-content-start">
+                                            <div class="col-sm-10 col-lg-9">
+                                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                                <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                                <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                                <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                                <!-- <a href="{% url 'instructor_registration' %}" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInDown">Book a demo</a>
+                                                <a href="{% url 'support' %}" class="btn btn-light py-md-3 px-md-5 animated slideInDown">Get in touch</a> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- <div class="carousel-item" style="height: inherit;">
+                        <img class="d-block w-100" src="{% static 'img/carousel-2.jpg' %}" alt="">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                            <div class="container">
+                                <div class="row justify-content-start">
+                                    <div class="col-sm-10 col-lg-9">
+                                        <h5 class="text-primary text-uppercase mb-3 animated slideInDown">START TO SUCCESS</h5>
+                                        <h1 class="display-3 text-white animated slideInDown">Build Ready-For-Anything</h1>
+                                            <h1 class="text-primary animated slideInDown">Work professional</h1>
+                                        <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">Grab Good Knowledge and Best skills from the best Mentors</p>
+                                        <a href="" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInDown">Book a demo</a>
+                                        <a href="{% url 'support' %}" class="btn btn-light py-md-3 px-md-5 animated slideInDown">Get in touch</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselmain" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselmain" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section> 
+    {% comment %} <section>
+        <div class="container-fluid p-0 carousel-sec">
+            <div id="carouselmain" class="carousel slide carousel-fade" style="height: 355px;" data-bs-ride="carousel">
+                <div class="carousel-inner carousel-sec-inner" style="height: inherit;">
+                    {% for slide in slider %}
+                        {% if slide.type == 'course' %}
+                            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                                <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                    <div class="container">
+                                        <div class="row justify-content-start">
+                                            <div class="col-sm-10 col-lg-9">
+                                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                                <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                                <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                                <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                                <div class="btn-container1">
+                                                    <a href="{% url 'category_course' cid=1 %}" class="btn btn-primary py-md-3 px-md-5 animated slideInDown start_now_btn">Start Learning Now!</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif slide.type == 'instructor' %}
+                            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                                <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                    <div class="container">
+                                        <div class="row justify-content-start">
+                                            <div class="col-sm-10 col-lg-9">
+                                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                                <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                                <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                                <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                                <div class="btn-container1">
+                                                    <a href="{% url 'contactus' %}" class="btn btn-light py-md-3 px-md-5 animated slideInDown">Get in touch</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}" style="height: inherit;">
+                                <img class="d-block w-100" src="{{slide.image.url}}" alt="">
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(24, 29, 56, .7);">
+                                    <div class="container">
+                                        <div class="row justify-content-start">
+                                            <div class="col-sm-10 col-lg-9">
+                                                <h5 class="text-primary text-uppercase mb-3 animated slideInDown">{{slide.title_1}}</h5>
+                                                <h1 class="display-3 text-white animated slideInDown">{{slide.title_2}}</h1>
+                                                <h1 class="text-primary animated slideInDown">{{slide.title_3}}</h1>
+                                                <p class="fs-5 text-white mb-4 pb-2 animated slideInDown">{{slide.title_4}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselmain" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselmain" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </section> {% endcomment %}
+    <!-- Carousel End -->
+    <div class="container-fluid curved-box home-curve-box pt-2 m-0">
+        <p class="fs-2 text-white mt-2 pt-1 pb-1">A broad selection of Courses</p>
+        <p class="fs-5 text-white ">Choose form over 210,000 online video courses with new additions published every month</p>
+    </div>
+
+
+
+<!-- live course -->
+
+&emsp14;
+&emsp14;
+<div class="container-fluid p-5 py-3 w-120 h-100 " id="liveCoursesContainer">
+    <div class="text-left">
+        <h1 class="mb-3" id="live_courses_id" style="display: none;">Live courses</h1>
+    </div>
+    <div id="carouselNewestCourses" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active live-carousel live-course-sec">
+                
+                <div class="row">
+                    {% for item in live_courses %}
+                        <div class="col-lg-4 col-md-4 p-2 h-100">
+                            
+                            <div class="card rounded border" style="max-height: 250px;">
+                                <div class="row g-0 " style="border-bottom: 1px solid #dee2e6;">
+                                    
+                                    <div class="col-md-4 img-sec">
+                                        <a href="{% url 'detail_live_course' item.id %}">
+                                        <img class="card-img-top " src="{{ item.img_url }}" alt="" style="max-height: 120px;">
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="col-md-8 live-content-box mt-2">
+                                        <div class="card-body">
+                                            <h6 class="card-title p-0 m-0"><a href="{% url 'detail_live_course' item.id %}">{{ item.title }}</a></h6>
+                                            <p class="card-text m-0"><small class="text-muted auther_name">By {{ item.host_name }}</small></p>
+                                            <p class="card-text p-0"><small class="text-muted"> {{ item.schedule_date|date:"d-m-Y" }} {{ item.schedule_time|time:"h:i A" }}</small></p>
+                                            <div class="d-flex justify-content-between m-0"> 
+                                                <h5 class="text-warning m-0">₹ {{ item.fees }}</h5>
+                                                {% if item.id|is_purchased:request.user %}
+                                                    <button type="button" class="btn btn-primary btn-sm border my-auto join-button" data-schedule="{{ item.schedule_date }}T{{ item.schedule_time }}" data-course-title="{{ item.title }}" data-time-left="{{ item.time_left }}">Join</button>
+                                                {% else %}
+                                                    <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.fees }}", id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto">Enroll Now</button>
+                                                {% endif %}
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="box-{{ item.id }}" class="box" style="display: none;">
+                                    <div class="countdown-value" id="div1-{{ item.id }}"></div>
+                                    <div class="countdown-value" id="div2-{{ item.id }}"></div>
+                                    <div class="countdown-value" id="div3-{{ item.id }}"></div>
+                                    <div class="countdown-value" id="div4-{{ item.id }}"></div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        {% for item in live_courses %}
+        document.getElementById("live_courses_id").style.display="block"
+        {% if item.id|is_purchased:request.user %}
+        startCountdown('{{ item.id }}', '{{ item.schedule_date|date:"Y-m-d" }} {{ item.schedule_time|time:"H:i:s" }}');
+        {% endif %}
+        {% endfor %}
+    });
+    
+    function startCountdown(courseId, scheduleDateTime) {
+        var scheduleDateTimeObj = new Date(scheduleDateTime);
+        var currentTime = new Date();
+        
+        if (scheduleDateTimeObj > currentTime) {
+            var interval = setInterval(function() {
+                var currentTime = new Date();
+                if (scheduleDateTimeObj > currentTime) {
+                    var timeLeftSeconds = Math.round((scheduleDateTimeObj - currentTime) / 1000);
+                    var days = Math.floor(timeLeftSeconds / (24 * 60 * 60));
+                    var hours = Math.floor((timeLeftSeconds % (24 * 60 * 60)) / (60 * 60));
+                    var minutes = Math.floor((timeLeftSeconds % (60 * 60)) / 60);
+                    var seconds = Math.floor(timeLeftSeconds % 60);
+
+                    document.getElementById('box-' + courseId).style.display = 'flex';
+                    document.getElementById('box-' + courseId).style.justifyContent  = 'space-around';
+                    document.getElementById('div1-' + courseId).innerHTML = days + " D";
+                    document.getElementById('div2-' + courseId).innerHTML = hours + " H";
+                    document.getElementById('div3-' + courseId).innerHTML = minutes + " M";
+                    document.getElementById('div4-' + courseId).innerHTML = seconds + " S";
+                } else {
+                    clearInterval(interval);
+                }
+            }, 1000);
+        } else {
+            console.error("The schedule date and time is in the past.");
+        }
+    }
+</script>
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        adjustContainerHeight();
+    });
+
+    function adjustContainerHeight() {
+        var liveCoursesContainer = document.getElementById('liveCoursesContainer');
+        var cards = document.querySelectorAll('.card');
+        var maxHeight = 0;
+
+        cards.forEach(function(card) {
+            if (card.offsetHeight > maxHeight) {
+                maxHeight = card.offsetHeight;
+            }
+        });
+
+        liveCoursesContainer.style.height = maxHeight + 'px';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    var joinButtons = document.querySelectorAll('.join-button');
+    joinButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var timeLeftSeconds = parseInt(this.dataset.timeLeft);
+            
+            var days = Math.floor(timeLeftSeconds / (24 * 60 * 60));
+            var hours = Math.floor((timeLeftSeconds % (24 * 60 * 60)) / (60 * 60));
+            var minutes = Math.floor((timeLeftSeconds % (60 * 60)) / 60);
+            var seconds = Math.floor(timeLeftSeconds % 60);
+
+            var popupMessage = '';
+
+            if (days > 0) {
+                popupMessage += days + ' day(s) ';
+            }
+            if (hours > 0) {
+                popupMessage += hours + ' hour(s) ';
+            }
+            if (minutes > 0) {
+                popupMessage += minutes + ' minute(s) ';
+            }
+            if (seconds > 0 || popupMessage === '') {
+                popupMessage += seconds + ' second(s) ';
+            }
+            popupMessage += 'left until ' + this.dataset.courseTitle + ' starts.';
+            // alert(popupMessage);
+            Swal.fire(popupMessage);
+        });
+    });
+});
+  
+</script>
+
+
+<!-- end live course -->
+
+
+    <section class=" category-course pb-3">
+        <div class="container-fluid px-5">
+            <ul class="nav nav-tabs nav-tabs-bordered" id="borderedTab" role="tablist">
+                {% for cat in categories %}
+                    {% if cat.id|has_course %}
+                    <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if forloop.counter == 1 %}active{% endif %}" id="{{cat.slug}}-tab" data-bs-toggle="tab" data-bs-target="#{{cat.slug}}-tab-box" type="button" role="tab" aria-controls="{{cat.category_name}}" aria-selected="true">{{cat.category_name}}</button>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+              </ul>
+              <div class="tab-content pt-2" id="borderedTabContent">
+                {% for cat in categories %}
+                    {% if cat.id|has_course %}
+                    <div class="tab-pane fade {% if forloop.counter == 1 %}show active{% endif %}" id="{{cat.slug}}-tab-box" role="tabpanel" aria-labelledby="{{cat.slug}}-tab">
+                        <div class="container py-4 px-5">
+                            <div class="row">
+                                <div class="col-lg-9">
+                                    <h4 class="card-title py-0">{{ cat.title }}</h4>
+                                    <h6 class="mb-1 card-text text-muted">{{ cat.description }}
+                                    </h6>
+                                </div>
+                                <div class="col-lg-3 text-center m-auto">
+                                    <a href="{% url 'category_course' cid=cat.id %}" class="btn btn-primary "> Explore {{cat.category_name}} </a>
+                                </div>
+                            </div>
+                        </div>
+ 
+                        <div class="row course_row pt-3">
+                            {% for item in cat.course_category.all|course_filter|slice:":6" %}
+                            
+                            <div class="col-lg-3 col-md-3 align-items-stretch course_box_body">
+                                <div class="card rounded border  border-box">
+                                    <div class="card-body">
+                                        <img class="card-img-top " src="{{ item.thumb_image.url }}" alt="" >
+                                        <div class="box_content">
+                                            {% if item.id|is_purchased:request.user %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'play_course' item.id %}">{{ item.course_name }}</a></h6>
+                                            {% else %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                                            {% endif %}
+                                            <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                                            <!-- <span class="small text-muted paragraph_txt ">{{item.description}}</span> -->
+                                            <!-- <span class="small text-muted paragraph_txt">
+                                                {{ item.description|slice:":80" }}{% if item.description|length > 80 %}...{% endif %}
+                                            </span> -->
+                                            <p class="small text-muted mb-0">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                                            <span class="d-flex">
+                                                <h4 class="text-warning fw-bold my-auto">₹ {{ item.discount_fee }}</h4>&emsp13;
+                                                <h5 class="small text-muted text-decoration-line-through my-auto" >₹ {{ item.actual_fee }}</h5>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer rounded d-flex justify-content-between">
+                                        <!-- <span class="d-flex">
+                                            <h4 class="text-warning fw-bold my-auto">₹ {{ item.discount_fee }}</h4>&emsp13;
+                                            <h5 class="small text-muted text-decoration-line-through my-auto" >₹ {{ item.actual_fee }}</h5>
+                                        </span> -->
+                                        <span class="d-flex">
+                                            <div>
+                                            {% if item.id|is_purchased:request.user %}
+                                            <a class="btn btn-primary btn-sm border my-auto start_now_btn" href="{% url 'play_course' item.id %}">Start Learning NOW!</a>
+                                            {% else %}
+                                            
+                                            <!-- <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                                <i class="bi bi-heart{% if user in item.wishlist.all %}-fill{% endif %}" id="heartIcon{{item.id}}"></i>
+                                            </button>
+                                            <script>
+                                                function AddToWishlist(itemId) {
+                                                    var heartIcon = document.getElementById('heartIcon' + itemId);
+                                                    if (heartIcon.classList.contains('bi-heart')) {
+                                                        heartIcon.classList.remove('bi-heart');
+                                                        heartIcon.classList.add('bi-heart-fill');
+                                                    } else {
+                                                        heartIcon.classList.remove('bi-heart-fill');
+                                                        heartIcon.classList.add('bi-heart');
+                                                    }
+                                                }
+                                            </script> -->
+                                            <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                                {% if user in item.wishlist.all %}
+                                                <i class="bi bi-heart-fill"></i>
+                                                {% else %}
+                                                <i class="bi bi-heart"></i>
+                                                {% endif %}
+                                            </button>
+                                            <script>
+                                                function removeFromWishlist(id){
+                                                    const csrf = Cookies.get('csrftoken');
+                                                    var btn = document.getElementsByClassName(atwl${id})
+                                                    fetch('remove_from_wishlist', {
+                                                        method: "POST",
+                                                        headers: {'X-CSRFToken': csrf},
+                                                        body: JSON.stringify({
+                                                            id: id
+                                                        })
+                                                    })
+                                                    .then(response => response.json())
+                                                    .then(result => {
+                                                        console.log(result);
+                                                        btn.onClick = "AddToWishlist('{{item.id}}')";
+                                                        btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                        // window.location = user_purchased_list
+                                                    })
+                                                }
+                                                function AddToWishlist(id){
+                                                    const csrf = Cookies.get('csrftoken');
+                                                    var btn = document.getElementById(atwl${id})
+                                                    if("{{request.user.is_authenticated}}" == "True"){
+                                                        fetch('add_to_wishlist', {
+                                                            method: "POST",
+                                                            headers: {'X-CSRFToken': csrf},
+                                                            body: JSON.stringify({
+                                                                id: id
+                                                            })
+                                                        })
+                                                        .then(response => response.json())
+                                                        .then(result => {
+                                                            console.log(result);
+                                                            if(result['status'] == 'add'){
+                                                                btn.innerHTML='<i class="bi bi-heart-fill"></i>';
+                                                            }else{
+                                                                btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                            }
+                                                            // window.location = user_purchased_list
+                                                        })    
+                                                    }
+                                                    else{
+                                                        window.location = "{% url 'user_login' %}";
+                                                    }
+                                                }
+                                            
+                                            </script>
+
+                                            {% if item.id|is_cart:request.user %}
+                                                <a id="cart-btn-{{ item.id }}" class="btn btn-primary btn-sm border my-auto"><i class="bi bi-cart-check"></i></a>
+                                            {% else %}
+                                                <a id="cart-btn-{{ item.id }}" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                            {% endif %}
+
+                            <script type="text/javascript">
+                                $(document).ready(function() {
+                                    $('.add-to-cart-btn').on('click', function(e) {
+                                        e.preventDefault();
+                                        var itemId = $(this).attr('id').split('-')[2];
+                                        
+                                        // Check if the user is authenticated
+                                        if ('{{ request.user.is_authenticated }}' !== 'True') {
+                                            // Redirect to the login page
+                                            window.location.href = "{% url 'user_login' %}";
+                                            return;
+                                        }
+                            
+                                        $.ajax({
+                                            url: $(this).attr('href'),
+                                            type: 'GET',
+                                            success: function(data) {
+                                                $('#cart-btn-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                                $('#cart-btn-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                            },
+                                            error: function(error) {
+                                                console.log(error);
+                                            }
+                                        });
+                                    });
+                                });
+                            </script>
+                            
+                            </div>
+                            <div>
+                            <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto">Enroll Now</button>
+                                            
+                            <!-- <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                <i class="bi bi-heart{% if user in item.wishlist.all %}-fill{% endif %}" id="heartIcon{{item.id}}"></i>
+                            </button> -->
+                            
+                           
+                            {% endif %}
+                        </div>
+                            </span>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% endfor %}
+                        </div> 
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+ 
+    <div class="container-fluid px-5 pb-3 mt-4">
+        <div class="text-left">
+            <h1 class="mb-3"  id="Recommended_id" style="display: none;">Most <span class="text-primary">Recommended</span> courses for you</h1>
+        </div>
+        <div id="carouselMRC" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-inner" style="height: inherit;">
+                <div class="carousel-item active" style="height: inherit;">
+                    {% for item in most_purchased_course %}
+                    <div class="col-lg-3 col-md-4 p-2 align-items-stretch course_box_body">
+                        <div class="card rounded border  border-box">
+                            <div class="card-body cb">
+                                <img class="card-img-top" src="{{ item.thumb_image.url }}" alt="">
+                                <div class="box_content">
+                                    <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                                    <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                                    <!-- <span class="small text-muted">Product Management Masterclass, you will learn with Sarah Johnson - Head of Product Customer Platform Gojek Indonesia.</span> -->
+                                    <p class="small text-muted mb-0">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                                    <span class="d-flex">
+                                        <h4 class="text-warning fw-bold my-auto">₹ {{ item.discount_fee }}</h4>&emsp13;
+                                        <h5 class="small text-muted text-decoration-line-through my-auto">₹ {{ item.actual_fee }}</h5>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-footer rounded d-flex justify-content-between">
+                                
+                                <span class="d-flex">
+                                    <div>
+                                    {% if item.id|is_purchased:request.user %}
+                                    <a class="btn btn-primary btn-sm border my-auto start_now_btn" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                                    {% else %}
+                                    
+                                    <!-- <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist2('{{item.id}}'), 'atwl{{item.id}}'" id="atwlrc{{item.id}}">
+                                        <i class="bi bi-heart{% if user in item.wishlist.all %}-fill{% endif %}" id="heartIconmr{{item.id}}"></i>
+                                        </button>
+                                        
+                                        <script>
+                                            function AddToWishlist2(itemId) {
+                                                var heartIcon = document.getElementById('heartIconmr' + itemId);
+                                                if (heartIcon.classList.contains('bi-heart')) {
+                                                    heartIcon.classList.remove('bi-heart');
+                                                    heartIcon.classList.add('bi-heart-fill');
+                                                } else {
+                                                    heartIcon.classList.remove('bi-heart-fill');
+                                                    heartIcon.classList.add('bi-heart');
+                                                }
+                                            }
+                                        </script> -->
+                                        <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                            {% if user in item.wishlist.all %}
+                                            <i class="bi bi-heart-fill"></i>
+                                            {% else %}
+                                            <i class="bi bi-heart"></i>
+                                            {% endif %}
+                                        </button>
+                                        <script>
+                                            function removeFromWishlist(id){
+                                                const csrf = Cookies.get('csrftoken');
+                                                var btn = document.getElementsByClassName(atwl${id})
+                                                fetch('remove_from_wishlist', {
+                                                    method: "POST",
+                                                    headers: {'X-CSRFToken': csrf},
+                                                    body: JSON.stringify({
+                                                        id: id
+                                                    })
+                                                })
+                                                .then(response => response.json())
+                                                .then(result => {
+                                                    console.log(result);
+                                                    btn.onClick = "AddToWishlist('{{item.id}}')";
+                                                    btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                    // window.location = user_purchased_list
+                                                })
+                                            }
+                                            function AddToWishlist(id){
+                                                const csrf = Cookies.get('csrftoken');
+                                                var btn = document.getElementById(atwl${id})
+                                                if("{{request.user.is_authenticated}}" == "True"){
+                                                    fetch('add_to_wishlist', {
+                                                        method: "POST",
+                                                        headers: {'X-CSRFToken': csrf},
+                                                        body: JSON.stringify({
+                                                            id: id
+                                                        })
+                                                    })
+                                                    .then(response => response.json())
+                                                    .then(result => {
+                                                        console.log(result);
+                                                        if(result['status'] == 'add'){
+                                                            btn.innerHTML='<i class="bi bi-heart-fill"></i>';
+                                                        }else{
+                                                            btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                        }
+                                                        // window.location = user_purchased_list
+                                                    })    
+                                                }
+                                                else{
+                                                    window.location = "{% url 'user_login' %}";
+                                                }
+                                            }
+                                        
+                                        </script>
+                                    
+                                    
+                                    {% if item.id|is_cart:request.user %}
+                                    <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border my-auto"><i class="bi bi-cart-check"></i></a>
+                                    {% else %}
+                                    <a id="cart-btn-mr-{{ item.id }}" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                    {% endif %}
+
+
+                                    <script type="text/javascript">
+                                        $(document).ready(function() {
+                                        $('.add-to-cart-btn').on('click', function(e) {
+                                        e.preventDefault(); 
+                                        var itemId = $(this).attr('id').split('-')[3];             
+                                    $.ajax({
+                                        url: $(this).attr('href'),
+                                        type: 'GET',
+                                        success: function(data) {
+                                        $('#cart-btn-mr-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                        $('#cart-btn-mr-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                    },
+                                    error: function(error) {
+                                    console.log(error); 
+                                    }
+                                    });
+                                    });
+                                });
+                            
+                                </script> </div>
+                                <div>
+                                <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto">Enroll Now</button>
+                            </div>
+                                {% endif %}
+
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <script>
+              {% for item in most_purchased_course %}
+        document.getElementById("Recommended_id").style.display="block"
+        {% endfor %}
+            $('#carouselMRC .carousel-item').each(function () {
+                var minPerSlide = 3;
+                var next = $(this).next();
+                if (!next.length) {
+                    next = $(this).siblings(':first');
+                }
+                next.children(':first-child').clone().appendTo($(this));
+
+                for (var i = 0; i < minPerSlide; i++) {
+                    next = next.next();
+                    if (!next.length) { next = $(this).siblings(':first'); }
+                    next.children(':first-child').clone().appendTo($(this));
+                }
+            });
+        </script>
+    </div>
+
+  
+    <div class="container-fluid px-5 mt-2 ">
+        <div class="text-left">
+            <h1 class="mb-3" id="course_category_id" style="display: none;">Newest course in <span class="text-primary">{{ category.category_name }}</span></h1>
+        </div>
+        <div id="carouselNewestCourses" class="carousel slide carousel-fade"  data-bs-ride="carousel">
+            <div class="carousel-inner" style="height: inherit;">
+                <div class="carousel-item active" style="height: inherit;">
+                    {% for item in new_courses  %}
+                        <div class="col-lg-4 col-md-4 p-2 align-items-stretch course_box_body">
+                            <div class="card rounded border border-box ">
+                                <div class="card-body">
+                                    <img class="card-img-top" src="{{ item.img_url }}" alt="">
+                                    <div class="box_content">
+                                        {% if item.id|is_purchased:request.user %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'play_course' item.id %}">{{ item.course_name }}</a></h6>
+                                            {% else %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                                            {% endif %}
+                                        <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                                        <!-- <span class="small text-muted">Product Management Masterclass, you will learn with Sarah Johnson - Head of Product Customer Platform Gojek Indonesia.</span> -->
+                                        <p class="small text-muted mb-0">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                                        <span class="d-flex">
+                                            <h4 class="text-warning fw-bold my-auto">₹ {{ item.discount_fee }}</h4>&emsp13;
+                                            <h5 class="small text-muted text-decoration-line-through my-auto">₹ {{ item.actual_fee }}</h5>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer rounded d-flex justify-content-between">
+                                    <span class="d-flex">
+                                            {% if item.id|is_purchased:request.user %}
+                                            <a class="btn btn-primary btn-sm border my-auto start_now_btn" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                                            {% else %}
+
+                                            <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                                {% if user in item.wishlist.all %}
+                                                <i class="bi bi-heart-fill"></i>
+                                                {% else %}
+                                                <i class="bi bi-heart"></i>
+                                                {% endif %}
+                                            </button>
+                                            <script>
+                                                function removeFromWishlist(id){
+                                                    const csrf = Cookies.get('csrftoken');
+                                                    var btn = document.getElementsByClassName(atwl${id})
+                                                    fetch('remove_from_wishlist', {
+                                                        method: "POST",
+                                                        headers: {'X-CSRFToken': csrf},
+                                                        body: JSON.stringify({
+                                                            id: id
+                                                        })
+                                                    })
+                                                    .then(response => response.json())
+                                                    .then(result => {
+                                                        console.log(result);
+                                                        btn.onClick = "AddToWishlist('{{item.id}}')";
+                                                        btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                        // window.location = user_purchased_list
+                                                    })
+                                                }
+                                                function AddToWishlist(id){
+                                                    const csrf = Cookies.get('csrftoken');
+                                                    var btn = document.getElementById(atwl${id})
+                                                    if("{{request.user.is_authenticated}}" == "True"){
+                                                        fetch('add_to_wishlist', {
+                                                            method: "POST",
+                                                            headers: {'X-CSRFToken': csrf},
+                                                            body: JSON.stringify({
+                                                                id: id
+                                                            })
+                                                        })
+                                                        .then(response => response.json())
+                                                        .then(result => {
+                                                            console.log(result);
+                                                            if(result['status'] == 'add'){
+                                                                btn.innerHTML='<i class="bi bi-heart-fill"></i>';
+                                                            }else{
+                                                                btn.innerHTML='<i class="bi bi-heart"></i>';
+                                                            }
+                                                            // window.location = user_purchased_list
+                                                        })    
+                                                    }
+                                                    else{
+                                                        window.location = "{% url 'user_login' %}";
+                                                    }
+                                                }
+                                            
+                                            </script>
+                                            
+                                            {% if item.id|is_cart:request.user %}
+                                            <a id="cart-btn-{{ item.id }}" class="btn btn-primary btn-sm border my-auto" style="margin-left: -51px;"><i class="bi bi-cart-check"></i></a>
+                                        {% else %}
+                                            <a id="cart-btn-{{ item.id }}" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" style="margin-left: -51px;" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                        {% endif %}
+                                            <script type="text/javascript">
+                                                $(document).ready(function() {
+                                                $('.add-to-cart-btn').on('click', function(e) {
+                                                e.preventDefault(); 
+                                                var itemId = $(this).attr('id').split('-')[3];             
+                                            $.ajax({
+                                                url: $(this).attr('href'),
+                                                type: 'GET',
+                                                success: function(data) {
+                                                $('#cart-btn-nc-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                                $('#cart-btn-nc-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                            },
+                                            error: function(error) {
+                                            console.log(error); 
+                                            }
+                                        });
+                                    });
+                                });
+                            </script> 
+                            
+                              <div>    
+                                <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto">Enroll Now</button>
+                            </div>
+                                            {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    
+        <script>
+                {% for item in new_courses  %}
+                document.getElementById("course_category_id").style.display="block"
+
+                {% endfor %}
+            $('#carouselNewestCourses .carousel-item').each(function () {
+                var minPerSlide = 3;
+                var next = $(this).next();
+                if (!next.length) {
+                    next = $(this).siblings(':first');
+                }
+                next.children(':first-child').clone().appendTo($(this));
+    
+                for (var i = 0; i < minPerSlide; i++) {
+                    next = next.next();
+                    if (!next.length) {
+                        next = $(this).siblings(':first');
+                    }
+                    next.children(':first-child').clone().appendTo($(this));
+                }
+            });
+        </script>
+    </div>
+    
+
+
+    
+
+    <div class="bg-light py-3 my-4 top-category-sec">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-sm-6 text-left m-auto">
+                    <h2 style="font-family: 'Kalam', cursive;">
+                        <span style="color: #4D4D4D;">TOP</span> <span style="color: #0073E4;">CATEGORIES</span>
+                    </h2>
+                    <p>Take one of Udemy’s range of Python courses and learn how 
+                        to code using this incredibly useful language. Its simple syntax 
+                        and readability makes Python perfect for Flask, Django, data 
+                        science, and machine learning. You’ll learn how to build 
+                        everything from games to sites to apps. 
+                        Choose from a range of courses that will appeal to</p>
+                </div>
+                
+                <div class="col-lg-8 col-sm-6 text-center m-auto pt-3">
+                    <div class="row">
+                        {% for item in topCategories %}
+                            <div class="col-lg-4 col-md-4 mb-4 mb-lg-0">
+                                <div class="top-category-box">
+                                    <a href="{% url 'category_course' cid=item.id %}">
+                                        <img
+                                        src="https://mdbcdn.b-cdn.net/img/Photos/Horizontal/Nature/4-col/img%20(73).webp"
+                                        class="w-100 shadow-1-strong rounded mb-4" alt="Boat on Calm Water"/>
+                                    </a>
+                                    <div class="top-left">{{item.category_name}}</div>
+                                </div>
+                                
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- Gallery -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Categories Start -->
+    
+<div class="container-fluid px-5 pb-4">
+        <div class="text-center">
+            <h1 style="font-family: 'Kalam', cursive;" class="mb-3">Most viewed by <span
+                    class="text-primary">Students</span></h1>
+        </div>
+        <div class="row border rounded p-4 most-view-sec"  style="display: flex; align-items: center;">
+            <!-- Vertical Pills Tabs -->
+            
+            <div class="col-lg-6 nav nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                {% for item in most_viewed_courses|slice:":3" %}
+                <button class="card rounded mb-2" id="v-pills-home-tab-{{item.id}}" data-bs-toggle="pill" data-bs-target="#v-pills-home-{{item.id}}" type="button" role="tab" aria-controls="v-pills-home-{{item.id}}" aria-selected="true">
+                    <div class="row p-1">
+                        <div class="col-lg-5 py-1">
+                            <img src="{{item.img_url}}" class="w-100 h-100" alt="">
+                        </div>
+                        <div class="col-lg-7 text-left py-2">
+                            <h6 class="fw-bold">{{item.course_name}}&emsp;
+                                <span class="badge rounded-pill bg-primary px-2 small">Bestseller</span>
+                            </h6>
+                            <span class="text-muted small">{{item.user.full_name}}</span>
+                            <div class="d-flex ">
+                                <div class="ratings mt-1">
+                                    <small>{{item.averagereview}}</small>
+                                    <i class="fa fa-star {% if item.averagereview > 0 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if item.averagereview > 1 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if item.averagereview > 2 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if item.averagereview > 3 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if item.averagereview > 4 %} rating-color {% endif %}"></i>
+                                </div>
+                            </div>
+                            <span class="shadow badge bg-white text-primary px-4 py-2">₹ {{item.discount_fee}}</span>
+                            
+                        </div>
+                    </div>
+                </button>
+                {% endfor %}
+ 
+            </div>
+            <div class="col-lg-6 tab-content" id="v-pills-tabContent" >
+                {% for item in most_viewed_courses %}
+                <div class="tab-pane fade show {% if forloop.counter == 1 %}active{% endif %}" id="v-pills-home-{{item.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab-{{item.id}}">
+                    <div class="row pt-4 most-view-right-sec">
+                        <div class="col-lg-12">
+                            <img src="{{item.img_url}}" style="height: auto;" class="card-img-top" alt="">
+                            <div class="container mt-4">
+                                <div class="d-flex">
+                                    <h4 class="fw-bold my-auto">{{item.course_name}}</h4>
+                                    <span class="badge bg-primary px-2 small my-auto">Bestseller</span>
+                                </div>
+                                <span class="text-muted">{{item.user.full_name}}</span>
+                                <div class="d-flex justify-content-between mt-4">
+                                    <h2 class="shadow badge bg-white text-primary px-4 py-2">₹ {{item.discount_fee}}</h2>
+                                    <div class="ratings">
+                                        <small>{{item.averagereview}}</small>
+                                        <i class="fa fa-star {% if item.averagereview > 0 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if item.averagereview > 1 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if item.averagereview > 2 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if item.averagereview > 3 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if item.averagereview > 4 %} rating-color {% endif %}"></i>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- End Vertical Pills Tabs -->
+        </div>
+</div>
+    
+    <!-- Categories Start -->
+    <!-- About Start -->
+    <!-- <div class="container-fluid px-5 pb-5">
+        <div class="text-left">
+            <h1 style="font-family: 'Kalam', cursive;" class="mb-3">Become an <span class="text-primary">Instructor</span>
+            </h1>
+        </div>
+
+            <div class="row g-5 binstructor-sec">
+                <div class="col-lg-6 " style="min-height: 195px;">
+                    <div class="position-relative h-100 img-left">
+                        <img class="img-fluid position-absolute w-100 h-100" src="{% static 'img/carousel-2.jpg' %}" alt="" style="object-fit: cover;">
+                    </div>
+                </div>
+                <div class="col-lg-6 my-auto des-right" >
+                    <p class="mb-4">Instructors from around the world teach millions of students on sphurit. We provide the tools and skills to teach what you love.</p>
+                    
+                    <a class="btn btn-default shadow mt-2 text-primary fw-bold" href="{% url 'instructor_registration' %}">Start teaching today</a>
+                </div>
+            </div>
+        
+    </div> -->
+    <!-- About End -->
+
+    <!-- MY Instructor section start -->
+
+    <div class="binstructor-sec mt-2">
+        <div class="container-fluid px-5 pb-5">
+        
+          <div class="heading_sec">
+            <h1 style="font-family: 'Kalam', cursive;" class="mb-3">Become an <span class="text-primary">Instructor</span>
+            </h1>
+          </div>
+          <div class="row">
+        <div class="col-lg-6 col-sm-6 img-left">
+            <div class="row">
+                <div class="col-sm-6 col-lg-6 m-0 p-0" style="text-align: end;">
+                        <img class="img-fluid " style="height: 190px !important ; width: 200px !important;" src="{% static 'img/Maskgroup.png' %}" alt="" >
+                        <img class="img-fluid mt-1" style="height: 129px !important ; width: 153px !important;" src="{% static 'img/Maskgroup3.png' %}" alt="" >
+                </div>
+                <div class="col-sm-6 col-lg-6 m-0 p-1"  style="text-align: start;">
+                    <div style="height: 133px; display:flex ;align-items: end;">
+                        <img class="img-fluid " style="height: 115px !important ; width: 184px !important;" src="{% static 'img/Maskgroup2.png' %}" alt="" style="object-fit: cover;">
+                    </div>
+                    <img class="img-fluid  mt-1" style="height: 218px !important ; width:212px !important;" src="{% static 'img/Maskgroup4.png' %}" alt="" style="object-fit: cover;">
+                </div>
+
+            </div>
+            <!-- <img class="img-fluid  w-100 h-100" src="{% static 'img/carousel-2.jpg' %}" alt="" style="object-fit: cover;"> -->
+        </div>
+
+        <div class="col-lg-6 col-sm-6">
+        <div class=" my-auto des-right" >
+            <p class="mb-4">
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+            </p>
+            
+            <a class="btn btn-default shadow mt-2 text-primary fw-bold" href="{% url 'instructor_registration' %}">Start teaching today</a>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+     <!-- MY Instructor section end -->
+
+    <!-- Testimonial Start -->
+    <div class="container-fluid px-5 py-5 testimonial-sec" style="background-color: #DBEDFF;">
+        <div class="container">
+            <div class="text-center">
+                <h1 style="font-family: 'Kalam', cursive;" class="mb-2">Testimonials</h1>
+            </div>
+            <div class="owl-carousel testimonial-carousel position-relative py-5">
+    
+                {% if testimonial %}
+                {% for tml in testimonial %}
+                
+                <div class="testimonial-item text-center {% if forloop.counter0 < 3 %}active{% endif %}" id="ts{{tml.id}}">
+                    <img class="border border-primary rounded-circle mx-auto " src="{{tml.image.url}}"
+                        style="width: 60px; height: 60px; margin-bottom: -30px;">
+    
+                    <div class="text-center p-4 bg-white position-relative" style="z-index: -1;">
+                        <p class="small pt-4 three-line-text">{{tml.description}}</p>
+                        <h5 class="mb-0 text-muted">{{tml.title}}</h5>
+                        <p class="small text-muted">{{tml.sub_title}}</p>
+                    </div>
+                </div>
+                
+                {% endfor %}
+                {% else %}
+                
+                <div class="testimonial-item text-center active" id="t0">
+                    <img class="border border-primary rounded-circle mx-auto " src="{% static 'img/carousel-2.jpg' %}"
+                    style="width: 80px; height: 80px; margin-bottom: -30px;">
+    
+                <div class="text-center p-4 bg-white position-relative" style="z-index: -1;">
+                    <p class="small pt-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam amet diam et
+                        eos. Clita erat ipsum et lorem et sit.</p>
+                    <h5 class="mb-0 text-muted">Client Name</h5>
+                    <p class="small text-muted">Global Head of Capability Development North America</p>
+                </div>
+    
+                    <!-- Testimonial 1 content -->
+                </div>
+                <div class="testimonial-item text-center" id="t1">
+                    <!-- Testimonial 2 content -->
+                    <img class="border border-primary rounded-circle mx-auto " src="{% static 'img/carousel-2.jpg' %}"
+                    style="width: 80px; height: 80px; margin-bottom: -30px;">
+    
+                <div class="text-center p-4 bg-white position-relative" style="z-index: -1;">
+                    <p class="small pt-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam amet diam et
+                        eos. Clita erat ipsum et lorem et sit.</p>
+                    <h5 class="mb-0 text-muted">Client Name</h5>
+                    <p class="small text-muted">Global Head of Capability Development North America</p>
+                </div>
+                </div>
+                <div class="testimonial-item text-center" id="t2">
+                    <!-- Testimonial 3 content -->
+                    <img class="border border-primary rounded-circle mx-auto " src="{% static 'img/carousel-2.jpg' %}"
+                    style="width: 80px; height: 80px; margin-bottom: -30px;">
+    
+                <div class="text-center p-4 bg-white position-relative" style="z-index: -1;">
+                    <p class="small pt-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum sit diam amet diam et
+                        eos. Clita erat ipsum et lorem et sit.</p>
+                    <h5 class="mb-0 text-muted">Client Name</h5>
+                    <p class="small text-muted">Global Head of Capability Development North America</p>
+                </div>
+                </div>
+                
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <!-- Testimonial End -->
+    
+    <script>
+
+        const AlertToast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            animation:false,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        
+        function removeFromWishlist(id,){
+            const csrf = Cookies.get('csrftoken');
+            var btn = document.getElementsByClassName(`atwl${id}`)
+            fetch('remove_from_wishlist', {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                btn.onClick = "AddToWishlist('{{item.id}}')";
+                btn.innerHTML='<i class="bi bi-heart"></i>';
+                // window.location = `user_purchased_list`
+            })
+        }
+        function AddToWishlist(id,){
+            const csrf = Cookies.get('csrftoken');
+            var btn = document.getElementById(`atwl${id}`)
+            if("{{request.user.is_authenticated}}" == "True"){
+                fetch('add_to_wishlist', {
+                    method: "POST",
+                    headers: {'X-CSRFToken': csrf},
+                    body: JSON.stringify({
+                        id: id
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    if(result['status'] == 'add'){
+                        btn.innerHTML='<i class="bi bi-heart-fill"></i>';
+                        AlertToast.fire({
+                            icon: "success",
+                            title: result['message']
+                        });
+                    }else{
+                        btn.innerHTML='<i class="bi bi-heart"></i>';
+                        AlertToast.fire({
+                            icon: "success",
+                            title: result['message']
+                        });
+                    }
+                    // window.location = `user_purchased_list`
+                })    
+            }else{
+                window.location = `user_login`;
+            }
+        }
+
+        function enrollNow(args){
+            var oid = "";
+            if("{{request.user.is_authenticated}}" == "True"){
+                fetch("{% url 'initEnrollPayment' %}", {
+                    method: "POST",
+                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                    body: JSON.stringify({
+                        "amount":args.p,
+                        "currency":"INR"
+                    })
+                })
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    var optionData = result['result']
+                    var options = {
+                        "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                        "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                        "currency": optionData['currency'],
+                        "name": "Course Enrollment",
+                        "description": "Course Enrollment",
+                        "image": "{% static 'img/icons/logo1.png'%}",
+                        "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                        // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                        "handler": function (response){
+                            if(response.razorpay_payment_id){
+                                console.log(response.razorpay_payment_id);
+                                oid = response.razorpay_order_id;
+                                fetch("{% url 'verifySignature' %}", {
+                                    method: "POST",
+                                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                    body: JSON.stringify({
+                                        "razorpay_paymentId":response.razorpay_payment_id,
+                                        "razorpay_orderId":response.razorpay_order_id,
+                                        "razorpay_signature":response.razorpay_signature
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log(result);
+                                    if(result['result']){
+                                        fetch("{% url 'purchaseCourse' %}", {
+                                            method: "POST",
+                                            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                            body: JSON.stringify({
+                                                "course_id":args.id,
+                                                "order_id":oid
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            console.log(result);
+                                            const swalWithBootstrapButtons = Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: "btn btn-success",
+                                                    cancelButton: "btn btn-danger"
+                                                },
+                                                buttonsStyling: false
+                                            });
+                                            swalWithBootstrapButtons.fire({
+                                            title: "Payment Successful.",
+                                            text: "Thanks for purchesed the course!",
+                                            icon: "success",
+                                            showCancelButton: false,
+                                            confirmButtonText: "Ok",
+                                            reverseButtons: true
+                                            }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location = "{% url 'user_dashboard' %}";
+                                            }
+                                            });
+                                        })
+                                    }
+                                })
+                            }else{
+                                console.log(response);
+                            }
+                        },
+                        "prefill": {
+                            "name": "{{ request.user.full_name }}",
+                            "email": "{{ request.user.email }}",
+                            "contact": "{{ request.user.mobile }}"
+                        },
+                        "notes": {
+                            "address": "Sphurit"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+        
+                    rzp1.open();
+                    rzp1.on('payment.failed', function (response){});
+                });
+            }
+            else{
+                window.location = "{% url 'user_login' %}";
+            }
+    
+        }
+    </script>
+{% endblock content %}
+    

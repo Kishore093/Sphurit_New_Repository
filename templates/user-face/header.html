@@ -1,0 +1,96 @@
+{% load static %}
+<!-- Navbar Start -->
+<style>
+/* .nav-item {
+  font-size: 22px;
+  color: #012970;
+  margin-right: 25px;
+  position: relative; 
+} */
+
+.bi-cart {
+    font-size: 1.5rem; 
+}
+
+.badge-number {
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 0.8rem;
+    transform: translate(-20%, -70%);
+}
+
+
+
+</style>
+    
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
+    <div class="container-fluid" >
+        <a href="{% url 'home' %}" class="navbar-brand mx-5">
+            <img class="img-fluid" src="{% static 'img/icons/logo1.png' %}" alt="",>
+        </a>
+        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <form class="w-50 me-auto" action="{% url 'search' %}" method="get">
+                <div class="input-group">
+                  <input type="search" class="form-control" name="q" placeholder="Search" aria-label="Search">
+                </div>
+            </form>
+            <ul class="navbar-nav ">
+                <li class="nav-item">
+                    <a href="{% url 'instructor_registration' %}" class="nav-item nav-link">Become an instructor</a>
+                </li>
+                {% if request.user.is_authenticated and request.user.is_Student %}
+                <li class="nav-item">
+                    <!-- <a href="{% url 'cart' %}" class="nav-item nav-link" title="Cart"><i class="bi bi-cart"></i></a> -->
+                    <a href="{% url 'cart' %}" class="nav-item nav-link" title="Cart">
+                        <i class="bi bi-cart"></i>
+                        {% if cart_count > 0 %}
+                            <span class="badge bg-primary badge-number">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+             
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% if request.user.image_url != "" %}
+                        <img src="{{ request.user.image_url }}" alt="Profile" height="30" class="rounded-circle">
+                        {% else %}
+                        <img src="{% static 'img/user.png' %}" alt="Profile" height="30" class="rounded-circle">
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu fade-down m-0" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">{{ request.user.full_name }}</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="{% url 'user_dashboard' %}">
+                                <i class="bi bi-person"></i>
+                                <span>My Profile</span>
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="{% url 'log_out' %}">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sign Out</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="{% url 'user_login' %}" class="nav-item nav-link">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'user_registration' %}" class="nav-item nav-link">Sign up</a>
+                </li>
+                {% endif %}
+            </ul>
+            
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->

@@ -1,0 +1,62 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+ <style>
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h5 class="card-title">{{course.course_name}}  |<span class="text-muted">  Students List</span></h5>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                          <th scope="col">SN</th>
+                          <th scope="col">Student Name</th>
+                          <th scope="col">Email</th>
+                          <th scope="col">Mobile</th>
+                          <!-- <th scope="col">purchase Amount</th>
+                          <th scope="col">GST Amount</th>
+                          <th scope="col">Timestamp</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in students %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ obj.full_name }}</td>
+                          <td>{{ obj.email }}</td>
+                          <td>{{ obj.mobile }}</td>
+                          <!-- <td>{{ obj.course.discount_fee }}</td> -->
+                          <!-- <td>{{public_config.GST_RATE}}%</td>
+                          <td>{{ obj.created_at }}</td> -->
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+
+</script>
+{% endblock content %}

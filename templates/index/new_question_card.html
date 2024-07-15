@@ -1,0 +1,47 @@
+{% load static %}
+
+<div class="mb-2 box question-box question" data-id="{{question.id}}">
+    <input type="text" data-id="{{question.id}}" class="question-title edit-on-click input-question" placeholder="Question title" value="{{question.question}}">
+    {% if question.question_type == "multiple choice" %}
+    <div class="choices{{question.id}}" data-id="{{question.id}}">
+        {% for choice in question.choices.all %}
+            <div class="choice c-{{question.id}}" id="option{{choice.id}}">
+                <input type="radio" id="{{choice.id}}" disabled>
+                <label for="{{choice.id}}">
+                    <input type="text" value="{{choice.choice}}" class="edit-choice" data-id="{{choice.id}}">
+                </label>
+                <span class="remove-option" title="Remove" data-filter="{{question.id}}" data-id="{{choice.id}}">&times;</span>
+            </div>
+        {% endfor %}
+        <div class="choice" id="add_option{{question.id}}" style="display: block;">
+            <input type = "radio" id = "add-choice" disabled />
+            <label for = "add-choice" class="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
+        </div>
+        <div class="d-flex justify-content-between">
+
+            <div class="answer-key" id="answer-key{{question.id}}">
+                <span>Answer Key -</span>&emsp;
+                {% for i in question.choices.all %}
+                <div class="form-check form-check-inline" id="ak{{i.id}}">
+                    <input class="form-check-input" type="radio" name="{{question.id}}-answer" id="choice-{{i.id}}"
+                     data-id="{{question.id}}" value="{{i.id}}" answer-key data-question_type = "{{question.question_type}}" {% if i.is_answer %} checked {% endif %}>
+                    <label for="choice-{{i.id}}">{{i.choice}}</label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="question-score">
+                <label for="score">Points</label>
+                <input type="number" data-id="{{question.id}}" id="score" class="input-score" value="{{question.score}}">
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    <div class="choice-option">
+        <input type="checkbox" class="required-checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked{% endif %}>
+        <label for="required-{{question.id}}" class="required">Required</label>
+        <div class="d-flex float-right">
+            <img src="{% static 'Icon/dustbin.png' %}" alt="Delete question icon" class="question-option-icon delete-question" 
+            title="Delete question" data-id="{{question.id}}">
+        </div>
+    </div>
+</div>

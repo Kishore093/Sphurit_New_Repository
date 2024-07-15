@@ -1,0 +1,322 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block extrastyle %}
+<style>
+    .col-lg-10 {
+      
+        margin-left: 245px;
+        margin-top: -491px;
+    }
+    .card-title {
+    padding: 10px 0 10px 20px !important;
+    font-size: 18px;
+    font-weight: 600;
+    color: #012970;
+    font-family: "Poppins", sans-serif;
+}
+.card {
+    margin: 0 20px 30px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 5px 0px #00000017;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="">
+    <div class="container-fluid curved-box pt-2">
+        <p class="fs-4 text-white mb-2">Support</p>
+        <p class="fs-6 text-white mb-2">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-2 card py-0 ">
+            {% include 'user-face/sidebar.html' %}
+        </div>
+        <div class="col-lg-10">
+            <div class="row">
+                {% comment %} <div class="col-lg-12">
+                    <h5 class="card-title">Make A Query</h5>
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <!-- course_query.html -->
+                            <form id="courseQueryForm" class="row p-4">
+                                {% csrf_token %}
+                                <div class="col-12">
+                                    <label for="full_name" class="form-label">Full Name</label>
+                                    <input type="text" name="name" class="form-control" id="full_name" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="mobile_number" class="form-label">Mobile Number</label>
+                                    <input type="text" maxlength="10" name="mobile" class="form-control"
+                                        id="mobile_number" required>
+                                    <script>
+                                        $(document).ready(function () {
+                                            $('#mobile_number').keypress(function (e) {
+                                                var regex = new RegExp("^[0-9]+$");
+                                                var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+                                                if (regex.test(str)) {
+                                                    return true;
+                                                }
+                                                e.preventDefault();
+                                                return false;
+                                            });
+                                        })
+                                    </script>
+                                </div>
+                                <div class="col-12">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="course" class="form-label">Select Course</label>
+                                    <select name="course" class="form-select" id="course" required>
+                                        <option selected value="" disabled>Select Course</option>
+                                        {% for item in request.user.user_purchased.all %}
+                                        <option value="{{ item.course.id }}">{{ item.course.course_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label for="query" class="form-label">Query</label>
+                                    <textarea name="query" class="form-control" id="query" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary w-100" type="button"
+                                        onclick="submitForm()">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div> {% endcomment %}
+
+
+                <div class="col-lg-12">
+                    <h5 class="card-title">Make A Query</h5>
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <!-- course_query.html -->
+                            <form id="courseQueryForm" class="row p-4">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="full_name" class="form-label">Full Name</label>
+                                            <input type="text" name="name" class="form-control" id="full_name" required value="{{ user.full_name }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="mobile_number" class="form-label">Mobile Number</label>
+                                            <input type="text" maxlength="10" name="mobile" class="form-control" id="mobile_number" required value="{{ user.mobile }}">
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $('#mobile_number').keypress(function (e) {
+                                                        var regex = new RegExp("^[0-9]+$");
+                                                        var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+                                                        if (regex.test(str)) {
+                                                            return true;
+                                                        }
+                                                        e.preventDefault();
+                                                        return false;
+                                                    });
+                                                })
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" name="email" class="form-control" id="email" required value="{{ user.email }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="course" class="form-label">Select Course</label>
+                                            <select name="course" class="form-select" id="course" required>
+                                                <option selected value="" disabled>Select Course</option>
+                                                {% for item in request.user.user_purchased.all %}
+                                                <option value="{{ item.course.id }}">{{ item.course.course_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label for="query" class="form-label">Query</label>
+                                            <textarea name="query" class="form-control" id="query" required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-primary w-100" type="button" onclick="submitForm()">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-12">
+                    <h5 class="card-title">All Query</h5>
+                    <div class="card mb-0">
+                        <div class="card-body">
+
+                            <div id="userQueries" style="max-height: 475px; overflow: auto;">
+                            </div>
+
+                            <script>
+                                {% comment %} function displayUserQueries(data) {
+                                    const userQueriesContainer = document.getElementById('userQueries');
+                                    userQueriesContainer.innerHTML = ''; 
+                            
+                                    data.forEach(query => {
+                                        const queryDiv = document.createElement('div');
+                                        queryDiv.innerHTML = `
+                                            <p>Course: ${query.course.course_name}</p>
+                                            <p>Query: ${query.query}</p>
+                                            <p>Create Date: ${query.created_at}</p>
+                                            <hr>`;
+                            
+                                        userQueriesContainer.appendChild(queryDiv);
+                                    });
+                                } {% endcomment %}
+                                function displayUserQueries(data) {
+                                    const userQueriesContainer = document.getElementById('userQueries');
+                                    userQueriesContainer.innerHTML = '';
+                                
+                                    const table = document.createElement('table');
+                                    table.classList.add('table');
+                                
+                                    // Create table header
+                                    const tableHeader = document.createElement('thead');
+                                    tableHeader.innerHTML = `
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Query</th>
+                                            <th>Create Date</th>
+                                        </tr>
+                                    `;
+                                    table.appendChild(tableHeader);
+                                
+                                    // Create table body
+                                    const tableBody = document.createElement('tbody');
+                                    data.forEach(query => {
+                                        const row = document.createElement('tr');
+                                        
+                                        // Extracting date components
+                                        const createdAt = new Date(query.created_at);
+                                        const day = createdAt.getDate().toString().padStart(2, '0'); // Day (2 digits, padded with leading zero if necessary)
+                                        const month = (createdAt.getMonth() + 1).toString().padStart(2, '0'); // Month (adding 1 as months are zero-based, then 2 digits, padded)
+                                        const year = createdAt.getFullYear(); // Full year (4 digits)
+                                        let hours = createdAt.getHours();
+                                        const minutes = createdAt.getMinutes().toString().padStart(2, '0'); // Minutes (2 digits, padded with leading zero if necessary)
+                                        const meridiem = hours >= 12 ? 'PM' : 'AM'; // AM/PM
+                                        hours = (hours % 12 || 12).toString().padStart(2, '0'); // Convert hours to 12-hour format (2 digits, padded with leading zero if necessary)
+                                        
+                                        // Constructing formatted date string
+                                        const formattedDate = `${day}-${month}-${year} ${hours}:${minutes} ${meridiem}`;
+                                        
+                                        row.innerHTML = `
+                                            <td>${query.course.course_name}</td>
+                                            <td>${query.query}</td>
+                                            <td>${formattedDate}</td>
+                                        `;
+                                        tableBody.appendChild(row);
+                                    });
+                                    
+                                    table.appendChild(tableBody);
+                                
+                                    userQueriesContainer.appendChild(table);
+                                }
+                            
+                                fetch('/api/get_user_queries/', {
+                                    method: 'GET',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRFToken': '{{ csrf_token }}', 
+                                    },
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    displayUserQueries(data);
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+
+
+                                const AlertToast = Swal.mixin({
+                                    toast: true,
+                                    position: "bottom-end",
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    animation:false,
+                                    didOpen: (toast) => {
+                                        toast.onmouseenter = Swal.stopTimer;
+                                        toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                    });
+
+                                
+                            
+                                function submitForm() {
+                                    const formData = new FormData(document.getElementById('courseQueryForm'));
+                            
+                                    fetch('{% url "course_query_api" %}', {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: {
+                                            'X-CSRFToken': '{{ csrf_token }}',
+                                        },
+                                    })
+                                    .then(response => {
+                                        if (response.ok) {
+                                            document.getElementById('courseQueryForm').reset();
+                                            AlertToast.fire({
+                                            icon: "success",
+                                            title: "Query Submitted successfully",
+                                            });
+                                            console.log('Form submitted successfully!');
+                            
+                                            fetch('/api/get_user_queries/', {
+                                                method: 'GET',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRFToken': '{{ csrf_token }}',  
+                                                },
+                                            })
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                displayUserQueries(data);
+                                            })
+                                            .catch(error => {
+                                                console.error('Error:', error);
+                                            });
+                                        } else {
+                                            console.error('Form submission failed.');
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+</script>
+{% endblock content %}

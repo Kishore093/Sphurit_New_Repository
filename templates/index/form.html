@@ -1,0 +1,165 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+
+{% endblock extrastyle %}
+{% block script %}
+
+<script src="{% static 'js/form.js' %}"></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-start">
+        <div class="col-lg-12 col-md-12 ">
+            <h5 class="card-title">Assigment For Topic &emsp;->&emsp; {{form.topic.topic_name}}</h5>
+        </div>
+    </div>
+    <div >
+        <div class="mb-2 box question-box" id="form-head">
+            <div class="form-title-box">
+                <input type="text" class="form-title edit-on-click input-form-title" placeholder="Assigment title" value="{{form.title}}">
+            </div>
+            <textarea class="form-description edit-on-click textarea-adjust" rows="2" placeholder="Assigment description" spellCheck = "false"
+            id="input-form-description">{{form.description}}</textarea>
+            {% if form.collect_email %}
+            <div class="collect-email txt-clr">
+                <h3 class="question-title">Email address <span class="require-star">*</span></h3>
+                <input type="text" autocomplete="off" aria-label="Valid email address" disabled dir = "auto" class="require-email-edit txtColor"
+                placeholder = "Valid email address" />
+                <p class="collect-email-desc">This form is collecting email addresses. <span class="open-setting">Change settings</span></p>
+            </div>
+            {% endif %}
+        </div>
+        <div id="q_ctr">
+
+        {% for question in form.questions.all %}
+        <div class="mb-2 box question-box question" data-id="{{question.id}}">
+            <input type="text" data-id="{{question.id}}" class="question-title edit-on-click input-question" placeholder="Question title" value="{{question.question}}">
+            <select class="question-type-select input-question-type" data-id="{{question.id}}" data-origin_type = "{{question.question_type}}">
+                <option value="short" {% if question.question_type == "short" %}selected{% endif %}>Short answer</option>
+                <option value="paragraph" {% if question.question_type == "paragraph" %}selected{% endif %}>Paragraph</option>
+                <option value="multiple choice" {% if question.question_type == "multiple choice" %}selected{% endif %}>Multiple choice</option>
+                <option value="checkbox" {% if question.question_type == "checkbox" %}selected{% endif %}>Checkbox</option>
+                <option value="fileupload" {% if question.question_type == "fileupload" %}selected{% endif %}>File Upload</option>
+                <option value="dropdown" {% if question.question_type == "dropdown" %}selected{% endif %}>Dropdown</option>
+                <option value="date" {% if question.question_type == "date" %}selected{% endif %}>Date</option>
+                <option value="time" {% if question.question_type == "time" %}selected{% endif %}>Time</option>
+            </select>
+            
+
+            {% if question.question_type == "multiple choice" %}
+            <div class="choices" data-id="{{question.id}}">
+                {% for choice in question.choices.all %}
+                    <div class="choice">
+                        <input type="radio" id="{{choice.id}}" disabled>
+                        <label for="{{choice.id}}">
+                            <input type="text" value="{{choice.choice}}" class="edit-choice" data-id="{{choice.id}}">
+                        </label>
+                        <span class="remove-option" title = "Remove" data-id="{{choice.id}}">&times;</span>
+                    </div>
+                {% endfor %}
+                <div class="choice">
+                    <input type = "radio" id = "add-choice" disabled />
+                    <label for = "add-choice" class="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
+                </div>
+                
+            </div>
+            {% elif question.question_type == "checkbox" %}
+            <div class="choices" data-id="{{question.id}}">
+                {% for choice in question.choices.all %}
+                    <div class="choice">
+                        <input type="checkbox" id="{{choice.id}}" disabled>
+                        <label for="{{choice.id}}">
+                            <input type="text" data-id="{{choice.id}}" class="edit-choice" value="{{choice.choice}}">
+                        </label>
+                        <span class="remove-option" title="Remove" data-id="{{choice.id}}">&times;</span>
+                    </div>
+                {% endfor %}
+                <div class="choice">
+                    <input type = "checkbox" id = "add-choice" disabled />
+                    <label for = "add-choice" class="add-option" id="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
+                </div>
+            </div>
+            {% elif question.question_type == "short" %}
+            <div class="answers" data-id="{{question.id}}">
+                <input type ="text" class="short-answer" disabled placeholder="Short answer text" />
+            </div>
+            {% elif question.question_type == "paragraph" %}
+            <div class="answers" data-id="{{question.id}}">
+                <textarea class="long-answer" disabled placeholder="Long answer text" ></textarea>
+            </div>
+            {% elif question.question_type == "fileupload" %}
+            <div class="answers" data-id="{{question.id}}">
+                <input type ="file" class="short-answer" disabled placeholder="file" />
+            </div>
+            {% elif question.question_type == "dropdown" %}
+            <div class="choices" data-id="{{question.id}}">
+                {% for choice in question.choices.all %}
+                    <div class="choice">
+                        <label for="{{choice.id}}"><i class="bi bi-circle-fill"></i>&emsp14;</label>
+                        <label for="{{choice.id}}">
+                            <input type="text" data-id="{{choice.id}}" class="edit-choice" value="{{choice.choice}}">
+                        </label>
+                        <span class="remove-option" title="Remove" data-id="{{choice.id}}">&times;</span>
+                    </div>
+                {% endfor %}
+                <div class="choice">
+                    &emsp;
+                    <label for = "add-choice" class="add-option" id="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
+                </div>
+            </div>
+            {% elif question.question_type == "date" %}
+            <div class="answers" data-id="{{question.id}}">
+                <input type ="date" class="date" disabled placeholder="Date" />
+            </div>
+            {% elif question.question_type == "time" %}
+            <div class="answers" data-id="{{question.id}}">
+                <input type ="time" class="time" disabled placeholder="Time" />
+            </div>
+            {% endif %}
+            <div class="choice-option">
+                <input type="checkbox" class="required-checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked{% endif %}>
+                <label for="required-{{question.id}}" class="required">Required</label>
+                <div class="float-right">
+                    <img src="{% static 'Icon/dustbin.png' %}" alt="Delete question icon" class="question-option-icon delete-question" title="Delete question"
+                    data-id="{{question.id}}">
+                </div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <div class="answer-key" id="answer-key{{question.id}}">
+                   <span>Answer Key -</span>&emsp;
+                   {% for i in question.choices.all %}
+                   <div class="form-check form-check-inline" id="ak{{i.id}}">
+                       <input class="form-check-input" type="radio" name="{{question.id}}-answer" id="choice-{{i.id}}"
+                        data-id="{{question.id}}" value="{{i.id}}" answer-key data-question_type = "{{question.question_type}}" {% if i.is_answer %} checked {% endif %}>
+                       <label for="choice-{{i.id}}">{{i.choice}}</label>
+                   </div>
+                   {% endfor %}
+               </div>
+               <div class="question-score">
+                   <label for="score">Points</label>
+                   <input type="number" data-id="{{ question.id }}" class="input-score" value="{{ question.score }}">
+               </div>
+               
+           </div>
+            
+        </div>
+        {% endfor %}
+        </div>
+        <div class="mb-4 box question-box d-flex justify-content-between" id="">
+            <div class="pt-1">
+                <p class="fw-bold">Add More Questions and Preview Assigment</p>
+            </div>
+            <div class="d-flex">
+                <a href="{% url 'preview_form' form.code %}">
+                    <img src = "{% static 'Icon/eye.png' %}" class="" title = "Preview" height="40" width="40" style="margin-left: 1em; cursor: pointer;" />
+                </a>
+                <img src = "{% static 'Icon/add.png' %}" class="" title="Add question" 
+                    id="add-question" height="40" width="40" style="margin-left: 1em; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

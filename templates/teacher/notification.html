@@ -1,0 +1,41 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block extrastyle %}
+
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="{% static 'js/taginput.js' %}"></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="pagetitle d-flex justify-content-between">
+        <h1 class="my-auto ">Notifications</h1>
+        <div class="">
+            <a href="{% url 'mark_all_read' %}" class="btn btn-outline-secondary btn-sm">Mark All Read</a>&emsp;
+            <a href="{% url 'delete_all_read' %}" class="btn btn-outline-danger btn-sm">Delete All Read</a>
+        </div>
+    </div><!-- End Page Title -->
+    <div class="row">
+        <div class="col-lg-6">
+            {% for notif in notifications %}
+            <div class="card mb-2 border-bottom border-1 border-{{notif.level}}">
+                <div class="card-body ">
+                    <!-- <div class="d-flex justify-content-between"> -->
+                        <h5 class="card-title py-0">{{notif.title}}</h5>
+                        
+                    <!-- </div> -->
+                    <p class="mb-1">{{notif.message}}</p>
+                    <p class="text-muted text-right small mb-0">{{notif.timestamp|naturaltime}}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-lg-6"></div>
+    </div>
+</main><!-- End #main -->
+<script>
+ 
+</script>
+{% endblock content %}

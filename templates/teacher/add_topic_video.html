@@ -1,0 +1,144 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+
+{% endblock extrastyle %}
+
+{% block script %}
+
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+
+
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+
+{% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+  <!-- Spinner Start -->
+  <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+          <span class="sr-only">Loading...</span>
+      </div>
+  </div>
+  <!-- Spinner End -->
+  <div class="row">
+      <div class="col-lg-8 col-md-8 ">
+          <h5 class="card-title">{{topic.topic_name}} <span class="text-muted">| Video Upload</span></h5>
+      </div>
+  </div>
+  <form class="row g-3 mt-3" action="{% url 'add_topic_video' topic.id %}" method="post" enctype="multipart/form-data" id="upload-form">
+      {% csrf_token %}
+
+      <div class="container col-md-12">
+          <div class="row">
+              <div class="col-md-10">
+                  <input class="form-control" type="file" accept="video/mp4,video/x-m4v,video/*" name="topic_video" id="topic_video_id" required>
+              </div>
+
+              <div class="col-md-12 mt-4">
+                  <video id="promo_frame" width="220" height="140" src="{% if topic.topic_video %}{{topic.topic_video.url}}{% else %}''{% endif %}" controls controlsList="nodownload">
+                      Your browser does not support the video tag.
+                  </video>
+                  <div class="progress mt-3" style="display: none;" id="progress-bar">
+                      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                  <div id="success-message" class="alert alert-success mt-3" style="display: none;">
+                      Video uploaded successfully!
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-12 text-right">
+          <button type="button" onclick="clearVideo()" class="btn btn-secondary" data-bs-dismiss="modal">Clear</button>
+          <button type="button" onclick="uploadVideo()" class="btn btn-primary">Upload</button>
+      </div>
+  </form>
+
+</main>
+
+
+
+<script>
+    function uploadVideo() {
+        const progressBar = $('#progress-bar .progress-bar');
+        const successMessage = $('#success-message');
+
+        const formData = new FormData($('#upload-form')[0]);
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "add_topic_video" topic.id %}',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function () {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', function (e) {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        progressBar.css("width", percent + '%');
+                        progressBar.text(percent + '%');
+                    }
+                });
+                return xhr;
+            },
+            success: function (data) {
+                console.log(data);
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "bottom-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    animation: false,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Video uploaded successfully!"
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+            },
+            complete: function () {
+                progressBar.css("width", "0%");
+                progressBar.text("0%");
+                progressBar.parent().hide();
+
+                // Clear video input and hide success message after 5 seconds
+                setTimeout(function () {
+                    document.getElementById('topic_video_id').value = null;
+                    promo_frame.src = "";
+                    promo_frame.style.display = 'none';
+                    successMessage.hide();
+                    window.location = `{{site_domain}}/teacher/topic_list/{{topic.chapter.id}}`;
+                    
+                }, 3000);
+            }
+        });
+
+        progressBar.parent().show();
+    }
+    $(document).ready(function () {
+        $('#topic_video_id').change(function () {
+            const selectedFile = this.files[0];
+            if (selectedFile) {             
+                const selectedVideoUrl = URL.createObjectURL(selectedFile);
+                $('#promo_frame').attr('src', selectedVideoUrl);
+            } else {                
+                $('#promo_frame').attr('src', '');
+            }
+        });
+    });
+
+</script>
+{% endblock content %}

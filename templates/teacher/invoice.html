@@ -1,0 +1,236 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+  h2 {
+    font-size: medium;
+  }
+  .fw-bold {
+    font-size: small;
+  }
+   .note-text {
+    font-size: small;
+  }
+  p.text-muted {
+    font-size: small;
+  }
+  .text-right .text-muted{
+    font-size: small;
+  }
+  .text-left .text-muted{
+    font-size: small;
+  }
+  
+
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+<script type="text/javascript" src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-end">
+      <div class="col-lg-12" id="htmlContent1">
+        <div class="container">
+        <div class="card p-5">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-lg-6 text-left">
+                <h2>SPHURIT EDUCATION</h2>
+                <h6 class="text-muted"><span class="text-muted">29, Singla Street,<br>Sikeston,New Delhi 110034</span></h6>
+                <h6 class="text-muted"><span class="text-muted">sphurit@gamil.com</span></h6>
+                <h6 class="text-muted"><span class="text-muted">+91 9897989989</span></h6>
+              </div>
+              <div class="col-lg-6 text-right">
+                <h3 class="page-title">INVOICE</h3>
+                <h4 class="fw-bold text-muted">#{{ invoiceNumber }}</h4>
+              </div>
+            </div>
+            <div class="row my-2">
+              <div class="col-lg-8 text-left">
+                <h5 class="text-muted mb-0">Bill To:</h5>
+                <h4 class="fw-bold mt-0 mb-0">{{user.full_name}}</h4>
+                <p class="text-muted mt-0 mb-0">{{user.email}}</p>
+                <p class="text-muted">{{user.mobile}}</p>
+              </div>
+              <div class="col-lg-4 text-right my-0">
+                <table class="table table-borderless">
+                  <tr><td><span class="text-muted ">Date :</span></td><td class="text-muted">{{orderDate|date:"M d, Y h:i A"}}</td></tr>
+                  <tr><td><span class="text-muted ">Payment Terms :</span></td><td  class="text-muted">Online</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="row">
+              <div class="table-responsive-sm">
+                <table class="table table-striped">
+                  <thead class="table-dark">
+                    <tr>
+                    <th class="fw-bold">Item</th>
+                    <th class="fw-bold">Quantity</th>
+                    <th class="fw-bold">Rate</th>
+                    <th class="fw-bold">Amount</th>
+                    </tr>
+                  </thead>
+                  {% comment %} <tbody>
+                    <tr>
+                    <td class="strong fw-bold">{{product.course_name}}</td>
+                    <td class="text-muted">1</td>
+                    <td class="text-muted">₹ {{ product.discount_fee }}</td>
+                    <td class="text-muted">₹ {{ product.discount_fee }}</td>
+                    </tr>
+                  </tbody> {% endcomment %}
+                  <tbody>
+                    <tr>
+                    <!-- <td class="strong">{{product.course_name}}</td> -->
+                    <td class="strong fw-bold">
+                      {% if product.course_name %}
+                          {{ product.course_name }}
+                      {% else %}
+                          {{ product.title }}
+                      {% endif %}
+                    </td>
+                    <td class="text-muted">1</td>
+                    <!-- <td class="">₹ {{ product.discount_fee }}</td> -->
+                    <td class="text-muted">
+                      {% if product.discount_fee %}
+                          ₹ {{ product.discount_fee }}
+                      {% else %}
+                          ₹ {{ product.fees }}
+                      {% endif %}
+                    </td>
+                    <!-- <td class="">₹ {{ product.discount_fee }}</td> -->
+                    <td class="text-muted">
+                      {% if product.discount_fee %}
+                          ₹ {{ product.discount_fee }}
+                      {% else %}
+                          ₹ {{ product.fees }}
+                      {% endif %}
+                    </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-8 ">
+                <p class="note-text mb-0"><span class="note-text">Notes :</span> This payment valid in particular course</p>
+                <p class="note-text"><span class="note-text">Terms :</span> Non- refundable</p>
+              </div>
+              <div class="col-lg-4 text-right ">
+                <table class="table table-clear">
+                  <tbody>
+                    <tr>
+                      <td class="left">
+                      <strong class="text-muted">Subtotal</strong>
+                      </td>
+                      <td class="text-muted">
+                        {% if product.discount_fee %}
+                            ₹ {{ product.discount_fee }}
+                        {% else %}
+                            ₹ {{ product.fees }}
+                        {% endif %}
+                    </td>
+                      {% comment %} <td class="right text-muted">₹{{ product.discount_fee }}</td> {% endcomment %}
+                    </tr>
+                    <tr>
+                      <td class="left">
+                      <strong class="text-muted">GST ({{gst_rate}}%)</strong>
+                      </td>
+                      <td class="right text-muted">₹ {{gst_price}}</td>
+                    </tr>
+                    <tr>
+                      <td class="left">
+                      <strong class="text-muted">Total</strong>
+                      </td>
+                      <td class="right">
+                      <strong class="text-muted">₹{{ total }}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>           
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-12 ">
+      <div id="editor"></div>
+      <div class="text-center">
+        <button class="btn btn-primary" id="generatePDF">Download</button>
+        <button class="btn btn-primary" id="print-doc">Print</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+{% comment %} 
+
+<script type="text/javascript">
+  function generatePDF() {
+    var element = document.getElementById('htmlContent1');
+    var opt = {
+      margin:       10,
+      filename:     'sample_file.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf(element, opt);
+  }
+
+  $('#generatePDF').click(function () {
+    generatePDF();
+  });
+
+  $('#print-doc').click(function () {
+    var printContents = document.getElementById("htmlContent").innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents;
+
+    window.print();
+
+    document.body.innerHTML = originalContents;
+  });
+</script> {% endcomment %}
+<script type="text/javascript">
+  function generatePDF() {
+    var element = document.getElementById('htmlContent1');
+    var filename = "sphurit_{{user.full_name}}.pdf"; // Getting the filename from the Django context
+    var opt = {
+      margin:       10,
+      filename:     filename, // Setting the filename dynamically
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save(); // Adjusted for html2pdf syntax
+  }
+
+  $('#generatePDF').click(function () {
+    generatePDF();
+  });
+
+  $('#print-doc').click(function () {
+    var printContents = document.getElementById("htmlContent").innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents;
+
+    window.print();
+
+    document.body.innerHTML = originalContents;
+  });
+</script>
+
+{% endblock content %}

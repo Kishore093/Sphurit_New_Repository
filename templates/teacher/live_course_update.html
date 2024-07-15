@@ -1,0 +1,455 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load datetime %}
+{% block extrastyle %}
+ <style>
+    
+ </style>
+{% endblock extrastyle %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-lg-8 col-md-8 " >
+            <h4> Live Update Course</h4>
+        </div>
+    </div>
+    <div class="row justify-content-start">
+        <div class="col-lg-10 col-md-10 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="bg-light p-3" >
+                <form class="row g-3" action="{% url 'live_course_update' obj.id %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <label for="id_category" class="form-label">Course Category</label>
+                        <select class="form-select" name="category_id" id="id_category" required>
+                        <option >Select Course Category</option>
+                        {% for cat in modules %}
+                        <option {% if obj.category.id == cat.id %}selected{% endif %} value="{{cat.id}}">{{cat.category_name}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="id_type" class="form-label">Course Type</label>
+                        <select class="form-select" name="course_type" id="id_type" required>
+                            <option >Select Course Type</option>
+                            <option {% if obj.type == 'Pre Recorded' %}selected{% endif %} value="Pre Recorded">Pre Recorded</option>
+                            <option {% if obj.type == 'Live' %}selected{% endif %} value="Live">Live</option>
+                            <option {% if obj.type == 'Hybrid' %}selected{% endif %} value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                
+
+                    <div id="lcfields" style="display: {% if obj.type == 'Live' %}block{% else %}none{%endif%};">
+                        
+                        <label for="validationDefault02" class="form-label">Host Name</label>
+                        <input type="text" class="form-control" name="host_name" id="validationDefault02" value="{{obj.host_name}}" required>
+    
+                        <div class="col-md-12">
+                            <label for="validationDefault02" class="form-label">About Host</label>
+                        <input type="text" class="form-control" name="about_host" id="validationDefault02" value="{{obj.about_host}}" required>
+    
+                            <label for="validationDefault02" class="form-label">Title</label>
+                            <input type="text" class="form-control" name="title" id="validationDefault02" value="{{obj.title}}" required>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="validationDefault03" class="form-label">Description</label>
+                            <textarea type="text" class="form-control" name="description" value="{{obj.description}}" id="validationDefault03">{{ obj.description }}</textarea>
+                        </div> 
+
+                        <label for="profile" class="form-label">Profile</label>
+                        <div class="row">
+                            <div class="col-md-7">
+                                <input class="form-control" type="file" name="thumb_image" accept="image/*" id="profile" onchange="previewProfile()">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" onclick="clearProfileImage()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <img id="profilePreview" src="{{ obj.img_url }}" class="img-fluid" height="100" width="100" />
+                            </div>
+                        </div>
+
+                        <script>
+                            window.onload = function() {
+                                // Set the image preview initially
+                                var profilePreview = document.getElementById('profilePreview');
+                                profilePreview.src = "{{ obj.thumb_image_file }}";
+                            };
+
+                            function previewProfile() {
+                                var fileInput = document.getElementById('profile');
+                                var profilePreview = document.getElementById('profilePreview');
+
+                                if (fileInput.files && fileInput.files[0]) {
+                                    var reader = new FileReader();
+
+                                    reader.onload = function (e) {
+                                        profilePreview.src = e.target.result;
+                                    };
+
+                                    reader.readAsDataURL(fileInput.files[0]);
+                                }
+                            }
+
+                            function clearProfileImage() {
+                                var fileInput = document.getElementById('profile');
+                                var profilePreview = document.getElementById('profilePreview');
+
+                                fileInput.value = null;
+                                profilePreview.src = "";
+                            }
+                        </script>
+
+                       <label for="urlSelect">Choose a URL</label>
+                       <select id="urlSelect" name="url" onchange="showURLInput(this)">
+                           <option value="{{obj.url}}">Select option</option>
+                           <option value="{{obj.url}}">Google Meet</option>
+                           <option value="{{obj.url}}">Zoom</option>
+                           <option value="{{obj.url}}">Chrome</option>
+                           <option value="{{obj.url}}">Microsoft</option>
+                       </select>
+                       
+                       <div id="urlInput" style="display: none; margin-top: 10px;">
+                           <label for="urlInputField">Enter Meeting URL:</label>
+                           <input type="text" id="urlInputField" name="url" value="{{obj.url}}" onchange="validateURL(this)">
+                           <small id="urlError" style="color: red; display: none;">URL must start with 'http://' or 'https://'</small>
+                       </div>
+                       
+                       <script>
+                           window.onload = function() {
+                               var urlSelect = document.getElementById('urlSelect');
+                               var urlInput = document.getElementById('urlInput');
+                               var urlInputField = document.getElementById('urlInputField');
+                               var selectedOption = urlSelect.options[urlSelect.selectedIndex];
+                       
+                               if (selectedOption.value !== "") {
+                                   urlInput.style.display = 'block';
+                                   urlInputField.value = selectedOption.value;
+                               }
+                           };
+                       
+                           function showURLInput(select) {
+                               var urlInput = document.getElementById('urlInput');
+                               var urlInputField = document.getElementById('urlInputField');
+                               var selectedOption = select.options[select.selectedIndex];
+                       
+                               if (selectedOption.value === "") {
+                                   urlInput.style.display = 'none';
+                                   urlInputField.value = ""; // Clear the URL input field
+                               } else {
+                                   urlInput.style.display = 'block';
+                                   urlInputField.value = selectedOption.value;
+                               }
+                           }
+                       
+                           function validateURL(input) {
+                               var urlError = document.getElementById('urlError');
+                               var urlInputField = input.value.trim();
+                       
+                               if (!urlInputField.startsWith('http://') && !urlInputField.startsWith('https://')) {
+                                   urlError.style.display = 'block'; // Show error message if URL does not start with 'http://' or 'https://'
+                               } else {
+                                   urlError.style.display = 'none';
+                               }
+                           }
+                       </script>
+                       
+
+                        <div class="row d-flex mt-3">
+                            <div class="col-md-6">
+                                <label for="schedule_date" class="form-label">Schedule Date *</label>
+                                <input type="date" class="form-control" name="schedule_date" value="{{obj.schedule_date|date:'Y-m-d'}}"
+                                    placeholder="Schedule the Date for the live" id="schedule_date">
+                            </div>
+                            
+                            <script>
+                                // Get today's date
+                                var today = new Date();
+                                var dd = String(today.getDate()).padStart(2, '0');
+                                var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+                                var yyyy = today.getFullYear();
+                                
+                                today = yyyy + '-' + mm + '-' + dd;
+                                
+                                document.getElementById("schedule_date").min = today;
+                            </script>
+                            
+                            <div class="col-md-6">
+                                <label for="schedule_time" class="form-label">Schedule Time *</label>
+                                <input type="time" class="form-control" name="schedule_time" value="{{obj.schedule_time|time:'H:i'}}"
+                                    placeholder="Schedule the timing for the live" id="schedule_time">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="validationDefault02" class="form-label">Join Fee</label>
+                            <div class="d-flex">
+                                <span class="input-group-text" id="">₹</span>
+                                <input type="text" class="form-control" name="fees" placeholder="Enter Join Fee" id="price" value="{{obj.fees}}">
+                            </div>
+                            <small id="feeError" style="color: red; display: none;">Fee must be 5 characters or less.</small>
+                        </div>
+                        <script>
+                            document.getElementById("price").addEventListener("input", function() {
+                                var fee = this.value;
+                                var feeError = document.getElementById("feeError");
+                                
+                                if (fee.length > 5) {
+                                    feeError.style.display = "block";
+                                    this.value = ''; // Clear the input
+                                } else {
+                                    feeError.style.display = "none";
+                                }
+                            });
+                        </script>
+                    </div>
+
+                    <div id="prcfields" style="display: {% if obj.type == 'Pre Recorded' %}block{% else %}none{%endif%};">
+                        <div class="col-md-12">
+                            <label for="validationDefault02" class="form-label">Course Name</label>
+                            <input type="text" class="form-control" name="course_name" id="validationDefault02" value="{{obj.course_name}}" >
+                        </div>
+                        <div class="container col-md-12 mt-3">
+                            <label for="Image" class="form-label">Thumbnail</label>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <input class="form-control" type="file" name="thumb_image" value="{{obj.thumb_image}}" accept="image/*" id="course_thumb_image" onchange="previewThumb()">
+                                </div>
+                                <div class="col-md-1">
+                                    <button onclick="clearThumbImage()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <img id="thumb_frame" src="{{obj.img_url}}" class="img-fluid" height="100" width="100" />
+                                </div>
+                            </div>        
+                        </div>
+                        <script>
+                            function previewThumb() {
+                                thumb_frame.src = URL.createObjectURL(event.target.files[0]);
+                            }
+                            function clearThumbImage() {
+                                document.getElementById('course_thumb_image').value = null;
+                                thumb_frame.src = "";
+                            }
+                        </script>
+                        <div class="container col-md-12">
+                            <label for="Video" class="form-label">Promo Video</label>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <input class="form-control" type="file" name="course_video" value="" accept="video/mp4,video/x-m4v,video/*" id="course_promo_video" onchange="previewVideo()">
+                                </div>
+                                <div class="col-md-1">
+                                    <button onclick="clearVideo()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <video width="220" height="100" style="display:block" controls controlsList="nodownload" src="{{obj.course_video_file}}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>        
+                        </div>
+                        <script>
+                            function previewVideo() {
+                                document.getElementById("course_promo_video").onchange = function(event) {
+                                    let file = event.target.files[0];
+                                    let blobURL = URL.createObjectURL(file);
+                                    document.querySelector("video").style.display = 'block';
+                                    document.querySelector("video").src = blobURL;
+                                }
+                            }
+                            function clearVideo() {
+                                document.getElementById('course_promo_video').value = null;
+                                promo_frame.src = "";
+                            }
+                        </script>
+                        <!-- <div class="col-md-12 mt-3">
+                            <label for="languageId" class="form-label">Language</label>
+                            <select class="form-select" name="language" id="languageId" required>
+                                <option value="" disabled >Select Language</option>
+                                <option {% if obj.language == 'English' %}selected{% endif %} value="English">English</option>
+                                <option {% if obj.language == 'Hindi' %}selected{% endif %} value="Hindi">Hindi</option>
+                                <option {% if obj.language == 'Marathi' %}selected{% endif %} value="Marathi">Marathi</option>
+                                <option {% if obj.language == 'Telugu' %}selected{% endif %} value="Telugu">Telugu</option>
+                                <option {% if obj.language == 'Bengali' %}selected{% endif %} value="Bengali">Bengali</option>
+                            </select>
+                        </div> -->
+                        <div class="col-12">&emsp13;
+                            <label for="tag-input">Language</label>
+                            <select class="js-select2" multiple="multiple" name="tags" placeholder="Click to select languages">
+                            {% for obj in languages %}
+                                <option value="{{ obj.id }}" data-badge="">{{ obj.name }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <script>
+                            $(document).ready(function() {
+                              $(".js-select2").select2({
+                                closeOnSelect: false,
+                                placeholder: "Click to select languages",
+                                allowHtml: true,
+                                allowClear: true,
+                                tags: true 
+                                
+                              });
+                            });
+                          </script>
+                        <div class="col-md-12 mt-3">
+                            <div class="form-check form-switch">
+                                <label class="form-check-label" for="flexSwitchCheckDefault">Generate A Coupon</label>
+                                <input class="form-check-input" value="{% if obj.generated_coupon == True %}Yes{% else %} No {% endif %}"  type="checkbox" onclick="ShowHideCoupon(this)" name="generated_coupon" role="switch" id="courseCoupon">
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowHideCoupon(btnPaid) {
+                                var couponDiv = document.getElementById("couponSection");
+                                if (btnPaid.value == "Yes") {
+                                    couponDiv.style.display = "block";
+                                    document.getElementById("couponeCodeValue").setAttribute('required', '');
+                                    document.getElementById("coupon_date").setAttribute('required', '');
+                                    document.getElementById("coupon_time").setAttribute('required', '');
+                                    btnPaid.value = "No";
+                                } else {
+                                    couponDiv.style.display = "none";
+                                    document.getElementById("couponeCodeValue").removeAttribute('required');
+                                    document.getElementById("coupon_date").removeAttribute('required');
+                                    document.getElementById("coupon_time").removeAttribute('required');
+                                    btnPaid.value = "Yes";
+                                }
+                            }
+                        </script>
+                        <div class="mb-2" style="display: {% if obj.generated_coupon == True %}block{% else %}none{% endif %};" id="couponSection">
+                            <!-- <div class="row">
+                                <div class="col-md-4">
+                                    <label for="couponeCodeValue" class="form-label">Create A Coupon</label>
+                                    <input type="text" class="form-control" placeholder="Create a Coupon" value="{{obj.coupon_code}}" name="coupon_code" id="couponeCodeValue" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="coupon_date" class="form-label">Coupon valid date*</label>
+                                    <input type="date" class="form-control" name="coupon_valid_date" value="{{obj.coupon_valid_date|date:'Y-m-d'}}" placeholder="Select Date" id="coupon_date" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="coupon_time" class="form-label">Coupon valid Time*</label>
+                                    <input type="time" class="form-control" name="coupon_valid_time" value="{{obj.coupon_valid_time|time:'H:i'}}" placeholder="Select Time" id="coupon_time">
+                                </div>
+                            </div> -->
+
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label for="couponeCodeValue" class="form-label">Create A Coupon</label>
+                                    <input type="text" class="form-control" placeholder="Create a Coupon" value="{{obj.coupon_code}}" name="coupon_code" id="couponeCodeValue" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="couponePercentValue" class="form-label">Coupon Percent</label>
+                                    <div class="d-flex">
+                                        <input type="text" class="form-control number_input" onkeypress="if (this.value.length >= 3) return false;" placeholder="Coupon Percent" value="{{obj.coupon_percent}}" name="coupon_percent" id="couponePercentValue" >
+                                        <span class="input-group-text" id="basic-addon2">%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label for="coupon_date" class="form-label">Coupon valid date*</label>
+                                    <input type="date" class="form-control" onchange="TDate()" name="coupon_valid_date" value="{{obj.coupon_valid_date|date:'Y-m-d'}}" placeholder="Select Date" id="coupon_date" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="coupon_time" class="form-label">Coupon valid Time*</label>
+                                    <input type="time" class="form-control" name="coupon_valid_time" value="{{obj.coupon_valid_time|time:'H:i'}}" placeholder="Select Time" id="coupon_time">
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <!-- <div class="col-md-12">
+                        <div class="form-check form-switch">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Paid courses</label>
+                            <input class="form-check-input" value="{% if obj.paid_course == True %}Yes{% else %} No {% endif %}" type="checkbox" onclick="ShowHideFee(this)" name="paid_course" role="switch" id="paidCourse">
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function ShowHideFee(btnPaid) {
+                            var feeDiv = document.getElementById("feeSection");
+                            if (btnPaid.value == "Yes") {
+                                feeDiv.style.display = "block";
+                                document.getElementById("price").setAttribute('required', '');
+                                document.getElementById("discount").setAttribute('required', '');
+                                document.getElementById("discount_percent").setAttribute('required', '');
+                                btnPaid.value = "No";
+                            } else {
+                                feeDiv.style.display = "none";
+                                document.getElementById("price").removeAttribute('required');
+                                document.getElementById("discount").removeAttribute('required');
+                                document.getElementById("discount_percent").removeAttribute('required');
+                                btnPaid.value = "Yes";
+                            }
+                        }
+                    </script>
+                    <div style="display: {% if obj.paid_course == True %}block{% else %}none{% endif %};" id="feeSection">
+                        <div class="row" >
+                            <div class="col-md-4">
+                                <label for="validationDefault02" class="form-label">Actual Fee</label>
+                                <div class="d-flex">
+                                    <span class="input-group-text" id="">₹</span>
+                                    <input type="number" class="form-control" name="actual_fee" placeholder="Enter Actual Fee" id="price" value="{{obj.actual_fee}}" >
+                                </div>
+                                </div>
+                            <div class="col-md-4">
+                                <label for="validationDefault03" class="form-label">Discount Fee</label>
+                                <div class="d-flex">
+                                    <span class="input-group-text" id="">₹</span>
+                                    <input type="number" class="form-control" name="discount_fee" value="{{obj.discount_fee}}" placeholder="Enter Discount Fee" id="discount" oninput="getPercent()" >
+                                </div>
+                            </div>
+                            <div class="col-md-4 ">
+                                <label for="validationDefault03" class="form-label">Total Discount</label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control " name="total_discount" value="{{obj.total_discount}}" placeholder="Enter Discount Percent" id="discount_percent" oninput="getDiscountedPrice()" >
+                                    <span class="input-group-text" id="basic-addon2">%</span>
+                                </div>
+                            </div>
+
+                            <script>
+                                function getPercent() {         
+                                    var numVal1 = Number(document.getElementById("price").value);
+                                    var numVal2 = Number(document.getElementById("discount").value);
+                                    // var totalValue = Math.round(100 - ((numVal2 / numVal1) * 100));
+                                    var totalValue = ((numVal1-numVal2)/numVal1)*100;
+                                    document.getElementById("discount_percent").value = totalValue;
+                                }
+                                function getDiscountedPrice(){
+                                    var numVal1 = Number(document.getElementById("price").value);
+                                    var numVal2 = Number(document.getElementById("discount_percent").value);
+                                    var totalValue = Math.round(numVal1-(numVal1*numVal2/100));
+                                    document.getElementById("discount").value = totalValue;
+                                }
+                            </script>
+                        </div>
+                    </div>
+                    
+                    </div>
+                </form>
+            </div> -->
+            <div class="col-md-12 text-right">
+                <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+    </div>
+    
+</main>
+<script>
+    document.getElementById("id_type").addEventListener("change", function(){
+        var selectedType = $(this).val();
+        console.log(selectedType);
+        if(selectedType === "Pre Recorded"){
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'none';
+        } else if(selectedType === "Live"){
+            document.getElementById("prcfields").style.display = 'none';
+            document.getElementById("lcfields").style.display = 'block';
+        } else{
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'block';
+        }
+    });
+</script>
+{% endblock content %}

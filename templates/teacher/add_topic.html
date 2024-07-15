@@ -1,0 +1,186 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+
+<style>
+    {% comment %} .deleteTopicbtn{
+        display:none
+    } {% endcomment %}
+    .topic-res-card {
+        padding: 1rem;
+        border: 1px solid grey;
+        border-radius: 15px;
+        width: 100px;
+    }
+
+    /* #topic_video_block{
+        display: none;
+    } */
+</style>
+{% endblock extrastyle %}
+
+{% block script %}
+
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'js/viewform.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12">
+            <h4>Add Topic</h4>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 " >
+            <div class="bg-light p-3">
+                <form class="row g-3" action="{% url 'add_topic' chapter.id %}" method="post" autocomplete="off" onsubmit="openLoader()">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <label for="id_chapter" class="form-label">Select Chapter</label>
+                        <select class="form-select" name="chapter_id" id="id_chapter" required>
+                          <option value="{{chapter.id}}" selected>{{chapter.chapter_name}}</option>
+                        </select>
+                      </div>
+                    <div class="col-md-12">
+                      <label for="topic_name" class="form-label">Topic Name</label>
+                      <input type="text" class="form-control" name="topic_name" id="topic_name" value="" required>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="description" class="form-label">Description</label>
+                      <textarea type="text" class="form-control" name="description" value="" id="description"></textarea>
+                    </div>
+                    <div class="col-md-12 text-right">
+                      <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="row justify-content-center mt-2">
+        <h4>Topics</h4>
+        <div class="col-lg-12 col-md-12 " id="" >
+            <div class="accordion accordion-flush" id="topic_accordion"></div>
+        </div>
+    </div>
+    
+</main>
+
+
+<script>
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+        const csrf = Cookies.get('csrftoken');
+        
+        $(document).ready( function(){
+            
+            fetch('{% url "get_topic" %}', {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    "chapter_id":"{{chapter.id}}"
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                // let res = JSON.parse(result['topics']);
+                const preNode = document.getElementById("topic_accordion");
+                preNode.innerHTML = result['topics'];
+               
+            });
+            
+        })
+
+        
+    })
+
+    function createForm(topicId){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/form/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                title: "",
+                topic_id: topicId.value
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `/teacher/form/${result["code"]}/edit`
+        })
+    }
+
+    function createQuiz(topicId){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/quiz/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                title: "",
+                topic_id: topicId.value
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `/teacher/quiz/${result["code"]}/edit`
+        })
+    }
+  
+    function openLoader() {
+        document.getElementById("spinner").classList.add('show');
+    }
+
+    const AlertToast = Swal.mixin({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        animation:false,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    function deleteTopic(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/delete_topic', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                tid: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            document.getElementById(`tc-${id}`).remove();
+            AlertToast.fire({
+                icon: "success",
+                title: "Topic Deleted",
+            });
+        });
+    }
+
+</script>
+{% endblock content %}

@@ -1,0 +1,56 @@
+
+{% load static %}
+
+<!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'home' %}">
+          <i class="bi bi-grid"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'course_list' user.id %}">
+          <i class="bi bi-book"></i>
+          <span>Course</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'live_course' user.id %}">
+          <i class="bi bi-book"></i>
+          <span>Live Course</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'subscription' %}">
+          <i class="bi bi-stack"></i>
+          <span>Subcription</span>
+        </a>
+      </li><!-- End Contact Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'course_statistics' %}">
+          <i class="bi bi-file-bar-graph"></i>
+          <span>Course Purchased</span>
+        </a>
+      </li><!-- End Register Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'chats' %}">
+          <i class="bi bi-chat-dots"></i>
+          <span>Chats</span>
+        </a>
+      </li><!-- End Login Page Nav -->
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="{% url 'calendar' %}">
+          <i class="bi bi-gear"></i>
+          <span>Calendar</span>
+        </a>
+      </li>
+    </ul>
+
+  </aside><!-- End Sidebar-->

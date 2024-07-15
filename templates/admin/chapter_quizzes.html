@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+{% block content %}
+<div class="container bg-light mt-4 shadow">
+    <h1 class="mt-4"><strong> Chapter: {{ chapter.chapter_name }}</strong></h1>
+    <ul class="list-group mt-4">
+        {% if quizzes %}
+            {% for quiz in quizzes %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ quiz.title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ quiz.description }}</p>
+                   
+                        <h4>Questions:</h4>
+                        <ul class="list-group">
+                            {% for question in quiz.questions.all %}
+                                <li class="list-group-item mb-3">
+                                    <h3>Q. :- {{ question.question }}</h3>
+                                    <h4 class="mt-3">Options:-</h4>
+                                    <ul class="list-group">
+                                        {% for choice in question.choices.all %}
+                                            <li class="ml-5">{{ choice.choice }}</li>
+                                        {% endfor %}
+                                        {% for choice in question.choices.all %}
+                                            {% if choice.is_answer %}
+                                                <li class="text-success">
+                                                    Correct Answer: <span style="color: black;"> - {{ choice.choice }}</span>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No quizzes found for this topic.
+            </div>
+        {% endif %}
+    </ul>
+</div>
+
+
+{% endblock content %}
+<style>
+.black-text {
+    color: black;
+}
+
+
+</style>
+

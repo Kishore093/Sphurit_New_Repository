@@ -1,0 +1,205 @@
+{% extends 'teacher/base.html' %} 
+{% load static %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block extrastyle %}
+ <style>
+    .list-group-item{
+        background-color: transparent;
+    }
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between mb-3 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="col-lg-8 col-md-8 d-flex">
+            <input class="user-check me-3" id="checkbox-all" type="checkbox" >
+            <h4>Imported Users</h4>
+        </div>
+        <!-- <div class="col-lg-4 col-md-4 text-right">
+            <button class="btn btn-outline-secondary btn-sm" onclick="selectAll()">Select</button>
+        </div> -->
+    </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.6s">
+        <ul class="list-group " id="users-list">
+            {% for obj in imported_users %}
+            <li class="list-group-item p-0 border-0">
+                <div class="card p-2 mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-1" >
+                            <input class="user-check me-1" type="checkbox" value="{{obj.id}}" aria-label="...">
+                            <div class="text-center" style="margin: auto;">
+                                {% if obj.profile_image %}
+                                <img src="{{obj.profile_image.url}}" class="rounded-circle" alt="" width="50">
+                                {% else %}
+                                <img src="{% static 'img/user.png' %}" class="rounded-circle" alt="" width="50">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-8 ">
+                            <h5><a href="{% url 'get_user_details' obj.id %}"><span class="fw-bold">{{ obj.first_name }} {{ obj.last_name }}</span></a></h5>
+                            <h6><span class="text-muted small">{{ obj.mobile }}</span></h6>
+                            <h6><span class="text-muted small">{{ obj.email }}</span></h6>
+                            <h6>Valid Date: <span class="text-muted small">
+                                {% if obj.user_purchased.exists %}
+                                    {% if obj.user_purchased.first.valid_date %}
+                                        {{ obj.user_purchased.first.valid_date }}
+                                    {% else %}
+                                        Not Available
+                                    {% endif %}
+                                {% else %}
+                                    Not Available
+                                {% endif %}
+                            </span></h6>
+
+                            {% comment %} <h6>Valid Date :<span class="text-muted small">{{ obj.email }}</span></h6> {% endcomment %}
+                        </div>
+                        <div class="col-md-3 text-right" style="margin-top: auto;">
+                            {% if obj.is_active %}
+                            <button class="btn btn-outline-success btn-sm" onclick="disapproveUser('{{obj.id}}')">Disapprove</button>
+                            {% else %}
+                            <button class="btn btn-outline-success btn-sm" onclick="approveUser('{{obj.id}}')">Approve</button>
+                            {% endif %}
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteUser('{{obj.id}}')">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+  </div>
+  <div class="row justify-content-center mt-3">
+    <div class="col-lg-12 col-md-12 text-right wow fadeInUp" data-wow-delay="0.9s">
+        <button class="btn btn-outline-success" onclick="approveAllUsers()">Approve All</button>
+        <button class="btn btn-outline-success" onclick="disapproveAllUsers()">Disapprove All</button>
+        <button class="btn btn-outline-danger" onclick="deleteAllUsers()">Delete All</button>
+    </div>
+</div>
+</main>
+
+<script>
+    function disapproveUser(id){
+        fetch('{% url "disapproveUser" %}', {
+            method: "POST",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location.reload();
+            // $(`#card_btn_${id}`).reload(`#card_btn_${id}`);
+        })
+    }
+    function approveUser(id){
+        fetch('{% url "approveUser" %}', {
+            method: "POST",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location.reload();
+            // $(`#card_btn_${id}`).load(`#card_btn_${id}`);
+        })
+    }
+    function deleteUser(id) {
+        var result = confirm("Do you want to delete?");
+        if (result==true) {
+            fetch('{% url "deleteUser" %}', {
+                method: "POST",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                window.location.reload();
+                // $(`#card_btn_${id}`).load(`#card_btn_${id}`);
+            })
+        } else {
+            return false;
+        }
+    }
+
+    const mainCheckbox = document.getElementById('checkbox-all');
+    const tableBody = document.getElementById('users-list');
+    mainCheckbox.addEventListener('change', function() {
+    if (this.checked === true)
+        tableBody.querySelectorAll('input[type="checkbox"]').forEach(function(element) {
+        element.checked = true;
+        });
+    else
+        tableBody.querySelectorAll('input[type="checkbox"]').forEach(function(element) {
+        element.checked = false;
+        });
+    });
+
+    function approveAllUsers(){
+        const tableBody = document.getElementById('users-list');
+        tableBody.querySelectorAll('input[type="checkbox"]').forEach(function(element) {
+            if(element.checked){
+                console.log(element.value);
+                fetch('{% url "approveUser" %}', {
+                    method: "POST",
+                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                    body: JSON.stringify({
+                        id: element.value
+                    })
+                })
+            }
+        });
+        window.location.reload();
+    }
+    function disapproveAllUsers(){
+        const tableBody = document.getElementById('users-list');
+        tableBody.querySelectorAll('input[type="checkbox"]').forEach(function(element) {
+            if(element.checked){
+                console.log(element.value);
+                fetch('{% url "disapproveUser" %}', {
+                    method: "POST",
+                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                    body: JSON.stringify({
+                        id: element.value
+                    })
+                })
+            }
+        });
+        window.location.reload();
+    }
+    function deleteAllUsers() {
+        var result = confirm("Do you want to delete?");
+        if (result==true) {
+            const tableBody = document.getElementById('users-list');
+            tableBody.querySelectorAll('input[type="checkbox"]').forEach(function(element) {
+                if(element.checked){
+                    console.log(element.value);
+                    fetch('{% url "deleteUser" %}', {
+                        method: "POST",
+                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                        body: JSON.stringify({
+                            id: element.value
+                        })
+                    })
+                }
+            });
+            window.location.reload();
+        } else {
+            return false;
+        }
+    }
+
+</script>
+{% endblock content %}

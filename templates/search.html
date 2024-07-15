@@ -1,0 +1,412 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load filter %}
+
+{% block extrastyle %}
+<style>
+    .card {
+    box-shadow: 0 0 0px 1px #00000017 !important;
+}
+    .card-img-top {
+        border-radius: 0px;
+        height: 12vw;
+    }
+   
+    h6.card-title a {
+        font-weight: bold;
+        color: #000;
+    }
+    .col-lg-3 {
+       width: 20%;
+    }
+    .card-sub-title {
+        font-size: 11px;
+        margin-top: -6px;
+    }
+    .small {
+        font-size: .75em;
+    }
+    .card-footer{
+        margin-top: -7px;
+    }
+    h4 {
+        font-size: 1.2rem;
+    }
+    .ptext {
+        margin-top: 3px;
+    }
+    h4.text-warning.fw-bold {
+        margin-top: -10px;
+        margin-left: 2px;
+    }
+    h5.small.text-muted.text-decoration-line-through {
+        margin-top: -8px;
+        margin-left: 2px;
+    } 
+    .mx-1 {
+        margin-left: 4.25rem !important;
+    }
+    
+
+    element.style {
+    }
+    .btn.btn-primary, .btn.btn-secondary {
+        color: #FFFFFF;
+    }
+    .my-auto {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .btn {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 600;
+        transition: .5s;
+    }
+    .my-auto {
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+    }
+.a.btn.btn-primary.btn-sm.border.my-auto.ml-5 {
+        margin-left: 50px;
+    }
+    .mx-1 {
+        margin-left: 3.25rem !important;
+    }
+    
+element.style {
+}
+.card-footer:last-child {
+    border-radius: 0 0 calc(.25rem - 1px) calc(.25rem - 1px);
+}
+.card-footer {
+    margin-top: -7px;
+}
+.card-header, .card-footer {
+    border-color: #ebeef4;
+    background-color: #fff;
+    color: #798eb3;
+    padding: 5px 15px;
+}
+.rounded {
+    border-radius: .25rem !important;
+}
+.p-2 {
+    padding: .5rem !important;
+}
+/* .justify-content-between {
+    justify-content: space-between !important;
+} */
+.card-footer.rounded.d-flex .d-flex {
+   
+    width: 66%;
+}.card-body {
+    height: 332px;
+}
+.course_box_body button#rzp-button1 {
+     margin: 0 ;
+}
+
+sm.border.my-auto.ml-5.text-white {
+    margin-left: -1px;
+    margin-right: -5px;
+} .btn-sm {
+
+    font-size: .75rem;
+}.col-lg-3.col-md-4.p-2.align-items-stretch.course_boxs_body {
+    width: 40%;
+} 
+.course_box_body .card-footer {
+    padding: 8px;
+    margin-top: -22px;
+}
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+{% endblock %}
+{% block content %}
+
+    <div class="container-fluid curved-box pt-4 m-0">
+        <h3 class="fs-2 text-white mt-2 pt-1 pb-1 text-capitalize">Courses of : {{ search_query }}</h3>
+       
+    </div>
+    <div class="container-fluid px-5 pt-5">
+    <div class="row ">
+        {% comment %} {% for item in object_list %}
+        <div class="col-lg-3 col-md-3 align-items-stretch course_box_body m-0 p-1">
+            <div class="card rounded border  border-box">
+                <div class="card-body">
+                    <img class="card-img-top" src="{{ item.img_url }}" alt="" >
+                    <div class="">
+                        <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                        <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                        <p class="small text-muted ptext">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                        <h4 class="text-warning fw-bold ">₹ {{ item.discount_fee }}</h4>
+                        
+                        <h5 class="small text-muted text-decoration-line-through " >₹ {{ item.actual_fee }}</h5>
+                    </div>
+                </div>
+                
+                <div class="card-footer p-2 rounded d-flex justify-content-between">
+                    
+                        <span class="d-flex">
+                           
+                            {% if item.id|is_purchased:request.user %}
+                            <a class="btn bg-warning btn-sm border my-auto ml-5 text-white slb" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                            {% else %}
+                            <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                                {% if user in item.wishlist.all %}
+                                <i class="bi bi-heart-fill"></i>
+                                {% else %}
+                                <i class="bi bi-heart"></i>
+                                {% endif %}
+                            </button>
+    
+                            {% if item.id|is_cart:request.user %}
+                            <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border "><i class="bi bi-cart-check"></i></a>
+                            {% else %}
+                            <a id="cart-btn-mr-{{ item.id }}" class="btn btn-secondary btn-sm border  add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                            {% endif %}
+    
+    
+                            <script type="text/javascript">
+                                $(document).ready(function() {
+                                $('.add-to-cart-btn').on('click', function(e) {
+                                e.preventDefault(); 
+                                var itemId = $(this).attr('id').split('-')[3];             
+                            $.ajax({
+                                url: $(this).attr('href'),
+                                type: 'GET',
+                                success: function(data) {
+                                $('#cart-btn-mr-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                $('#cart-btn-mr-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                            },
+                            error: function(error) {
+                            console.log(error); 
+                            }
+                            });
+                            });
+                        });                
+                        </script>
+                            
+                        
+                        {% endif %}
+    
+                        </span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="py-5 my-5">
+            <p class="h3 text-muted my-5 text-center">Sorry, we couldn't find any results!!</p>
+        </div>
+        {% endfor %} {% endcomment %}
+    {% for item in object_list %}
+    <div class="col-lg-3 col-md-3 align-items-stretch course_box_body">
+        <div class="card mb-4 rounded border">
+            <div class="card-body">
+                <img class="card-img-top" src="{{ item.img_url }}" alt="">
+                <div class="">
+                    {% if item.id|is_purchased:request.user %}
+                        <h6 class="card-title mb-0 one-line-text"><a href="{% url 'play_course' item.id %}">{{ item.course_name }}</h6>
+                    {% else %}
+                        <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                    {% endif %}
+                    <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                    <p class="small text-muted ptext">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                    <h4 class="text-warning fw-bold">₹ {{ item.discount_fee }}</h4>
+                    <h5 class="small text-muted text-decoration-line-through">₹ {{ item.actual_fee }}</h5>
+                </div>
+            </div>
+
+            <div class="card-footer p-2 rounded ">
+                {% if item.id|is_purchased:request.user %}
+                <a class="btn btn-warning btn-sm border my-auto text-white" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                {% else %}
+                <span class="justify-content-between d-flex">
+                    <div>
+                        <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                            {% if user in item.wishlist.all %}
+                                <i class="bi bi-heart-fill"></i>
+                            {% else %}
+                                <i class="bi bi-heart"></i>
+                            {% endif %}
+                        </button>
+                        {% if item.id|is_cart:request.user %}
+                            <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border"><i class="bi bi-cart-check"></i></a>
+                        {% else %}
+                            <a id="cart-btn-mr-{{ item.id }}" class="btn btn-secondary btn-sm border  add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                        {% endif %}
+                    </div>
+                    <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm ml-5">Enroll Now</button>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="py-5 my-5">
+        <p class="h3 text-muted my-5 text-center">Sorry, we couldn't find any results!!</p>
+    </div>
+{% endfor %}
+    </div>
+</div>
+
+<script>
+    function removeFromWishlist(id){
+        const csrf = Cookies.get('csrftoken');
+        var btn = document.getElementsByClassName(`atwl${id}`)
+        fetch('remove_from_wishlist', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            btn.onClick = "AddToWishlist('{{item.id}}')";
+            btn.innerHTML='<i class="bi bi-heart"></i>';
+            // window.location = `user_purchased_list`
+        })
+    }
+    function AddToWishlist(id){
+        const csrf = Cookies.get('csrftoken');
+        var btn = document.getElementById(`atwl${id}`)
+        if("{{request.user.is_authenticated}}" == "True"){
+            fetch('add_to_wishlist', {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                if(result['status'] == 'add'){
+                    btn.innerHTML='<i class="bi bi-heart-fill"></i>';
+                }else{
+                    btn.innerHTML='<i class="bi bi-heart"></i>';
+                }
+                // window.location = `user_purchased_list`
+            })    
+        }
+        else{
+            window.location = "{% url 'user_login' %}";
+        }
+    }
+
+</script>
+<script>
+
+    function enrollNow(args){
+        if("{{request.user.is_authenticated}}" == "True"){
+            var oid = "";
+            fetch("{% url 'initEnrollPayment' %}", {
+                method: "POST",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "amount":args.p,
+                    "currency":"INR"
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                var optionData = result['result']
+                var options = {
+                    "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                    "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "currency": optionData['currency'],
+                    "name": "Course Enrollment",
+                    "description": "Course Enrollment",
+                    "image": "{% static 'img/icons/logo1.png'%}",
+                    "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                    "handler": function (response){
+                        if(response.razorpay_payment_id){
+                            console.log(response.razorpay_payment_id);
+                            oid = response.razorpay_order_id;
+                            fetch("{% url 'verifySignature' %}", {
+                                method: "POST",
+                                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                body: JSON.stringify({
+                                    "razorpay_paymentId":response.razorpay_payment_id,
+                                    "razorpay_orderId":response.razorpay_order_id,
+                                    "razorpay_signature":response.razorpay_signature
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                if(result['result']){
+                                    fetch("{% url 'purchaseCourse' %}", {
+                                        method: "POST",
+                                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                        body: JSON.stringify({
+                                            "course_id":args.id,
+                                            "order_id":oid
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log(result);
+                                        const swalWithBootstrapButtons = Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: "btn btn-success",
+                                                    cancelButton: "btn btn-danger"
+                                                },
+                                                buttonsStyling: false
+                                                });
+                                                swalWithBootstrapButtons.fire({
+                                                title: "Payment Successful.",
+                                                text: "Thanks for purchesed the course!",
+                                                icon: "success",
+                                                showCancelButton: false,
+                                                confirmButtonText: "Ok",
+                                                reverseButtons: true
+                                                }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location = "{% url 'user_dashboard' %}";
+                                                }
+                                                });
+
+                                    })
+                                }
+                            })
+                        }else{
+                            console.log(response);
+                        }
+                    },
+                    "prefill": {
+                        "name": "{{ request.user.full_name }}",
+                        "email": "{{ request.user.email }}",
+                        "contact": "{{ request.user.mobile }}"
+                    },
+                    "notes": {
+                        "address": "Sphurit"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+
+                rzp1.open();
+                rzp1.on('payment.failed', function (response){})
+            });
+        }else{
+            window.location = "{% url 'user_login' %}";
+        }
+    }
+</script>
+{% endblock content %}

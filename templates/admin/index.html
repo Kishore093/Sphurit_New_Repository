@@ -1,0 +1,506 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+{% block content %}
+
+  <!-- [ Main Content ] start -->
+  <div class="row">
+    <!--[ daily sales section ] start-->
+    <div class="col-md-6 col-xl-4">
+      <div class="card daily-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Enrolled Teachers</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                {{ enrolled_teachers_count }}</h3>
+            </div>
+
+          </div>
+      
+        </div>
+      </div>
+    </div>
+    <script>
+      
+      fetch('/enrolled-teachers-count/')
+          .then(response => response.json())
+          .then(data => {
+              
+              document.getElementById('enrolledTeachersCount').textContent = data.enrolled_teachers_count;
+          })
+          .catch(error => {
+              console.error('Error fetching enrolled teachers count:', error);
+              
+              document.getElementById('enrolledTeachersCount').textContent = 'Error';
+          });
+  </script>
+
+
+
+    <!--[ daily sales section ] end-->
+    <!--[ Monthly  sales section ] starts-->
+    <div class="col-md-6 col-xl-4">
+      <div class="card Monthly-sales">
+          <div class="card-block">
+              <h6 class="mb-4">Monthly Earning</h6>
+              <div class="row d-flex align-items-center">
+                  <div class="col-9">
+                      <!-- Display the monthly earning -->
+                      <h3 id="monthly-earning" class="f-w-300 d-flex align-items-center m-b-0">Loading...</h3>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <script>
+      // Fetch monthly earnings using JavaScript
+      fetch("{% url 'monthly_earning' %}")
+          .then(response => response.json())
+          .then(data => {
+              document.getElementById('monthly-earning').textContent = '₹ ' + data.monthly_earning.toFixed(2);
+          })
+          .catch(error => {
+              console.error('Error fetching monthly earnings:', error);
+          });
+  </script>
+  
+    
+    <!--[ Monthly  sales section ] end-->
+    <!--[ year  sales section ] starts-->
+
+    <!-- <dv class="col-md-12 col-xl-4">
+      <div class="card yearly-sales">
+        <div class="card-block">
+          <h6 class="mb-4">Yearly Earning</h6>
+          <div class="row d-flex align-items-center">
+            <div class="col-9">
+              <h3 class="f-w-300 d-flex align-items-center  m-b-0">₹ {{ yearly_earning|floatformat:2 }}</h3>
+            </div>
+           
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    -->
+
+   <div class="col-md-6 col-xl-4">
+    <div class="card Yearly-sales">
+        <div class="card-block">
+            <h6 class="mb-4">Yearly Earning</h6>
+            <div class="row d-flex align-items-center">
+                <div class="col-9">
+                    <!-- Display the yearly earning -->
+                    <h3 id="yearly-earning" class="f-w-300 d-flex align-items-center m-b-0">Loading...</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fetch yearly earnings using JavaScript
+    fetch("{% url 'yearly_earning' %}")
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('yearly-earning').textContent = '₹ ' + data.yearly_earning.toFixed(2);
+        })
+        .catch(error => {
+            console.error('Error fetching yearly earnings:', error);
+        });
+</script> 
+    <!--[ year  sales section ] end-->
+
+
+    
+    <!--[ Recent Users ] start-->
+
+
+<div class="col-xl-12 col-md-6">
+  <div class="card Recent-Users">
+    <div class="card-header">
+      <h5>Recent courses</h5>
+    </div>
+    <div class="card-block px-0 py-3">
+      <div class="table-responsive">
+        <table class="table align-items-center table-flush table-hover" id="courseTable">
+          <tbody>
+            {% for course in recent_courses %}
+            <tr data-course-id="{{ course.id }}">
+              <td>
+                <img class="rounded-circle" style="width:40px;" src="{% static 'assets/images/user/avatar-3.jpg' %}" alt="activity-user">
+              </td>
+              <td>
+                <a href="{{ site.domain }}/admin/teacher/course/{{ course.id }}/change">{{ course.course_name }}</a>
+              </td>
+              <td>{{ course.created_at }}</td>
+              <td>
+                <div class="float-right">
+                  {% if course.approved %}
+                    <button class="btn btn-success action-button" data-action="approve" disabled>Approved</button>
+                  {% else %}             
+                    <button class="btn btn-success action-button" data-action="approve">Approve</button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% csrf_token %}
+{% url 'approve_course' as approve_course_url %}
+{% url 'hide_course' as hide_course_url %} 
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    var courseRows = document.querySelectorAll('#courseTable tbody tr');
+    courseRows.forEach(function(row) {
+        var courseId = row.getAttribute('data-course-id');
+        var approveButton = row.querySelector('.btn-success');
+        var hideButton = row.querySelector('.btn-danger');
+
+        // Fetch the course status from the server
+        fetchCourseStatus(courseId)
+            .then(function(response) {
+                if (response.success) {
+                    if (response.status === 'approved') {
+                        approveButton.textContent = 'Approved';
+                        approveButton.disabled = true;
+                        hideButton.textContent = 'Hide';
+                        hideButton.disabled = false;
+                    } else if (response.status === 'hidden') {
+                        hideButton.textContent = 'Hidden'; 
+                        hideButton.disabled = true;
+                        approveButton.textContent = 'Approve';
+                        approveButton.disabled = false;
+                    } else {
+                        
+                        hideButton.textContent = 'Hide';
+                        hideButton.disabled = false;
+                        approveButton.textContent = 'Approve';
+                        approveButton.disabled = false;
+                    }
+                }
+            })
+            .catch(function(error) {
+                console.error('Error fetching course status:', error);
+            });
+    });
+});
+
+
+
+document.getElementById('courseTable').addEventListener('click', function(event) {
+    var target = event.target;
+
+    if (target.classList.contains('action-button')) {
+        event.preventDefault();
+
+        var action = target.getAttribute('data-action');
+        var courseId = target.closest('tr').getAttribute('data-course-id');
+
+        if (action === 'approve') {
+            approveCourse(courseId, target);
+        } else if (action === 'hide') {
+            hideCourse(courseId, target);
+        }
+    }
+});
+
+function approveCourse(courseId, buttonElement) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '{{ approve_course_url }}', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    var csrftoken = getCookie('csrftoken');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                buttonElement.textContent = 'Approved';
+                buttonElement.disabled = true;
+                var hideButton = buttonElement.parentElement.querySelector('.btn-danger');
+                hideButton.textContent = 'Hided'; 
+                hideButton.disabled = true;
+            } else {
+                console.error('Error approving course. Status code: ' + xhr.status);
+                alert('Error approving course');
+            }
+        }
+    };
+
+    var data = 'course_id=' + encodeURIComponent(courseId);
+    xhr.send(data);
+}
+
+// function hideCourse(courseId, buttonElement) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.open('POST', '{{ hide_course_url }}', true);
+//     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+//     var csrftoken = getCookie('csrftoken');
+//     xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+//     xhr.onreadystatechange = function () {
+//         if (xhr.readyState === 4) {
+//             if (xhr.status === 200) {
+//                 buttonElement.textContent = 'Hided';
+//                 buttonElement.disabled = true;
+//                 var approveButton = buttonElement.parentElement.querySelector('.btn-success');
+//                 approveButton.textContent = 'Approve'; 
+//                 approveButton.disabled = false;
+//             } else {
+//                 console.error('Error hiding course. Status code: ' + xhr.status);
+//                 alert('Error hiding course');
+//             }
+//         }
+//     };
+
+//     var data = 'course_id=' + encodeURIComponent(courseId);
+//     xhr.send(data);
+// }
+
+
+function fetchCourseStatus(courseId) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get_course_status?course_id=' + encodeURIComponent(courseId), true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    reject(xhr.statusText);
+                }
+            }
+        };
+
+        xhr.send();
+    });
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+
+    <!--[ Recent Users ] end-->
+
+   
+    <div class="col-xl-12 col-md-6">
+      <div class="card Recent-Users">
+        <div class="card-header">
+          <h5>Live courses</h5>
+        </div>
+        <div class="card-block px-0 py-3">
+          <div class="table-responsive">
+            <table class="table align-items-center table-flush table-hover" id="courseTable1">
+              <tbody>
+                {% for course in live_courses %}
+                <tr data-course-id="{{ course.id }}">
+                  <td>
+                    <img class="rounded-circle" style="width:40px;" src="{% static 'assets/images/user/avatar-3.jpg' %}" alt="activity-user">
+                  </td>
+                  <td>
+                    <a href="{{ site.domain }}/admin/teacher/course/{{ course.id }}/change">{{ course.host_name }}</a>
+                  </td>
+                  <td>{{ course.created_at }}</td>
+                  <td>
+                    <div class="float-right">
+                      {% if course.approved %}
+                        <button class="btn btn-success action-button" data-action="approve" disabled>Approved</button>
+                      
+                      {% else %}
+                        
+                        <button class="btn btn-success action-button" data-action="approve">Approve</button>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    var courseRows = document.querySelectorAll('#courseTable1 tbody tr');
+    courseRows.forEach(function(row) {
+        var courseId = row.getAttribute('data-course-id');
+        var approveButton = row.querySelector('.btn-success');
+        var hideButton = row.querySelector('.btn-danger');
+
+        // Fetch the course status from the server
+        fetchCourseStatus(courseId)
+            .then(function(response) {
+                if (response.success) {
+                    if (response.status === 'approved') {
+                        approveButton.textContent = 'Approved';
+                        approveButton.disabled = true;
+                        hideButton.textContent = 'Hide';
+                        hideButton.disabled = false;
+                    } else if (response.status === 'hidden') {
+                        hideButton.textContent = 'Hidden'; 
+                        hideButton.disabled = true;
+                        approveButton.textContent = 'Approve';
+                        approveButton.disabled = false;
+                    } else {
+                        
+                        hideButton.textContent = 'Hide';
+                        hideButton.disabled = false;
+                        approveButton.textContent = 'Approve';
+                        approveButton.disabled = false;
+                    }
+                }
+            })
+            .catch(function(error) {
+                console.error('Error fetching course status:', error);
+            });
+    });
+});
+
+
+
+document.getElementById('courseTable1').addEventListener('click', function(event) {
+    var target = event.target;
+
+    if (target.classList.contains('action-button')) {
+        event.preventDefault();
+
+        var action = target.getAttribute('data-action');
+        var courseId = target.closest('tr').getAttribute('data-course-id');
+
+        if (action === 'approve') {
+            approveCourse(courseId, target);
+        } else if (action === 'hide') {
+            hideCourse(courseId, target);
+        }
+    }
+});
+
+function approveCourse(courseId, buttonElement) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '{{ approve_course_url }}', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+    var csrftoken = getCookie('csrftoken');
+    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                buttonElement.textContent = 'Approved';
+                buttonElement.disabled = true;
+                var hideButton = buttonElement.parentElement.querySelector('.btn-danger');
+                hideButton.textContent = 'Hidded'; 
+                hideButton.disabled = true;
+            } else {
+                console.error('Error approving course. Status code: ' + xhr.status);
+                alert('Error approving course');
+            }
+        }
+    };
+
+    var data = 'course_id=' + encodeURIComponent(courseId);
+    xhr.send(data);
+}
+
+// function hideCourse(courseId, buttonElement) {
+//     var xhr = new XMLHttpRequest();
+//     xhr.open('POST', '{{ hide_course_url }}', true);
+//     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+//     var csrftoken = getCookie('csrftoken');
+//     xhr.setRequestHeader('X-CSRFToken', csrftoken);
+
+//     xhr.onreadystatechange = function () {
+//         if (xhr.readyState === 4) {
+//             if (xhr.status === 200) {
+//                 buttonElement.textContent = 'Hidded';
+//                 buttonElement.disabled = true;
+//                 var approveButton = buttonElement.parentElement.querySelector('.btn-success');
+//                 approveButton.textContent = 'Approve'; 
+//                 approveButton.disabled = false;
+//             } else {
+//                 console.error('Error hiding course. Status code: ' + xhr.status);
+//                 alert('Error hiding course');
+//             }
+//         }
+//     };
+
+//     var data = 'course_id=' + encodeURIComponent(courseId);
+//     xhr.send(data);
+// }
+
+function fetchCourseStatus(courseId) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/get_course_status?course_id=' + encodeURIComponent(courseId), true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    reject(xhr.statusText);
+                }
+            }
+        };
+
+        xhr.send();
+    });
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+
+
+
+{% endblock content %}

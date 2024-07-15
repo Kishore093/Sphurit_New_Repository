@@ -1,0 +1,71 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+   .row{
+    display: flex; 
+    flex-wrap: nowrap;    
+   }
+   .card-body {
+    padding: 1.5rem;
+    margin: -1rem;
+    margin-right: 0rem 
+    }
+    .card{
+    margin: 0px!important;
+}
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+
+{% endblock %}
+{% block content %}
+<div class="container-fluid curved-box pt-2 m-0">
+    <p class="fs-4 text-white mb-1">My purchased</p>
+    <p class="fs-6 text-white mb-2">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-2 card">
+        {% include 'user-face/sidebar.html' %}
+    </div>
+    <div class="col-lg-10 w-70%">
+        <div class="card m-0">
+            <div class="card-body">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                          <th scope="col" style="width: 5%;">SN</th>
+                          <th scope="col" style="width: 26%;">Course Name</th>
+                          <th scope="col"  style="width: 12%;">Course Fee</th>
+                          <th scope="col"  style="width: 5%;">GST</th>
+                          <th scope="col"  style="width: 17%;">Purchase Date</th>
+                          <th scope="col" style="width: 20%;">Valid up to</th>
+                          <th scope="col" style="width: 8%;">Files</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in courses %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ obj.course.course_name }}</td>
+                          <td>{{ obj.course.discount_fee }}</td>
+                          <td>{{public_config.GST_RATE}}%</td>
+                          <td>{{ obj.created_at|date:"d-m-Y h:i A"}}</td>
+                          <td>Dec. 22, 2023, 1:06 p.m.</td>
+                          <td><a href="{% url 'download_invoice' obj.id %}" class="btn btn-primary btn-sm" title="Invoice"><i class="bi bi-file-earmark-text"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 
+
+<script>
+   
+</script>
+
+{% endblock content %}

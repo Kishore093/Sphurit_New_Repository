@@ -1,0 +1,383 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+   .full-width-image {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: cover;
+    }
+
+    .container {
+        margin-top: -200px;
+    }
+    .abp{
+        margin-right: 20px;
+    }
+    img.mt-5.img-fluid.position-relative.mx-5{
+        margin-left: 9rem !important;
+    }
+
+    .row.rcard{
+        margin-left:0;
+    }
+    img.mt-5.img-fluid.position-relative.mx-5 {
+         margin-left: 0 !important; 
+    }
+    
+.card-footer.rounded.d-flex .d-flex {
+    justify-content: space-between;
+    width: 68%;
+}
+.d-flex {
+     display: none !important; 
+}
+.course_box_body button#rzp-button1 {
+    margin-left: 62px !important;
+}
+.row>* {
+   
+     padding-right: 0; 
+     padding-left: 0; 
+  
+}
+    @media screen and (max-width: 300px) and (min-width: 200px) {
+    .mx-5 {
+     margin-left: 1rem !important;
+    }
+    img.abtimg2.mt-5 {
+    padding-right: 60px;
+    }
+    .px-5 {
+    padding-right: 0rem !important;
+    padding-left: 0rem !important;
+}
+.mx-5 {
+    margin-right: 0rem !important;
+    margin-left: 0rem !important;
+}.row>* {
+   
+     padding-right: 0;
+
+}
+@media screen and (max-width: 280px) {
+    img.mt-5.img-fluid.position-relative.mx-5 {
+    margin-left: 0rem !important;
+    }
+    img.abtimg2.mt-5 {
+    padding-right: 143px;
+    }
+}
+}
+@media only screen and (max-width: 590px)  and (min-width: 310px) {
+
+    .px-5 {
+    padding-right: 0rem !important;
+    padding-left: 0rem !important;
+    }
+    .mx-5 {
+        margin-right: 0rem !important;
+        margin-left: 0rem !important;
+    }
+    img.mt-5.img-fluid.position-relative.mx-5 {
+    margin-left: 0rem !important;
+    }
+    img.abtimg2.mt-5 {
+    padding-right: 33px;
+    }
+     .px-5 {
+    padding-right: 0rem !important;
+   
+     }.abtp {
+    padding-right: 3rem !important; 
+     padding-left: 0rem !important; 
+} 
+.col-lg-6 {
+    padding-left: 10px;
+}
+margin-left: calc(var(--bs-gutter-x)* -.5);
+} 
+
+@media only screen and (max-width: 600px)  and (min-width: 400px) {
+        img.mt-5.img-fluid.position-relative.mx-5 {
+             margin-left: 0rem !important;
+    }
+    .mx-5 {
+    margin-right: 3rem !important;
+ }
+
+.abtp {
+    padding-right: 0rem !important; 
+     padding-left: 0rem !important; 
+}.mx-1 {
+    margin-left: 3.25rem !important;
+}
+  
+}
+@media only screen and (max-width: 900px)  and (min-width: 700px) {
+    .p-5 {
+    padding: 0rem !important;
+}  
+ .px-5 {
+
+    padding-left: 0rem !important;
+}
+.mx-5 {
+    margin-right: 0rem !important;
+}
+img.mt-5.img-fluid.position-relative.mx-5 {
+    margin-left: 0rem !important;
+}
+.abtp {
+    margin-left: 2rem !important;
+}
+.row>* {
+    padding-right: 0; 
+   }
+.img.hero-img.mt-5 {
+    margin-right: 128px;
+}
+@media only screen and (max-width:1290px)  and (min-width:  910px) {
+  
+img.mt-5.img-fluid.position-relative.mx-5 {
+    margin-left: 0rem !important;
+}
+.mx-5 {
+    margin-right: 0rem !important;
+    margin-left: 0rem !important;
+}
+
+}
+
+@media only screen and (max-width: 1300px)  and (min-width: 1000px)  {
+    img.mt-5.img-fluid.position-relative.mx-5 {
+    margin-left: 0rem !important;
+}.px-5 {
+    
+    padding-left: 0rem !important;
+}
+.mx-5 {
+    margin-right: 0rem !important;
+    margin-left: 0rem !important;
+}.abtp{
+    padding-right: 8rem !important;
+    margin-top: -150px;
+}
+}  
+
+</style>
+{% endblock extrastyle %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+{% endblock %}
+
+{% block content %}
+{% if about_us.image %}
+<img src="{{ about_us.image.url }}" alt="{{ about_us.title }}" class="img-fluid w-100 full-width-image">
+{% endif %}
+<div class="container-fluid bg-primary" style="height: autopx;">
+    <div class="row align-items-center">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-6 col-sm-12 p-5   align-items-center">
+                <h1 class="text-white mt-5 mx-5 px-5">We are Passionate About Building Tools For the Classrooms</h1>
+                <p class="text-white mx-5 px-5">At Sphurit, we blend market expertise with a consultative spirit. Our team, a dynamic mix of youth and seasoned pros, leverages 20+ years of industry experience. Our USP? Crafting tailor-made digital strategies that resonate with your brand and drive measurable results. Partner with us to conquer the digital realm!</p>
+            </div>
+    
+        
+            <div class="col-lg-6 col-md-6 col-sm-12 mt-2 position-relative">
+                <div class="video-container" style="position: relative; width: 430px; height: 290px;">
+                    <img class="hero-img mt-5 img-fluid position-relative text-end mx-5 p-5" src="{% static 'img/y2.png' %}" alt="img" style="width: 100%; height: 100%; cursor: pointer;" onclick="toggleVideo()">
+                    <video id="video" controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
+                        <source src="{% static 'vedio/abv..mp4' %}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+            
+            <script>
+                function toggleVideo() {
+                    var video = document.getElementById("video");
+                    if (video.style.display === "none") {
+                        video.style.display = "block";
+                    } else {
+                        video.style.display = "none";
+                    }
+                }
+            </script>
+            
+        {% comment %} <div class="col-lg-6 col-md-6 col-sm-12 mt-2  position-relative">
+            <div class="play-butto ">
+            <a href="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" style="width: 400px; height: 240px;" >
+                <img class="hero-img mt-5 " src="{% static 'img/y2.png' %}" alt="img" style="width: 400px; height: 240px;">
+               
+            </a>
+        </div>  {% endcomment %}
+        
+
+
+        </div>
+    </div>
+</div>
+</div>
+<div class="container-fluid mb-5 mt-5">
+    <div class="row align-items-center">
+  
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5  align-items-center">
+            <h1 class="abtp  text-primary mx-5 mt-0 px-5">Individual Online Learning</h1>
+           
+            <p class="abtp mx-5 px-5">Individual learning means that a student will study on their own.</p>
+            <p class="abtp mx-5 px-5 ">Individualized learning, or individualized instruction, is a method of teaching in which content, instructional technology, and pace of learning are based upon the abilities and interest of each learner.</p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-5">
+            <a href="#">
+                <img class="abtimg2 img-fluid ml-3 mt-0 px-2 " src="{% static 'img/lp.png' %}" alt="img" width="400px" height="400px">
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5 align-items-center c">
+           
+            <img class="abtp img-fluid mx-5  px-5" src="{% static 'img/lp2.png' %}" alt="img" width="400px" height="400px">
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5 align-items-center">
+            <h1 class="text-primary ">Classrooms Lessons</h1>
+            <p class="text-dark mr-5">A lesson or class is a structured period of time where learning is intended to occur.</p>
+            <p class="">It involves one or more students (also called pupils or learners in some circumstances) being taught by a teacher or instructor.A lesson may be either one section of a textbook (which, apart from the printed page, can also include multimedia) or, more frequently, a short period of time during which learners are taught about a particular subject or taught how to perform a particular activity. Lessons are generally taught in a classroom but may instead take place in a situated learning environment</p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5 align-items-center">
+            <h1 class="abtp text-primary mx-5 px-5">Coding Campus</h1>
+            <p class="abtp text-dark mx-5 px-5">Yes, coding is a good career for the future.</p>
+            <p class="abtp mx-5 px-5 ">Our journey began with a simple yet profound idea: to bridge the gap between ambition and proficiency in coding. From our humble beginnings, we've grown into a vibrant community that nurtures talent, fosters innovation, and champions the spirit of continuous learning.</p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <a href="#">
+                <img class="abtimg2 mt-5" src="{% static 'img/l3.png' %}" alt="img" width="400px" height="400px">
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid " style="background-color:#511de2; height: auto;">
+    <div class="row align-items-center">
+        <div class="col-lg-6 col-md-6 col-sm-12 mt-5 px-5 text-center">
+            <a href="#">
+                <img class="abtp mt-4 mb-2 mx-5 px-5" src="{% static 'img/p.png' %}" alt="img" width="400px" height="400px">
+            </a>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5 align-items-center">
+            <h1 class="text-white mt-5 mx-5">Education is in Our Blood</h1>
+            <p class="text-white mx-5 mr-3">Education should create a class of persons, Indian in blood and colour, but English in taste, in opinions, in morals, and in intellect.</p>
+            <p class="text-white mx-5 mr-3">Education helps a person to get knowledge and improve confidence in life. It can help you improve your career and your personal growth. An educated person can become a great citizen in society. It helps you to take the right decisions in life.</p>
+           
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row align-items-center">
+        <div class="col-lg-6 col-md-6 col-sm-12 p-5 align-items-center">
+            <h1 class="abtp text-primary mt-5 mx-5 px-5 ">Our Instructors</h1>
+            <p class="abtp text-dark mx-5 px-5">A teacher is a person who helps others to acquire knowledge, competences or values.</p>
+            <p class="abtp mx-5 px-5">Instructor is the title for an individual responsible for teaching students in a particular subject area. Instructors teach courses in their area of expertise and develop an instructional plan and assignments to be administered to students. Instructors may have teaching and research responsibilities at school.</p>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12 align-items-center ">
+            <div class="card showdow mt-5 ">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-lg-6 ">
+                        <div class="column">
+                            <div class="card mt-4">
+                                <div class="row g-0">
+                                    <div class="col-auto">
+                                        <img src="{% static 'img/pro1.png' %}" alt="img" class="termimg mt-3 mx-2 mb-3" width="120px" height="120px">
+                                        
+                                    </div>
+                                    <div class="col">
+                                        <div class="card-body  ">
+                                            <p class="fw-bold mt-4 m-0 p-0 ">Anup Kulkarni</p>
+                                            <p class="ccc m-0 p-0" > Founder and CEO</p>
+                                    
+                                        
+                                        </div>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="col-lg-6 ">
+                        <div class="column">
+                            <div class="card mt-4">
+                                <div class="row g-0">
+                                    <div class="col-auto">
+                                        <img src="{% static 'img/pro1.png' %}" alt="img" class="mt-3 mx-2 mb-3" width="120px" height="120px">
+                                        
+                                    </div>
+                                    <div class="col">
+                                        <div class="card-body  ">
+                                            <p class="fw-bold mt-4 m-0 p-0 ">M. Purushoutham</p>
+                                            <p class="ccc m-0 p-0" >Director
+                                            </p>
+                               
+                                          
+                                        </div>
+                                    </div>
+                                  
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div class="row rcard">
+                        <div class="col-lg-12 ">
+                        <div class="column">
+                            <div class="card mt-4">
+                                <div class="row g-0">
+                                    <div class="col-auto">
+                                        <img src="{% static 'img/pro1.png' %}" alt="img" class="mt-3 mx-2 mb-3" width="120px" height="120px">
+                                        
+                                    </div>
+                                    <div class="col">
+                                        <div class="card-body  ">
+                                            <p class="fw-bold mt-4 m-0 p-0 ">Himanshu Rajput</p>
+                                            <p class="ccc m-0 p-0" > Social Media Head</p>
+                                    
+                                          
+                                        </div>
+                                    </div>
+                                 
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>   
+            
+                  
+                    
+                    
+                      
+                        
+                    </div  > 
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+    </div>
+</div>
+
+{% endblock content %}

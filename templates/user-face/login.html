@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  
+    <title>SPHURIT</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+  
+    <!-- Favicons -->
+    <!-- <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
+  
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <!-- Vendor CSS Files -->
+    <link href="{% static 'teacher/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.snow.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/quill/quill.bubble.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+    <link href="{% static 'teacher/vendor/simple-datatables/style.css' %}" rel="stylesheet">
+  
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+  
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="{% static 'teacher/css/style.css' %}" rel="stylesheet">
+    <style>
+      .container {
+        position: relative;
+        overflow: visible; /* Set overflow to visible */
+      }
+    
+      .card {
+        position: relative;
+        overflow: visible; /* Set overflow to visible */
+        z-index: 1;
+      }
+    
+      .card::before {
+        content: "";
+        position: absolute;
+        top: -42px; /* Adjust the position to move the curved shape up */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 170px; /* Adjust the width of the curved shape */
+        height: 50px; /* Adjust the height of the curved shape */
+        background-color: white; /* Set the background color of the curved shape */
+        /*border-radius: 200% 200% 0 0; /* Create the upper curved shape effect */
+        z-index: 2; /* Ensure the curved shape is above the card */
+        background-image: url(/static/img/icons/logo1.png);
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        border-top-right-radius: 170px;
+        border-top-left-radius: 170px;
+        border-bottom-left-radius: 0px;
+        border-bottom-right-radius: 0px;
+      }
+    </style>
+    
+
+    
+</head>
+
+<body>
+
+  <main>
+    <div class="container position-relative">
+      {% if messages %}
+        <div class="messages alert-fixed">
+        {% for message in messages %}
+          <script>
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true,
+              animation:false,
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
+            });
+            Toast.fire({
+              icon: "{{ message.tags }}",
+              title: "{{message}}"
+            });
+          </script>
+        {% endfor %}
+        </div>
+      {% endif %}
+      <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4" style="background-color: #e6f3f7;">
+        <h6 class="card-title  pb-0 fs-5">Let's get started now!</h6>
+        <p class="mb-5">Or create an account if not registered yet</p>
+
+        <!-- <div class="container">
+          <div class="row justify-content-center">
+            
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+              <div class="semicircle"></div>
+              <div class="card p-4">
+                <div class="card-body">
+                  <div class="pb-2 text-center ">
+                    <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a>
+                    <h5 class="card-title  pb-0 fs-5">Login to Your Account</h5>
+                  </div>
+                  <form action="{% url 'user_login' %}" method="post" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="col-12">
+                      <label for="yourUsername" class="form-label">Email or Phone Number*</label>
+                      <div class="input-group has-validation">
+                        <input type="text" name="username" class="form-control" id="yourUsername" required>
+                        <div class="invalid-feedback">Please enter your email or Phone Number!</div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">Send OTP</button>
+                    </div>
+                    
+                    <div class="col-12">
+                      <p class="small mb-0">Don't have account? <a href="{% url 'user_registration' %}">Create an account</a></p>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        <div class="container mt-5" >
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
+              <div class="card p-4">
+                <div class="card-body">
+                  <div class="pb-2 text-center">
+                    <!-- <a href="{% url 'home' %}"><img src="{% static 'img/icons/logo1.png' %}" alt=""></a> -->
+                    <h5 class="card-title pb-0 fs-5 mt-1">Login to Your Account</h5>
+                  </div>
+                  <form action="{% url 'user_login' %}" method="post" class="row g-3 needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="col-12">
+                      <label for="yourUsername" class="form-label">Email or Phone Number*</label>
+                      <div class="input-group has-validation">
+                        <input type="text" name="username" class="form-control" id="yourUsername" required>
+                        <div class="invalid-feedback">Please enter your email or Phone Number!</div>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <button class="btn btn-primary w-100" type="submit">Send OTP</button>
+                    </div>
+                    <div class="col-12">
+                      <p class="small mb-0">Don't have an account? <a href="{% url 'user_registration' %}">Create an
+                          account</a></p>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </section>
+    </div>
+  </main><!-- End #main -->
+  <script>
+    // $(document).ready(function(){
+    //   window.setTimeout(function() {
+    //     $(".alert").fadeTo(500, 0).slideUp(500, function(){
+    //       $(this).remove();
+    //     });
+    //   }, 5000);
+    // });
+  </script>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <!-- Vendor JS' Files -->
+    <script src="{% static 'teacher/vendor/apexcharts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'teacher/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'teacher/vendor/chart.js/chart.umd.js' %}"></script>
+    <script src="{% static 'teacher/vendor/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'teacher/vendor/quill/quill.min.js' %}"></script>
+    <script src="{% static 'teacher/vendor/simple-datatables/simple-datatables.js' %}"></script>
+    <script src="{% static 'teacher/vendor/tinymce/tinymce.min.js' %}"></script>
+    <script src="{% static 'teacher/vendor/php-email-form/validate.js' %}"></script>
+  
+    <!-- Template Main JS File -->
+    <script src="{% static 'teacher/js/main.js' %}"></script>
+
+    <!-- JavaScript Libraries -->
+    
+   <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+   <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+   <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+   <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+   <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+   
+
+   <!-- Template Javascript -->
+   <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

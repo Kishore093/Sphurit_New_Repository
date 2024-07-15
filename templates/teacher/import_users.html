@@ -1,0 +1,180 @@
+{% extends 'teacher/base.html' %}
+{% load import_filter %} 
+{% load static %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block extrastyle %}
+ <style>
+.card {
+    margin: 0 0px 30px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+  <div class="row mb-3">
+    <div class="col-lg-8 col-md-8 " >
+        <h4>Import Users</h4>
+    </div>
+    <div class="col-lg-4 col-md-4" style="text-align: end;">
+        <a href="" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"><i class="bi bi-plus-square"></i> Add User</a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.3s">
+        <div class="card p-3">
+            <form class="row g-3" action="{% url 'import_users' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="col-md-12">
+                  <label for="validationDefault04" class="form-label">Select course</label>
+                  <select class="form-select" name="course_id" id="id_course" required>
+                    <option selected disabled >Select Course</option>
+                    {% for obj in course %}
+                    <option value="{{obj.id}}">{{obj.course_name}}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="small" id="selected_course"></div>
+                </div>
+                <div class="col-md-12">
+                  <label for="validationDefault02" class="form-label">Select File</label>
+                  <input type="file" class="form-control" name="user_file" id="validationDefault02" value="" required>
+                </div>
+                <div class="col-md-12">
+                  <label for="validationDefault02" class="form-label">Valid Date</label>
+                  <input type="date" class="form-control" name="valid_date" id="validationDefault02" value="" required>
+                </div>
+                <div class="col-md-12 d-flex justify-content-between">
+                  <a href="{% static 'sample.csv' %}" class="btn btn-primary">Download Sample File</a>
+                  <button class="btn btn-primary" type="submit">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.3s">
+      <h4 class="mb-3">Imported Users</h4>
+
+      {% for obj in imported_course %}
+        <div class="card mb-3">
+          <div class="row g-0">
+            <div class="col-md-2" style="margin: auto;">
+              <a href="#"><img class="img-fluid" style="height: 5rem; margin-left: 1rem;" src="{{ obj.thumb_image.url }}" alt=""></a>
+            </div>
+            <div class="col-md-10" style="padding-left: 1rem;">
+              <div class="card-body">
+                <h5 class="card-title"><a href="{% url 'get_imported_users' obj.id %}">{{ obj.course_name }}</a></h5>
+                
+                <div class="d-flex justify-content-between">
+                  <h6 class="fw-bold">Total Students : <span class="text-muted">{{ obj.course_purchased.all|query_count }}</span></h6>
+                  <span>
+                    <button class="btn btn-outline-success" onclick="approveAllUsers('{{ obj.id }}')">Approve</button>
+                    <button class="btn btn-outline-danger" onclick="deleteAllUsers('{{obj.id}}')">Delete</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+<!-- Add Single user Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h5 class="modal-title" id="addUserModalLabel">Add User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form class="row g-3" action="{% url 'add_single_user' %}" method="post">
+              {% csrf_token %}
+              <div class="col-md-12">
+                <label for="validationDefault04" class="form-label">Select course</label>
+                <select class="form-select" name="course_id" id="id_course" required>
+                  <option selected disabled >Select Course</option>
+                  {% for obj in course %}
+                  <option value="{{obj.id}}">{{obj.course_name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" name="first_name" id="first_name" class="form-control" value="" required placeholder="First Name">
+              </div>
+              <div class="col-md-6">
+                <label for="last_name" class="form-label">Last Name</label>
+                <input type="text" name="last_name" id="last_name" class="form-control" value="" required placeholder="Last Name">
+              </div>
+              <div class="col-md-12">
+                <label for="phone_number" class="form-label">Mobile Number</label>
+                <input type="number" name="mobile" id="phone_number" class="form-control" value="" required placeholder="Mobile Number">
+              </div>
+              <div class="col-md-12">
+                <label for="email" class="form-label">Email Id</label>
+                <input type="email" name="email" id="email" class="form-control" required placeholder="Email Id">
+              </div>
+              <div class="col-md-12">
+                <label for="validationDefault02" class="form-label">Valid Date</label>
+                <input type="date" class="form-control" name="valid_date" id="validationDefault02" value="" required>
+              </div>
+              <div class="text-right">
+                  <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+  function approveAllUsers(id){
+    fetch('{% url "approveAllUsers" %}', {
+        method: "POST",
+        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+        body: JSON.stringify({
+            id: id
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result);
+        window.location.reload();
+        // $(`#card_btn_${id}`).load(`#card_btn_${id}`);
+    })
+  }
+  function deleteAllUsers(id){
+    var result = confirm("Do you want to delete?");
+        if (result==true) {
+          fetch('{% url "deleteAllUsers" %}', {
+              method: "POST",
+              headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+              body: JSON.stringify({
+                  id: id
+              })
+          })
+          .then(response => response.json())
+          .then(result => {
+              console.log(result);
+              window.location.reload();
+              // $(`#card_btn_${id}`).load(`#card_btn_${id}`);
+          })
+        } else {
+            return false;
+        }
+    
+  }
+</script>
+{% endblock content %}

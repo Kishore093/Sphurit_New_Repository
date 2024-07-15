@@ -1,0 +1,149 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+
+{% endblock extrastyle %}
+{% block script %}
+<style>
+    .card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+</style>
+
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h5 class="card-title">{{course.course_name|capfirst }}</h5>
+        </div>
+        <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <a href="{% url 'add_chapter' course.id %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> New Chapter</a>
+        </div>
+    </div>
+
+    <div class="col-12">
+        
+
+        {% for obj in chapter %}
+        <div class="card" id="ch-{{obj.id}}">
+            <div class="row g-0">
+                <div class="col-md-12">
+                    <div class="card-body">
+                        <p class="fw-bold"><a href="{% url 'topic_list' obj.id %}">{{ obj.chapter_name }}</a>  ({{obj.topic_chapter.all.count}} Topics)</p>
+                        <p class="">{{ obj.description|safe }}</p>
+                        <div class="text-right">
+                            {% if obj.hide %}
+                            <button class="btn btn-secondary btn-sm " onclick="showChapter('{{obj.id}}')">show</button>
+                            {% else %}
+                            <button class="btn btn-secondary btn-sm " onclick="hideChapter('{{obj.id}}')">hide</button>
+                            {% endif %}
+                            {% if not course.approved %}
+                            <a href="{% url 'update_chapter' obj.id %}" class="btn btn-outline-secondary btn-sm mx-3"><i class="bi bi-pencil"></i></a>
+                            
+                            <button data-bs-toggle="modal" data-bs-target="#delete-chapter{{obj.id}}" class="btn btn-outline-danger btn-sm "><i class="bi bi-trash"></i></button>
+                            {% endif %}
+                        </div>
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="delete-chapter{{obj.id}}" tabindex="-1" role="dialog" aria-labelledby="delete-modal-title" aria-hidden="true">
+                            <div class="modal-dialog modal-confirm">
+                                <div class="modal-content">
+                                    <div class="modal-header flex-column">
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <div class="icon-box">
+                                            <i class="bi bi-trash material-icons"></i>
+                                        </div>
+                                        <!-- <h4 class="modal-title w-100">Are you sure?</h4> -->
+                                        <h4>Do you want to permanently delete <br> this chapter with Topic - {{obj.topic_chapter.all.count}}?</h4>
+                                        
+                                    </div>
+                                    <div class="modal-body text-left">
+                                        
+                                        {% for t in obj.topic_chapter.all %}
+                                        <span class="px-4 d-block">{{forloop.counter}}. {{t.topic_name}}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer justify-content-center">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button onclick="deleteChapter('{{obj.id}}')" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function showChapter(id){
+                            const csrf = Cookies.get('csrftoken');
+                            fetch('/teacher/show_chapter', {
+                                method: "POST",
+                                headers: {'X-CSRFToken': csrf},
+                                body: JSON.stringify({
+                                    id: id
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                if(result['status'] == false){
+                                    alert(result['message']);
+                                }else{
+                                    window.location = `/teacher/chapter_list/{{ obj.course.id }}`
+                                }
+                                
+                            })
+                        }
+                        function hideChapter(id){
+                            const csrf = Cookies.get('csrftoken');
+                            fetch('/teacher/hide_chapter', {
+                                method: "POST",
+                                headers: {'X-CSRFToken': csrf},
+                                body: JSON.stringify({
+                                    id: id
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                window.location = `/teacher/chapter_list/{{ obj.course.id }}`
+                            })
+                        }
+                        function deleteChapter(id){
+                            const csrf = Cookies.get('csrftoken');
+                            fetch('/teacher/delete_chapter', {
+                                method: "POST",
+                                headers: {'X-CSRFToken': csrf},
+                                body: JSON.stringify({
+                                    cid: id
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                document.getElementById(`delete-chapter${id}`).hide();
+                                document.getElementById(`cid-${id}`).remove();
+                                AlertToast.fire({
+                                    icon: "success",
+                                    title: "Chapter Deleted",
+                                });
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+</main>
+
+
+{% endblock content %}

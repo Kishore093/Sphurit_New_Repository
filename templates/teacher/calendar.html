@@ -1,0 +1,414 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load datetime %}
+
+{% block extrastyle %}
+<link href="{% static 'calender/main.css' %}" rel="stylesheet" />
+<style>
+    
+
+
+    /* ============ */
+
+    .event-cal {
+        width: 3.125rem;
+        line-height: 1;
+        flex-direction: column;
+        text-align: center;
+        border-radius: 0.5rem;
+    }
+    .event-calendar-month {
+        background-color: #e11d48;
+        color: #fff;
+        border-radius: 0.5rem 0.5rem 0 0;
+        padding: 0.275rem;
+        font-weight: 500;
+    }
+    .event-calendar-day {
+        font-size: 1.5rem;
+        padding: 0.25rem;
+        background-color: #f2f4f6;
+        border-top: 0;
+        border-radius: 0 0 0.5rem 0.5rem;
+        color: #1f2937;
+        font-weight: 500;
+    }
+</style>
+{% endblock extrastyle %}
+
+{% block script %}
+<script src="{% static 'calender/main.js' %}"></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h4>Calendar</h4>
+            <h6 class="text-muted">Whether you've been teaching for years or are teaching for the first </h6>
+        </div>
+        <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#EventModal" class="btn btn-primary"><i class="bi bi-plus-square"></i> Add Event</a> -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-5 col-md-5 mt-3" >
+            <div class=" d-flex justify-content-between">
+                <h2 class="fs-5 fw-bold mb-1" style="margin-top: auto;">Events</h2>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#add-event" class="btn btn-primary"><i class="bi bi-plus-square"></i> Add Event</a>
+            </div>
+            {% for e in user.user_events.all %}
+            <div class="card border-0 shadow mt-3 mb-0">
+                <div class="card-body">
+                    <div class="row align-items-center d-block d-sm-flex">
+                        <div class="col-auto mb-3 mb-sm-0">
+                            <div class="event-cal d-flex"><span class="event-calendar-month">{{ e.start_time.month|month_name }}</span><span class="event-calendar-day py-2">{{ e.start_time.date|date:"d" }}</span></div>
+                        </div>
+                        <div class="col">
+                            <h3 class="h5 mb-1">{{e.title}}</h3>
+                            <div class="small fw-bold">Organized by : {{e.user.full_name}}</div>
+                            <div class="small fw-bold">From : {{ e.start_time|date:"Y-m-d" }}&emsp; {{ e.start_time|time:"h:i a" }}</div>
+                            <div class="small fw-bold">To : {{ e.end_time|date:"Y-m-d" }}&emsp; {{ e.end_time|time:"h:i a" }}</div>
+                            <h6 class="text-muted border-top mt-1 pt-1">{{ e.description }}</h6>
+                        </div>
+                        <div class="text-right">
+                            <button data-bs-toggle="modal" data-bs-target="#edit-event{{e.id}}" class="btn btn-outline-secondary btn-sm "><i class="bi bi-pencil"></i></button>
+                            <button data-bs-toggle="modal" data-bs-target="#delete-event{{e.id}}" class="btn btn-outline-danger btn-sm "><i class="bi bi-trash"></i></button>
+                        </div>
+                        <div class="modal fade edit-form" id="edit-event{{e.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog " role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header border-bottom-0">
+                                        <h5 class="modal-title" id="modal-title">Update Event</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form id="EditEvent{{e.id}}" action="{% url 'event_edit' e.id %}" method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <div class="alert alert-danger " role="alert" id="danger-alert" style="display: none;">
+                                                End date should be greater than start date.
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="event-title">Event Name <span class="text-danger">*</span></label>
+                                                <input type="text" name="title" value="{{e.title}}" class="form-control" id="event-title" placeholder="Enter event name" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="event-description">Event Description - <small class="text-muted">Optional</small></label>
+                                                <textarea type="text" name="description" class="form-control" id="event-description" placeholder="Enter event description">{{e.description}}</textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="start-date">Start Date <span class="text-danger">*</span></label>
+                                                <input type="datetime-local" name="start_time" value="{{e.start_time|date:'Y-m-d H:i'}}" class="form-control" id="start_date_update_id{{e.id}}" placeholder="start-date" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="end-date">End Date - <small class="text-muted">Optional</small></label>
+                                                <input type="datetime-local" name="end_time" onchange="checkDateUpdate()" value="{{e.end_time|date:'Y-m-d H:i'}}" class="form-control" id="end_date_update_id{{e.id}}" placeholder="end-date">
+                                            </div>
+                                            <script>
+                                                function checkDateUpdate (){
+                                                    var startDate = document.getElementById("start_date_update_id{{e.id}}").value;
+                                                    var endDate = document.getElementById("end_date_update_id{{e.id}}").value;
+                                                    if (startDate != ""){
+                                                        if ((Date.parse(endDate) <= Date.parse(startDate))) {
+                                                            document.getElementById("end_date_update_id{{e.id}}").value = "";
+                                                            alert("End date should be greater than Start date");
+                                                        }
+                                                    }else{
+                                                        document.getElementById("end_date_update_id{{e.id}}").value = "";
+                                                        alert("Select start date first!");
+                                                    }
+                                                }
+                                            </script>
+                                        </div>
+                                        <div class="modal-footer border-top-0 d-flex justify-content-center">
+                                            <button type="submit" class="btn btn-success" id="submit-button">Submit</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Delete Modal -->
+                        <div class="modal fade" id="delete-event{{e.id}}" tabindex="-1" role="dialog" aria-labelledby="delete-modal-title" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="delete-modal-title">Confirm Deletion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center" id="delete-modal-body">
+                                    Are you sure you want to delete the event?
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <button type="button" class="btn btn-secondary rounded-sm" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{% url 'event_delete' e.id %}" class="btn btn-danger rounded-lg" id="delete-button">Delete</a>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %} 
+        </div>
+        <div class="col-lg-7 col-md-7">
+            <!-- <div class="clearfix">
+                <a class="btn btn-secondary left border" href="{% url 'calendar' %}?{{ prev_month }}"> Previous Month </a>
+                <a class="btn btn-secondary right border" href="{% url 'calendar' %}?{{ next_month }}"> Next Month </a>
+            </div> -->
+            <div id="calendar">
+                
+            </div>
+        </div>
+    </div>
+    <!-- Add Event modal -->
+    <div class="modal fade edit-form" id="add-event" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title" id="modal-title">Add Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="AddEventForm" action="{% url 'event_new' %}" method="post">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="alert alert-danger " role="alert" id="danger-alert" style="display: none;">
+                            End date should be greater than start date.
+                        </div>
+                        <div class="form-group">
+                            <label for="event-title">Event Name <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" id="event-title" placeholder="Enter event name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-description">Event Description <span class="text-danger">*</span></label>
+                            <textarea type="text" name="description" class="form-control" id="event-description" placeholder="Enter event description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="start-date">Start Date <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="start_time" class="form-control" id="start_date_id" placeholder="start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date">End Date - <small class="text-muted">Optional</small></label>
+                            <input type="datetime-local" name="end_time" onchange="checkDate()" class="form-control" id="end_date_id" placeholder="end-date">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success" id="submit-button">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    <!-- Modal -->
+    <!-- <div class="modal fade" id="EventModal" tabindex="-1" aria-labelledby="EventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="EventModalLabel">Add Event</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'event_new' %}">
+                        {% csrf_token %}
+                        
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-info right"> Submit </button>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+     -->
+
+
+    <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#add-event" class="btn btn-primary"><i class="bi bi-plus-square"></i> Add Event</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#delete-modal" class="btn btn-primary"><i class="bi bi-plus-square"></i> delete Event</a> -->
+    <!-- Add modal -->
+
+    
+<script>
+    function converterDataParaDjangoFormat(data) {
+        const dataJS = new Date(data);
+        const ano = dataJS.getFullYear();
+        const mes = (dataJS.getMonth() + 1).toString().padStart(2, '0');
+        const dia = dataJS.getDate().toString().padStart(2, '0');
+        const hora = dataJS.getHours().toString().padStart(2, '0');
+        const minuto = dataJS.getMinutes().toString().padStart(2, '0');
+        const segundo = dataJS.getSeconds().toString().padStart(2, '0');
+        const formatoDjango = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
+        return formatoDjango;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var today = new Date();
+    
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,list'
+            },
+            initialDate: today,
+            navLinks: true,
+            selectable: true,
+            selectMirror: true,
+            select: function(arg) {
+                console.log('clicked')
+                console.log(arg.start)
+                console.log(arg.end)
+                var modal = document.getElementById('eventModal')
+                modal.style.display = 'block'
+                document.getElementById('id_start_time').value = converterDataParaDjangoFormat(arg.start);
+                document.getElementById('id_end_time').value = converterDataParaDjangoFormat(arg.end);
+                calendar.unselect();
+            },
+
+            eventClick: function(arg) {
+                console.log('clicked')
+                var title = arg.event.title;
+                var start = formatDateTime(arg.event.start) ;
+                var end = formatDateTime(arg.event.end);
+                var description = arg.event.extendedProps.description || '';
+                var id = arg.event.id;
+        
+                var modalInputEnd = document.getElementById('end_event_detail'); 
+        
+                var modal = document.getElementById('detailModal')
+                var modalTitle = document.getElementById('title_event_detail'); 
+                var modalStart = document.getElementById('start_event_detail'); 
+                var modalEnd = document.getElementById('end_event_detail'); 
+                var modalDescripition = document.getElementById('description_event_detail'); 
+                var deleteButton = document.getElementById("delete-event-button");
+                var nextWeek = document.getElementById("add-to-next-week");
+                var nextDay = document.getElementById("add-to-next-day");
+        
+                deleteButton.setAttribute("data-event-id", id);
+                nextWeek.setAttribute("data-event-id-week", id);
+                nextDay.setAttribute("data-event-id-day", id);
+                modal.style.display = 'block' 
+                
+                modalTitle.textContent = title;
+                modalStart.textContent = start;
+                modalEnd.textContent = end;
+                modalDescripition.textContent = description;
+
+                modal.style.display = 'block';
+            },
+            
+            editable: true,
+            dayMaxEvents: true, // allow "more" link when too many events
+            events: `${{ events|safe }}`
+        });
+        calendar.render();
+    });
+    const closeBtn1 = document.getElementById('modalClose1');
+    const closeBtn2 = document.getElementById('modalClose2');
+    const closeBtn3 = document.getElementById('modalDetailClose');
+
+    closeBtn1.addEventListener('click',()=>{
+        const eventModal = document.getElementById('eventModal')
+        eventModal.style.display = 'none';
+    });
+
+    closeBtn2.addEventListener('click',()=>{
+        const eventModal = document.getElementById('eventModal')
+        eventModal.style.display = 'none';
+    });
+
+    closeBtn3.addEventListener('click',()=>{
+        const eventModal = document.getElementById('detailModal')
+        eventModal.style.display = 'none';
+    });
+
+    function formatDateTime(dateTime) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+        const dataFormatada = new Date(dateTime).toLocaleDateString('pt-BR', options);
+        return dataFormatada;
+    };
+
+    document.getElementById('delete-event-button').addEventListener('click', function() {
+        const eventId = this.getAttribute('data-event-id');
+        if (confirm('Are you sure you want to delete this event?')) {
+            $.ajax({
+                url: `/delete_event/${eventId}/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Error!');
+                }
+            });
+        }
+    });
+            
+    document.getElementById('add-to-next-week').addEventListener('click', function() {
+        const eventId = this.getAttribute('data-event-id-week');
+        if (confirm('Are you sure you want add this event to next week?')) {
+            $.ajax({
+                url: `/next_week/${eventId}/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Error!');
+                }
+            });
+        }
+    });
+      
+    document.getElementById('add-to-next-day').addEventListener('click', function() {
+        const eventId = this.getAttribute('data-event-id-day');
+        if (confirm('Are you sure you want add this event to next day?')) {
+            $.ajax({
+            url: `/next_day/${eventId}/`,
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function(xhr, status, error) {
+                    alert('Error!');
+                }
+            });
+        }
+    });
+      
+</script>
+<script>
+    function checkDate (){
+        var startDate = document.getElementById("start_date_id").value;
+        var endDate = document.getElementById("end_date_id").value;
+        if (startDate != ""){
+            if ((Date.parse(endDate) <= Date.parse(startDate))) {
+                document.getElementById("end_date_id").value = "";
+                alert("End date should be greater than Start date");
+            }
+        }else{
+            document.getElementById("end_date_id").value = "";
+            alert("Select start date first!");
+        }
+    }
+    
+
+    
+</script> 
+</main>
+
+{% endblock content %}

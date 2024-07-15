@@ -1,0 +1,21 @@
+{% load static %}
+
+<div class="form-topnav mb-4">
+    <div class="float-right">
+        <img src="{% static 'Icon/setting.png' %}" alt="Setting icon" title = "Setting" class="nav-form-menu-icon open-setting" />
+        <img src="{% static 'Icon/send.png' %}" alt ="Send icon" title = "Send" class="nav-form-menu-icon small-screen" id="send-form-btn" />
+        <button class = "btn btn-primary big-screen" title = "Send" id="send-form-btn">Send</button>
+    </div>
+</div>
+<div class="form-topnav mb-4">
+    <div class="form-navigation d-flex justify-content-evenly">
+        {% if form.is_quiz %}
+        <span class="col-4 navigation active mr-4"><a href = "{% url 'edit_form' form.code %}" class="link">Questions</a></span>
+        <span class="col-4 navigation score"><a href="{% url 'score' form.code %}" class="link">Scores</a></span>
+        <span class="col-4 navigation ml-4"><a href = "{% url 'responses' form.code %}" class="link">Responses</a></span>
+        {% else %}
+        <span class="col-6 navigation active mr-4"><a href = "{% url 'edit_form' form.code %}" class="link">Questions</a></span>
+        <span class="col-6 navigation ml-4"><a href = "{% url 'responses' form.code %}" class="link">Responses</a></span>
+        {% endif %}
+    </div>
+</div>

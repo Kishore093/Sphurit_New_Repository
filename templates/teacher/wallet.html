@@ -1,0 +1,256 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+ <style>
+ .card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <section class="section dashboard">
+        <div class="row mb-3">
+            <div class="col-lg-12 col-md-12 ">
+                <h4>Wallet</h4>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xxl-12 col-md-12">
+                <div class="card info-card revenue-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Balance</h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="bi bi-currency-rupee"></i>
+                            </div>
+                            <div class="ps-3">
+                                <!-- Display updated wallet balance after creating payout -->
+                                <h6 id="total_balance" data-value="{{ user.wallet.balance }}">{{ user.wallet.balance }}</h6>
+                            </div>
+                        </div>
+                        <span class="fw-bold">NOTE : <span class="text-muted fw-bold small">This is your wallet balance. You can partial payment request greater than or equal to your balance</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="row">
+            <div class="col-lg-12">
+              <div class="card px-3 pb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="card-title">Make Payout Request</h5>
+                        <a href="" class="btn btn-primary btn-sm my-auto" data-bs-toggle="modal" data-bs-target="#BankListModal">Show Banks</a>
+                    </div>
+                    
+                    <form class="g-3" action="{% url 'makePayoutRequest' %}" method="post">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-8 ">
+                                <select id="bank_id" name="bank_id" class="form-select" required>
+                                    <option selected disabled>Select Bank</option>
+                                    {% for bank in user.user_banks.all %}
+                                    <option value="{{bank.uid}}">{{ bank.bank_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 ">
+                                {% if user.user_banks.all.count < 2 %}
+                                <a href="" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addBankModal"><i class="bi bi-plus-square"></i> Add Bank</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="number" class="form-control" oninput="chechAmount()" id="amount" name="amount" placeholder="Enter Amount" required>
+                                <div class="small text-danger mt-2" id="amountError"></div>
+                            </div>
+                            <script>
+                                function chechAmount(){
+                                    var amount = parseFloat(Number(document.getElementById("amount").value));
+                                    var total = parseFloat(document.getElementById('total_balance').getAttribute('data-value'));
+                                    if(amount <= total){
+                                        document.getElementById("payout_btn").removeAttribute('disabled');
+                                        document.getElementById('amountError').innerHTML = ``
+                                    }else if(amount == 0){
+                                        document.getElementById("payout_btn").setAttribute('disabled', '');
+                                        document.getElementById('amountError').innerHTML = ``
+                                    }else{
+                                        document.getElementById("payout_btn").setAttribute('disabled', '');
+                                        document.getElementById('amountError').innerHTML = Amount should be less than ₹${total}
+                                    }
+                                    
+                                }
+                            </script>
+                            <div class="col-md-4">
+                                <button type="submit"  id="payout_btn" class="btn btn-primary btn-sm"><i class="bi bi-plus-square"></i> Create Payout</button>
+                            </div>
+                        </div>
+                    </form>
+                    {% if message %}
+                    <span class="text-danger small">{{message}}</span>
+                    {% endif %}
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
+                <div class="card-body">
+                    <h5 class="card-title">Transactions</h5>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">SN</th>
+                                <th scope="col">Bank</th>
+                                <th scope="col">Account No</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Timestamp</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in user.wallet.wallet_transactions.all %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ obj.bank.bank_name }}</td>
+                                <td>{{ obj.bank.account_number }}</td>
+                                <td>{{ obj.amount }}</td>
+                                
+                                {% if obj.status == "success" %}
+                                <td><span class="badge bg-success">{{obj.status|capfirst}}</span></td>
+                                {% elif obj.status == "pending" %}
+                                <td><span class="badge bg-warning">{{obj.status|capfirst}}</span></td>
+                                {% else %}
+                                <td><span class="badge bg-danger">{{obj.status|capfirst}}</span></td>
+                                {% endif %}
+                                <td>{{ obj.created_at }}</td>
+                                <td>
+                                    {% if obj.status == "success" %}
+                                    <a href=""><i class="bi bi-cloud-arrow-down card-title"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Bank Modal -->
+    <div class="modal fade" id="addBankModal" tabindex="-1" aria-labelledby="addBankModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Bank</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="row g-3" action="{% url 'addBank' %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                      <input type="text" name="account_name" class="form-control" value="" required placeholder="Your Name">
+                    </div>
+                    <div class="col-md-12">
+                        <input type="number" name="phone_number" class="form-control" value="" required placeholder="Your Mobile Number">
+                    </div>
+                    <div class="col-md-12">
+                        <input type="text" name="bank_name" class="form-control" required placeholder="Your Bank Name">
+                    </div>
+                    <div class="col-md-12">
+                        <input type="number" id="acno1" name="account_number" class="form-control" required placeholder="Your Account Number">
+                    </div>
+                    <div class="col-md-12">
+                        <input type="number" id="acno2" name="account_number1" oninput="matchAccountNo()" class="form-control" required placeholder="Confirm Account Number">
+                        <div id="acno"></div>
+                    </div>
+                    <div class="col-12">
+                      <input type="text" name="ifsc_code" class="form-control" required placeholder="Bank IFSC Code">
+                    </div>
+                    
+                    <div class="text-right">
+                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- show Banks Modal -->
+    <div class="modal fade" id="BankListModal" tabindex="-1" aria-labelledby="BankListModalLabel" aria-hidden="true" style="z-index: 1052 !important;">
+        <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="BankListModalLabel">All Banks</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <table class="table table-hover mb-1">
+                    <thead>
+                        <tr>
+                            <th>Bank Name</th>
+                            <th>Account Number</th>
+                            <th>IFSC</th>
+                            <th>Account Holder</th>
+                            <th>Mobile Number</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in user.user_banks.all %}
+                        <tr>
+                            <td><span class="card-sub-title my-auto">{{ obj.bank_name }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.account_number }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.ifsc_code }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.account_name }} </span></td>
+                            <td><span class="card-sub-title my-auto">{{ obj.phone_number }} </span></td>
+                            <td>
+                                {% if user.user_banks.all.count > 1 %}
+                                <a href="{% url 'deleteBank' obj.uid %}" class="btn btn-outline-danger btn-sm" ><i class="bi bi-trash"></i></a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="text-right">
+                    {% if user.user_banks.all.count == 1 %}
+                    <span class="text-danger small">Default account can't be delete!</span>
+                    {% endif %}
+                </div>
+                
+            </div>
+        </div>
+        </div>
+    </div>
+</main><!-- End #main -->
+
+<script>
+    function matchAccountNo() {  
+        var pw1 = document.getElementById("acno1").value;
+        var pw2 = document.getElementById("acno2").value;
+
+        if(parseInt(pw1) === parseInt(pw2)){
+            document.getElementById('acno').innerHTML = "<small class='text-success'>Account Number Matched</small>";
+        }else{  
+            document.getElementById('acno').innerHTML = "<small class='text-danger'>Account Number Not Matched</small>"
+        }
+    }
+</script>
+{% endblock content %}

@@ -1,0 +1,353 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load filter %}
+{% block extrastyle %}
+<style>
+    ::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+    }
+    .card {
+    margin: 0 0px 10px !important;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row" id="empty_thread_block" style="display: block;">
+
+                    </div>
+
+                    <div class="row" id="chat_thread_block" style="display: none;">
+                        <div class="col-lg-4 card mb-0 bg-white">
+                            <div class="w-100 bg-white p-2" style="height: 500px;overflow: scroll;overflow-x: hidden;"
+                                id="threads_block">
+                            </div>
+                        </div>
+                        <div class="col-lg-8" style="padding-left: 27px !important;">
+                            <div class="row bg-light border-bottom py-2" id="message-header" style="display: none;">
+                                <div class="col-lg-12 d-flex">
+                                    <img src="" id="receiver_image" height="30" width="30" class="rounded-circle">
+                                    &emsp;<div id="receiver_name" class="card-title p-0 mb-0 my-auto"></div>
+                                    &emsp13;<div class="my-auto" id="online_status"></div>
+                                </div>
+                            </div>
+                            <div class="pt-2" id="message-box"
+                                style="height: 410px;overflow: scroll;overflow-x: hidden;">
+                            </div>
+
+                            <div class="row bg-light p-2 justify-content-center" style="display: none;"
+                                id="message-footer">
+                                <div class="col-lg-12 px-0 d-flex justify-content-center" style="width: 100%;">
+                                    
+                                    <input type="text" class="form-control" id="message_input"
+                                        placeholder="Write message...">&emsp;
+                                    
+                                    <a href="javascript:void(0)"
+                                        onclick="sendMessagesNew(document.getElementById('message_input').value)"
+                                        class="my-auto" id="chat-message-submit">
+                                        <h3 class="my-auto">
+                                            <svg width="20" height="20" fill="currentColor" class="bi bi-send"
+                                                viewBox="0 0 16 16">
+                                                <path
+                                                    d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z" />
+                                            </svg>
+                                        </h3>
+                                    </a>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ request.user.id|json_script:"user_id" }}
+    </div>
+    
+    
+</main><!-- End #main -->
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+<script>
+    Pusher.logToConsole = false;
+    var pusher = "";
+    // var channel = "";
+    var receiver = "";
+    var sender = JSON.parse(document.getElementById('user_id').textContent);
+    // Enable pusher logging - don't include this in production
+    function initPusher(){
+        const csrf = Cookies.get('csrftoken');
+        fetch('initiate_pusher', {
+            method: "GET",
+            headers: { 'X-CSRFToken': csrf },
+        })
+        .then(response => response.json())
+        .then(result => {
+            pusher = new Pusher(`${result['key']}`, {
+                cluster: `${result['cluster']}`
+            });
+            pusher.connection.bind('error', function(err) {
+                console.error('Error connecting to Pusher:', err);
+            });
+            
+        });
+    }
+    function bindEvent(){
+        var chat_channel = `chat_${sender}_${receiver}`;
+        var channel = pusher.subscribe(chat_channel);
+        channel.bind(chat_channel, function(res) {
+            if(receiver != ""){
+                var data = res['message'];
+                var e = document.getElementById('message-box');
+                if (data['sender'] == sender) {
+                    let element = document.createElement("div");
+                    element.classList.add('d-flex');
+                    element.classList.add('justify-content-end');
+                    element.classList.add('mb-4');
+                    element.innerHTML = `
+                    <div class="msg_cotainer_send rounded">
+                        ${data['description']}
+                        <span class="msg_time">${data['time_stamp']}</span>
+                    </div>`;
+                    e.appendChild(element);
+                }
+                else {
+                    let element = document.createElement("div");
+                    element.classList.add('d-flex');
+                    element.classList.add('justify-content-start');
+                    element.classList.add('mb-4');
+                    element.innerHTML = `
+                    <div class="msg_cotainer rounded">
+                        ${data['description']}
+                        <span class="msg_time_send">${data['time_stamp']}</span>
+                    </div>`;
+                    e.appendChild(element);
+                }
+                e.scrollTo({ left: 0, top: e.scrollHeight, behavior: "smooth" });
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initPusher();
+        const csrf = Cookies.get('csrftoken');
+        fetch('fetch_thread', {
+            method: "GET",
+            headers: { 'X-CSRFToken': csrf, "sender": sender },
+        })
+        .then(response => response.json())
+        .then(result => {
+            var ids = JSON.parse(result['ids']);
+            var data = result['data'];
+            var e = document.getElementById('threads_block');
+            var chat_block = document.getElementById('chat_thread_block');
+            var ept_block = document.getElementById("empty_thread_block");
+            if (data.length === 0) {
+                ept_block.style.display = "block";
+                chat_block.style.display = "none";
+                ept_block.innerHTML = `
+                <div class="col-md-12" style="height:590px;">
+                <div class="card h-100 shadow-0" style="padding-top: 10%;">
+                    <div class="card-body text-center">
+                        <img src="{% static 'img\chat.png' %}" alt="Random Image" class="img-fluid">
+                        <p>No threads available yet!!!</p>
+                    </div>
+                </div>
+                </div>`;
+                e.appendChild(element);
+            } 
+            else {
+                ept_block.style.display = "none";
+                chat_block.style.display = "flex";
+
+                // Records are available, proceed with displaying thread cards
+                for (let i = 0; i < data.length; i++) {
+                    if (ids.includes(data[i]['first_user']['id'])) {
+                        let element = document.createElement("div");
+                        element.innerHTML = `
+                        <a href="javascript:void(0)" onclick="getMessages(${data[i]['first_user']['id']})">
+                            <div class="card mb-2 shadow-0">
+                            <div class="card-body d-flex justify-content-between">
+                                <div class="d-flex">
+                                    <img src="${data[i]['first_user']['image']}" height="40" width="40" class="rounded-circle">
+                                    &emsp;
+                                    <div>
+                                        <h4 class="card-title mb-0 p-0">${data[i]['first_user']['name']}</h4>
+                                        <span class="small" id="last-message-time">${data[i]['time_stamp']}</span>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <span class="badge rounded-pill bg-success">2</span><br>
+                                </div>
+                            </div>
+                            </div>
+                        </a>`;
+                        e.appendChild(element);
+                    }
+                    else {
+                        let element = document.createElement("div");
+                        element.innerHTML = `
+                        <a href="javascript:void(0)" onclick="getMessages(${data[i]['second_user']['id']})">
+                            <div class="card mb-2 shadow-0">
+                            <div class="card-body d-flex justify-content-between">
+                                <div class="d-flex">
+                                <img src="${data[i]['second_user']['image']}" height="40" width="40" class="rounded-circle">
+                                &emsp;
+                                <div>
+                                    <h4 class="card-title mb-0 p-0">${data[i]['second_user']['name']}</h4>
+                                    <span class="small" id="last-message-time">${data[i]['time_stamp']}</span>
+
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <span class="badge rounded-pill bg-success">2</span><br>
+                            </div>
+                            </div>
+                            </div>
+                        </a>`;
+                        e.appendChild(element);
+                    }
+                }
+            }
+        });
+    });
+
+    function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+            parent.removeChild(parent.firstChild);
+        }
+    }
+
+    function getMessages(receiverId) {
+        
+        const senderId = JSON.parse(document.getElementById('user_id').textContent);
+        const csrf = Cookies.get('csrftoken');
+        const formData = new FormData();
+        formData.append("receiver", receiverId);
+        formData.append("sender", senderId);
+
+        fetch('fetch_messages', {
+            method: "POST",
+            headers: { 'X-CSRFToken': csrf, },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            receiver = result['receiver_id'];
+            var data = result['data'];
+            var e = document.getElementById('message-box');
+            removeAllChildNodes(e);
+            bindEvent();
+            for (let i = 0; i < data.length; i++) {
+                if (result['receiver_id'] == data[i]['receiver']) {
+                    let element = document.createElement("div");
+                    element.classList.add('d-flex');
+                    element.classList.add('justify-content-end');
+                    element.classList.add('mb-4');
+                    element.innerHTML = `
+                <div class="msg_cotainer_send rounded">
+                    ${data[i]['description']}
+                    <span class="msg_time">${data[i]['time_stamp']}</span>
+                </div>`;
+                    e.appendChild(element);
+                }
+                else {
+                    let element = document.createElement("div");
+                    element.classList.add('d-flex');
+                    element.classList.add('justify-content-start');
+                    element.classList.add('mb-4');
+                    element.innerHTML = `
+                    <div class="msg_cotainer rounded">
+                        ${data[i]['description']}
+                        <span class="msg_time_send">${data[i]['time_stamp']}</span>
+                    </div>`;
+                    e.appendChild(element);
+                }
+            }
+
+            document.getElementById('last-message-time').innerText = data[data.length - 1]['time_stamp'];
+            document.getElementById('receiver_image').src = result['receiver_image'];
+            document.getElementById('receiver_name').innerText = result['receiver_name'];
+            e.scrollTo({ left: 0, top: e.scrollHeight, behavior: "smooth" });
+            if (result['online_status'] == true) {
+                document.getElementById('online_status').innerHTML = '<i class="bi bi-circle-fill" style="color:green"></i>';
+            } else {
+                document.getElementById('online_status').innerHTML = '<i class="bi bi-circle-fill" style="color:red"></i>';
+            }
+        });
+        var ft = document.getElementById('message-header')
+        ft.style.display = "block";
+        var ft = document.getElementById('message-footer')
+        ft.style.display = "block";
+    }
+
+
+    function sendMessagesNew(messageContent) {
+        if (!messageContent.trim()) {
+            return;
+        }
+        const csrf = Cookies.get('csrftoken');
+        const formData = new FormData();
+        formData.append("receiver", receiver);
+        formData.append("sender", sender);
+        formData.append("message", messageContent)
+        fetch('send_messages', {
+            method: "POST",
+            headers: { 'X-CSRFToken': csrf, },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if(result['status']==false){
+                Swal.fire("Can't send message, You blocked by admin!");
+            }
+            document.getElementById('message_input').value = "";
+           
+        });
+    }
+
+    
+//     function sendMessagesNew(messageContent) {
+//     if (!messageContent.trim()) {
+//         return;
+//     }
+//     const csrf = Cookies.get('csrftoken');
+//     const formData = new FormData();
+//     formData.append("receiver", receiver);
+//     formData.append("sender", sender);
+//     formData.append("message", messageContent);
+
+//     fetch('send_messages', {
+//         method: "POST",
+//         headers: { 'X-CSRFToken': csrf },
+//         body: formData
+//     })
+//     .then(response => response.json())
+//     .then(result => {
+//         document.getElementById('message_input').value = "";
+        
+//         // Check if the block status is true
+//         if (result.block_status) {
+//             // Hide the message input box
+//             document.getElementById('message-footer').style.display = 'none';
+//         } else {
+//             // Show the message input box
+//             document.getElementById('message-footer').style.display = 'block';
+//         }
+//     });
+// }
+
+
+</script>
+{% endblock content %}

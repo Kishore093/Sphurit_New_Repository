@@ -1,0 +1,229 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+
+{% endblock extrastyle %}
+{% block script %}
+<style>
+    .card {
+    margin: 0 20px 30px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+</style>
+<script src="{% static 'js/quiz.js' %}"></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-start px-3">
+        <div class="col-lg-12 col-md-12 ">
+            
+            <h5 class="card-title">Quiz For Topic &emsp;->&emsp; {{form.topic.topic_name}}</h5>
+        </div>
+    </div>
+    <div >
+        <div class="mb-2 box question-box" id="form-head">
+            <div class="form-title-box">
+                <input type="text" class="form-title edit-on-click input-quiz-title txt-clr" placeholder="Quiz title" value="{{form.title}}">
+            </div>
+            <textarea class="form-description edit-on-click textarea-adjust txt-clr" rows="1" placeholder="Quiz description" spellCheck = "false"
+            id="input-quiz-description">{{form.description}}</textarea>
+        </div>
+        <div id="q_ctr">
+        {% for question in form.questions.all %}
+        <div class="mb-2 box question-box question" data-id="{{question.id}}">
+            <input type="text" data-id="{{question.id}}" class="question-title edit-on-click input-question" placeholder="Question title" value="{{question.question}}">
+            {% if question.question_type == "multiple choice" %}
+            <div class="choices{{question.id}}" data-id="{{question.id}}">
+                {% for choice in question.choices.all %}
+                    <div class="choice c-{{question.id}}" id="option{{choice.id}}">
+                        <input type="radio" id="{{choice.id}}" disabled>
+                        <label for="{{choice.id}}">
+                            <input type="text" value="{{choice.choice}}" class="edit-choice" data-id="{{choice.id}}">
+                        </label>
+                        <span class="remove-option" title="Remove" data-filter="{{question.id}}" data-id="{{choice.id}}">&times;</span>
+                    </div>
+                {% endfor %}
+                 <div class="choice" id="add_option{{question.id}}" style="display: {% if question.choices.all.count < 4 %}block{% else %}none{% endif %};">
+                    <input type = "radio" id = "add-choice" disabled />
+                    <label for = "add-choice" class="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
+                </div>
+                <div class="d-flex justify-content-between">
+                     <div class="answer-key" id="answer-key{{question.id}}">
+                        <span>Answer Key -</span>&emsp;
+                        {% for i in question.choices.all %}
+                        <div class="form-check form-check-inline" id="ak{{i.id}}">
+                            <input class="form-check-input" type="radio" name="{{question.id}}-answer" id="choice-{{i.id}}"
+                             data-id="{{question.id}}" value="{{i.id}}" answer-key data-question_type = "{{question.question_type}}" {% if i.is_answer %} checked {% endif %}>
+                            <label for="choice-{{i.id}}">{{i.choice}}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="question-score">
+                        <label for="score">Points</label>
+                        <input type="number" data-id="{{ question.id }}" class="input-score" value="{{ question.score }}">
+
+                        <!-- <input type="number" data-id="{{ question.id }}" id="getPoints" class="input-score" value="{{ question.score }}"> -->
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="choice-option">
+                <input type="checkbox" class="required-checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked{% endif %}>
+                <label for="required-{{question.id}}" class="required">Required</label>
+                <div class="d-flex float-right">
+                    <img src="{% static 'Icon/dustbin.png' %}" alt="Delete question icon" class="question-option-icon delete-question" 
+                    title="Delete question" data-id="{{question.id}}">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+        <div class="mb-4 box question-box d-flex justify-content-between" id="">
+            <div class="pt-1">
+                <p class="fw-bold">Add More Questions and Preview Quiz</p>
+            </div>
+            <div class="d-flex">
+                <a href="{% url 'preview_form' form.code %}">
+                    <img src = "{% static 'Icon/eye.png' %}" class="" title = "Preview" height="40" width="40" style="margin-left: 1em; cursor: pointer;" />
+                </a>
+                <img src = "{% static 'Icon/add.png' %}" class="" title="Add question" 
+                    id="add-question" height="40" width="40" style="margin-left: 1em; cursor: pointer;" />
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+
+   {% comment %}  
+    document.addEventListener("DOMContentLoaded", function () {
+        // Function to enable/disable "Add question" button based on whether an answer key is selected
+        function updateAddQuestionButton() {
+            // Get all answer key radio buttons
+            const answerKeyRadioButtons = document.querySelectorAll('[answer-key]');
+
+            // Get the "Add question" button
+            const addQuestionButton = document.getElementById('add-question');
+
+            let anyRadioButtonChecked = false;
+            answerKeyRadioButtons.forEach(function(radioButton) {
+                if (radioButton.checked) {
+                    anyRadioButtonChecked = true;
+                }
+            });
+            addQuestionButton.disabled = !anyRadioButtonChecked;
+        }
+
+        // Add event listener to each answer key radio button
+        document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
+            radioButton.addEventListener('change', updateAddQuestionButton);
+        });
+
+        // Function to handle click event on "Add question" button
+        document.getElementById('add-question').addEventListener('click', function() {
+            // Check if any answer key radio button is checked
+            const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
+            if (!anyRadioButtonChecked) {
+                alert("Please select an answer key before adding a question.");
+            }
+        });
+
+        // Initial call to updateAddQuestionButton to set the initial state of the "Add question" button
+        updateAddQuestionButton();
+    }); {% endcomment %}
+    {% comment %} document.addEventListener("DOMContentLoaded", function () {
+        // Function to enable/disable "Add question" button based on whether an answer key is selected for any question
+        function updateAddQuestionButton() {
+            // Get all answer key radio buttons for all questions
+            const answerKeyRadioButtons = document.querySelectorAll('[answer-key]');
+    
+            // Get the "Add question" button
+            const addQuestionButton = document.getElementById('add-question');
+    
+            let anyRadioButtonChecked = false;
+            answerKeyRadioButtons.forEach(function(radioButton) {
+                if (radioButton.checked) {
+                    anyRadioButtonChecked = true;
+                }
+            });
+            addQuestionButton.disabled = !anyRadioButtonChecked;
+        }
+    
+        // Add event listener to each answer key radio button for all questions
+        document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
+            radioButton.addEventListener('change', updateAddQuestionButton);
+        });
+    
+        // Function to handle click event on "Add question" button
+        document.getElementById('add-question').addEventListener('click', function() {
+            // Check if any answer key radio button is checked for any question
+            const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
+            if (!anyRadioButtonChecked) {
+               
+                alert("Please select an answer-key key before adding a question.");
+            }else if(anyRadioButtonChecked){
+                alert(" answer-keyselect");
+            }       
+            else{
+                alert(" before adding a question.");
+            }
+        });
+    
+        // Initial call to updateAddQuestionButton to set the initial state of the "Add question" button
+        updateAddQuestionButton();
+    });
+     {% endcomment %}
+
+     document.addEventListener("DOMContentLoaded", function () {
+        // Function to enable/disable "Add question" button based on whether an answer key is selected for each question
+        function updateAddQuestionButton(questionIndex) {
+            // Get the answer key radio buttons for the current question
+            const answerKeyRadioButtons = document.querySelectorAll(`[data-id="${questionIndex}"][answer-key]`);
+    
+            // Get the "Add question" button
+            const addQuestionButton = document.getElementById('add-question');
+    
+            let anyRadioButtonChecked = false;
+            answerKeyRadioButtons.forEach(function(radioButton) {
+                if (radioButton.checked) {
+                    anyRadioButtonChecked = true;
+                }
+            });
+            addQuestionButton.disabled = !anyRadioButtonChecked;
+        }
+    
+        // Add event listener to each answer key radio button for all questions
+        document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
+            radioButton.addEventListener('change', function() {
+                // Get the index of the current question
+                const questionIndex = radioButton.dataset.id;
+                // Call updateAddQuestionButton with the current question index
+                updateAddQuestionButton(questionIndex);
+            });
+        });
+    
+        // Function to handle click event on "Add question" button
+        document.getElementById('add-question').addEventListener('click', function() {
+            // Check if any answer key radio button is checked for any question
+            const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
+            if (!anyRadioButtonChecked) {
+                    alert("Please select an answer key for each question before adding a new question.");
+                }
+        });
+    
+        // Initial call to updateAddQuestionButton for each question to set the initial state of the "Add question" button
+        document.querySelectorAll('.question-box').forEach(function(questionBox) {
+            // Get the index of the current question
+            const questionIndex = questionBox.dataset.id;
+            // Call updateAddQuestionButton with the current question index
+            updateAddQuestionButton(questionIndex);
+        });
+    });
+    
+</script> 
+
+  
+{% endblock %}

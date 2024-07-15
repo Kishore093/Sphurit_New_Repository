@@ -1,0 +1,78 @@
+
+{% load static %}
+
+<!-- ======= Sidebar ======= -->
+<ul class="sidebar-nav" id="sidebar-nav">
+  <li>
+    <div class="row mt-3" style="align-items: center;justify-content: center;">
+      <div class="col-lg-4 col-md-4 col-sm-4 p-0 m-0" style="display: flex;align-items: center;justify-content: center;">
+        {% if request.user.image_url != "" %}
+        <img src="{{ request.user.image_url }}" alt="Profile" height="60" width="40" class="rounded-circle my-auto">
+        {% else %}
+        <img src="{% static 'img/user.png' %}" alt="Profile" height="50" class="rounded-circle my-auto">
+        {% endif %}
+        &emsp13;
+      </div>
+      <div class="col-lg-8 col-md-8 col-sm-8" style="text-align: left;">
+        <span class="card-title" style="font-size: 14px; padding: 0px !important;">{{ request.user.full_name }}</span><br/>
+        <span class="small text-muted" style="font-size: 12px;">{{ request.user.mobile }}</span>
+      </div>
+    </div>
+  </li>
+  
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'user_dashboard' %}">
+      <!-- <i class="bi bi-book"></i> -->
+      <span>My Courses</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'user_purchased_list' %}">
+      <!-- <i class="bi bi-stack"></i> -->
+      <span>Course Purchased</span>
+    </a>
+  </li><!-- End Contact Page Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'user_purchased_live_list' %}">
+      <!-- <i class="bi bi-stack"></i> -->
+      <span>Live Course Purchased</span>
+    </a>
+  </li>
+
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'user_wish_list' %}">
+      <!-- <i class="bi bi-file-bar-graph"></i> -->
+      <span>Wishlists</span>
+    </a>
+  </li><!-- End Register Page Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'chats' %}">
+      <!-- <i class="bi bi-chat-dots"></i> -->
+      <span>Chats</span>
+    </a>
+  </li><!-- End Login Page Nav -->
+
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'view_user_profile' %}">
+      <!-- <i class="bi bi-gear"></i> -->
+      <span>Profile</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'course_query' %}">
+      <!-- <i class="bi bi-gear"></i> -->
+      <span>Support</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link collapsed" href="{% url 'log_out' %}">
+      <!-- <i class="bi bi-file-earmark"></i> -->
+      <span>Sign Out</span>
+    </a>
+  </li><!-- End Blank Page Nav -->
+
+</ul>
+<!-- End Sidebar-->

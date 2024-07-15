@@ -1,0 +1,417 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load filter %}
+{% block extrastyle %}
+<style>
+    .card-img-top {
+        border-radius: 20px;
+        height: 10vw;
+    }
+    h6.card-title a {
+        font-weight: bold;
+        color: #000;
+    }
+    .row{
+        flex-wrap: nowrap;
+        padding-right: calc(var(--bs-gutter-x)* .5); 
+
+    }
+    .container.profile-sec {
+        padding: 10px;
+        margin-right: 10px;
+        width: 800px;
+        margin-left: 0px;
+    }
+    .card-body .card-sec{
+        height: 22.5rem;
+        width: 13.8rem;
+        
+    }
+    .ratings {
+        font-size: 10px; /* Adjust as needed */
+        display: flex;
+    }
+    
+    .col-lg-6 {
+        display: flex;
+        align-items: center;
+    }
+    
+    .text-warning,
+    .text-muted {
+        font-size: 12px; /* Adjust as needed */
+    } 
+    
+    /* Optional: To reduce space between discount fee and actual fee */
+     .text-right .d-flex {
+        gap: 5px; /* Adjust as needed */
+    } 
+    a {
+        color: black;
+        text-decoration: none;
+        size: 7px;
+    }
+    .course-name {
+        max-width: 100%; /* Ensure it doesn't exceed container width */
+        overflow: hidden;
+        white-space: nowrap; /* Prevents wrapping */
+        text-overflow: ellipsis;
+    }
+    .pt-3 {
+        padding-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    .px-3 {
+        padding-right: 1rem !important;
+        padding-left: 0rem !important; 
+    }
+    h6.text-secondary {
+        font-size: small;
+    }
+    .border-box p.small.text-muted {
+        font-size: 11px;
+        margin-bottom: 1px;
+    }
+    .card-body {
+        flex: 0 1 auto;
+        padding: 1rem 1rem;
+    }
+    .card.rounded.border.border-box {
+        min-height: 320px;
+    }.card-bod.cd {
+        height: 261px;
+    }a#cart-btn-mr-32 {
+        margin-right: 17px;
+    }
+    .card-sec {
+        padding: 10px !important;
+    }
+    .card-img-top {
+    border-radius: 0px;
+    height: 12vw;
+}
+.course_box_body {
+    width: 25% !important;
+}
+.card-bod.cd {
+    height: 279px !important;
+    padding: 10px !important;
+}
+.card {
+    margin: 0px !important;
+    box-shadow: 0 0 0px 1px #00000017 !important;
+}
+    
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+{% block content %}
+    <div class="">
+        <div class="container-fluid curved-box pt-2">
+            <p class="fs-4 text-white mb-2">My Courses</p>
+            <p class="fs-6 text-white mb-2">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+        </div>
+        
+    
+        <div class="row">
+            <div class="col-lg-2 card py-0 " style="margin-left: 20px !important;">
+                {% include 'user-face/sidebar.html' %}
+            </div>
+            <div class="col-lg-10  ">
+                <div class="container-fluid  profile-sec">
+                    <div class="mt-3">
+                        <h1 style="font-family: 'Kalam', cursive; justify-content: center;" class="mb-3">All <span class="text-primary">Python</span> Courses</h1>
+                    </div>
+                    <div class="row">
+                        {% for item in request.user.user_purchased.all %}
+                        <div class="col-lg-4 col-md-4 align-items-stretch course_box_body" >
+                            <div class="card">
+                                <div class="card-body card-sec">
+                                    <img class="card-img-top" src="{{ item.course.img_url }}" alt="" >
+                                    <!-- <div class="px-3 pt-3">
+                                        <h6 class="one-line-text"><a href="{% url 'play_course' item.course.id %}">{{ item.course.course_name }}</a></h6>
+                                    </div> -->
+                                    <div class="px-3 pt-3">
+                                        {% if item.course.course_name %}
+                                            <h6 class="one-line-text course-name"><a href="{% url 'play_course' item.course.id %}">{{ item.course.course_name }}</a></h6>
+                                        {% else %}
+                                            <h6 class="one-line-text course-name"><a href="{% url 'play_course' item.course.id %}">{{ item.course.title }}</a></h6>
+                                        {% endif %}
+                                    </div>
+                                    <div class="px-3 d-flex justify-content-between">
+                                        <h6 class="text-secondary">{{ item.user.full_name }}</h6>
+                                        <a href="{% url 'play_course' item.course.id %}"><h4 class="text-primary"><i class="bi bi-play-circle"></i></h4></a>
+                                    </div>
+                                    {% if item.get_course_progress == 0.0 %}
+                                    <a href="{% url 'play_course' item.course.id %}">
+                                        <div class="progress rounded mb-2" style="height: 30px; background-color: silver;">
+                                            <div class="progress-bar small rounded" role="progressbar" style="width: 100%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"><a   class="btn btn-warning text-white btn-sm border my-auto">Start learning NOW!</a></div>
+                                        </div>
+                                       
+                                    </a>
+                                    {% else %}
+                                    <div class="progress rounded mb-2" style="height: 20px; background-color: silver;">
+                                        <div class="progress-bar small rounded" role="progressbar" style="width: {{item.course.id|get_course_progress:request.user}}%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">{{item.course.id|get_course_progress:request.user}}% Completed</div>
+                                    </div>
+                                    {% endif %}
+                                    <div class="row">
+                                        <div class="col-lg-6 text-left m-auto">
+                                            <div class="ratings">
+                                                <i class="fa fa-star {% if item.course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                                <i class="fa fa-star {% if item.course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                                <i class="fa fa-star {% if item.course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                                <i class="fa fa-star {% if item.course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                                <i class="fa fa-star {% if item.course.averagereview > 4 %} rating-color {% endif %}"></i>
+                                                <small>({{ item.course.averagereview }})</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-right">
+                                            {% comment %} <span class="d-flex">
+                                                <h5 class="text-warning fw-bold my-auto">₹ {{ item.course.discount_fee }}</h5>&emsp13;
+                                                <h6 class="small text-muted text-decoration-line-through my-auto" >₹ {{ item.course.actual_fee }}</h6>
+                                            </span> {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="border py-5 mb-3">
+                            <p class="h3 text-muted my-5 text-center">No Course Purchased Yeat!!</p>
+                        </div>
+                       {% endfor %}
+                    </div>
+                </div>
+
+
+            
+                <div class="container-fluid mt-2 ">
+                    <div >
+                        <h1 style="font-family: 'Kalam', cursive;" class="mb-4">Most <span class="text-primary">Recommended</span> courses for you </h1>
+                    </div>
+                    <div class="row">
+                        {% for item in course|slice:":3" %}
+                        <div class="col-lg-3 col-md-4 p-2 align-items-stretch course_box_body">
+                            <div class="card rounded border  border-box">
+                                <div class="card-bod cd">
+                                    <img class="card-img-top" src="{{ item.img_url }}" alt="" >
+                                    <div class="">
+                                        {% if item.id|is_purchased:request.user %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'play_course' item.id %}">{{ item.course_name }}</h6>
+                                        {% else %}
+                                            <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                                        {% endif %}
+                                        
+                                        <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                                        {% comment %} <span class="small text-muted">Product Management Masterclass, you will learn with Sarah Johnson - Head of Product Customer Platform Gojek Indonesia.</span> {% endcomment %}
+                                        <p class="small text-muted">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                                        <span class="d-flex">
+                                            <h4 class="text-warning fw-bold">₹ {{ item.discount_fee}}</h4>&emsp13;
+                                            <h5 class="small text-muted text-decoration-line-through" >₹ {{ item.actual_fee }}</h5>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer rounded d-flex justify-content-between">
+                                    
+                                    <span class="d-flex">
+                                        {% if item.id|is_purchased:request.user %}
+                                        <a class="btn btn-warning text-white btn-sm border my-auto" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                                        {% else %}
+                                            <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist2('{{item.id}}'), 'atwl{{item.id}}'" id="atwlrc{{item.id}}">
+                                                <i class="bi bi-heart{% if user in item.wishlist.all %}-fill{% endif %}" id="heartIconmr{{item.id}}"></i>
+                                            </button>
+            
+                                            {% if item.id|is_cart:request.user %}
+                                                        <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border my-auto"><i class="bi bi-cart-check"></i></a>
+                                                    {% else %}
+                                                        <a id="cart-btn-mr-{{ item.id }}" style="margin-left: -3rem" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                                    {% endif %}
+        
+        
+                                                <script type="text/javascript">
+                                                    $(document).ready(function() {
+                                                    $('.add-to-cart-btn').on('click', function(e) {
+                                                    e.preventDefault(); 
+                                                    var itemId = $(this).attr('id').split('-')[3];             
+                                                $.ajax({
+                                                    url: $(this).attr('href'),
+                                                    type: 'GET',
+                                                    success: function(data) {
+                                                    $('#cart-btn-mr-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                                    $('#cart-btn-mr-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                                },
+                                                error: function(error) {
+                                                console.log(error); 
+                                                }
+                                            });
+                                        });
+                                    });
+                                
+                                    </script> 
+                                    <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto enr">Enroll Now</button>
+                                    
+                                    
+                                    <script>
+                                        function AddToWishlist2(itemId) {
+                                            var heartIcon = document.getElementById('heartIconmr' + itemId);
+                                            if (heartIcon.classList.contains('bi-heart')) {
+                                                heartIcon.classList.remove('bi-heart');
+                                                heartIcon.classList.add('bi-heart-fill');
+                                            } else {
+                                                heartIcon.classList.remove('bi-heart-fill');
+                                                heartIcon.classList.add('bi-heart');
+                                            }
+                                        }
+                                    </script>
+                                    {% endif %}
+        
+                                    </span>
+                               
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                       
+                    </div>
+                </div>
+
+
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function removeFromWishlist(id){
+            const csrf = Cookies.get('csrftoken');
+            fetch('remove_from_wishlist', {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                window.location = `/`
+            })
+        }
+        function AddToWishlist(id){
+            const csrf = Cookies.get('csrftoken');
+            fetch('add_to_wishlist', {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                window.location = `/`
+            })
+        }
+
+        function enrollNow(args){
+            fetch("{% url 'initEnrollPayment' %}", {
+                method: "POST",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "amount":args.p,
+                    "currency":"INR"
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                var optionData = result['result']
+                var options = {
+                    "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                    "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "currency": optionData['currency'],
+                    "name": "Course Enrollment",
+                    "description": "Course Enrollment",
+                    "image": "{% static 'img/icons/logo1.png'%}",
+                    "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                    "handler": function (response){
+                        if(response.razorpay_payment_id){
+                            console.log(response.razorpay_payment_id);
+                            orderId = response.razorpay_order_id;
+                            fetch("{% url 'verifySignature' %}", {
+                                method: "POST",
+                                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                body: JSON.stringify({
+                                    "razorpay_paymentId":response.razorpay_payment_id,
+                                    "razorpay_orderId":response.razorpay_order_id,
+                                    "razorpay_signature":response.razorpay_signature
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                if(result['result']){
+                                    fetch("{% url 'purchaseCourse' %}", {
+                                        method: "POST",
+                                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                        body: JSON.stringify({
+                                            "course_id":args.id,
+                                            "order_id": orderId
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log(result);
+                                        const swalWithBootstrapButtons = Swal.mixin({
+                                            customClass: {
+                                                confirmButton: "btn btn-success",
+                                                cancelButton: "btn btn-danger"
+                                            },
+                                            buttonsStyling: false
+                                        });
+                                        swalWithBootstrapButtons.fire({
+                                        title: "Payment Successful.",
+                                        text: "Thanks for purchesed the course!",
+                                        icon: "success",
+                                        showCancelButton: false,
+                                        confirmButtonText: "Ok",
+                                        reverseButtons: true
+                                        }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location = "{% url 'user_dashboard' %}";
+                                        }
+                                        });
+                                    })
+                                }
+                            })
+                        }else{
+                            console.log(response);
+                        }
+                    },
+                    "prefill": {
+                        "name": "{{ user.full_name }}",
+                        "email": "{{ user.email }}",
+                        "contact": "{{ user.mobile }}"
+                    },
+                    "notes": {
+                        "address": "Sphurit"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+    
+                rzp1.open();
+                rzp1.on('payment.failed', function (response){})
+            });
+    
+        }
+    </script>
+{% endblock content %}
+    

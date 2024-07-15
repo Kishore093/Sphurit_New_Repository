@@ -1,0 +1,1413 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load count %}
+{% load filter %}
+{% load humanize %}
+{% block extrastyle %}
+<style>
+  .bg-image:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+ 
+
+.card-title a{
+    font-weight: bold;
+        color: #000;
+      
+}
+.accordion-button::after {
+    background-image: url("../../static/img/dropdown_arrow.png");
+}
+.accordion-button:not(.collapsed)::after {
+    background-image: url("../../static/img/dropdown_arrow.png");
+}
+
+bt-sm{
+    font-size: 0.75rem;
+    
+}
+.star-rating {
+
+display:flex;
+flex-direction: row-reverse;
+font-size:3em;
+justify-content:space-around;
+/* padding:0 .2em; */
+text-align:center;
+width:5em;
+}
+
+.star-rating input {
+display:none;
+}
+
+.star-rating label {
+color:#ccc;
+cursor:pointer;
+}
+
+.star-rating :checked ~ label {
+color:#f90;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+color:#fc0;
+}
+
+.carousel-inner .card-footer.rounded.d-flex.justify-content-between h4.text-warning {
+    font-size: 16px !important;
+}   
+.border-box p.small.text-muted {
+    font-size: 11px;
+    margin-bottom: 1px;
+}
+.btn.btn-secondary {
+    color: #FFFFFF;
+    margin-left: -3rem;
+} .fixed-card {
+    position: fixed;
+    top: 100px; /* Adjust as needed */
+    left: 77%;
+    transform: translateX(-50%);
+    z-index: 1000; /* Ensure the card appears above other content */
+    margin-bottom: 20px; 
+}
+.carousel-item {
+      width: 74%;
+}
+.card{
+    box-shadow: 0 0 4px #00000024 !important;
+
+}
+
+.w-100.h-100 {
+    margin-bottom: 0px !important;
+}
+/* .card.mb-3.px-3.rvw-card {
+    width: 62%;
+    margin-left: 30px;
+
+} */
+.course_box_body {
+    width: 20% !important;
+}
+
+h1.mb-3.ml-5 {
+    margin-left: 66px;
+}.rc {
+    margin-left: 62px;
+}
+.col-lg-6.cc {
+    width: 68%;
+    margin-left: -34px;
+}
+.card-body.ccd {
+    height: 100px;
+}
+.btn.btn-secondary {
+    color: #FFFFFF;
+    margin-left: -1rem;
+}
+.box_content h4.text-warning.fw-bold.my-auto {
+  
+     line-height: 0; 
+}
+h6.card-sub-title.text-muted {
+    margin-top: -5px;
+    font-size: 11px !important;
+    font-weight: 400;
+}
+.card.rounded.border.border-box {
+    min-height: 354px;
+}
+.course_box_body h6.card-sub-title {
+    font-size: 12px;
+}
+.course_boxs_body {
+    width: 27% !important;
+}
+.course_box_body h6.card-sub-title {
+    font-size: 11px;
+    font-weight: 400;
+}
+
+a#cart-btn-mr-32 {
+      margin-right: 33px; 
+      margin-left: 1px;
+    }
+a#cart-btn-mr-13 {
+        margin-left: 1.5px;
+    }
+.col-lg-3.col-md-4.p-2.align-items-stretch.course_box_body {
+        width: 20% !important;
+    }
+.enr{
+    margin-left: -0.75rem !important;
+    }
+.mt-5 {
+    margin-top: 11rem !important;
+}
+.card.mb-3.px-3.rvw-card {
+    width: auto !important;
+    margin-left: 21px !important;
+}
+
+
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-1">
+        <div class="col-lg-12 col-md-12 p-0" >
+            <div class="" style="height: 450px;
+                background-image: url({{course.img_url}});background-repeat: no-repeat;
+                background-size: cover;background-position: center;">
+                <div class="position-relative" style="height: 450px;background-color: #132c49e6!important;">
+                    <div class="position-absolute" style="top: 20%; bottom: 25%; right: 0; left: 50px;opacity: 0.9;">
+                    <!-- <div class="container position-absolute" style="top: 20%; bottom: 25%; right: 0; left: 0;opacity: 0.9;"> -->
+                        <div class="row">
+                            <div class="col-lg-8 " style="z-index: 5; margin-bottom: 3px;">
+                                <span class=" text-white">Phython</span>
+                                {% comment %} <button class="btn btn-outline-warning btn-sm"><span class="small">Development</span></button>
+                                <button class="btn btn-outline-info btn-sm"><span class="small">Programming Language</span></button>
+                                <button class="btn btn-outline-primary btn-sm"><span class="small">Phython</span></button> {% endcomment %}
+                                <div class="d-flex my-2">
+                                    <h3 class="text-white fw-bold my-auto">{{ course.course_name }}</h3>&emsp;
+                                    <span class="badge rounded-pill bg-danger small my-auto">Best Seller</span>
+                                </div>
+                                {% with text=course.description %}
+                                    {% if text|wordcount > 20 %}
+                                        <p class="small text-white">{{text|truncatewords:20}}</p>
+                                    {% endif %}
+                                {% endwith %}
+                                <div class="d-flex">
+                                    <div class="ratings">
+                                        <small class="rating-color">({{ course.averagereview }})</small>&emsp13;
+                                        <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                                        &emsp13;<small class="text-white">({{course.course_feedbacks.all.count}})</small>
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <i class="bi bi-person rating-color"></i>
+                                        <span class="text-white small">{{ course.course_purchased.all.count }} Enrolled </span>
+                                        <!-- <span class="text-white small">{{ course.course_purchased.all.count }} enrolled on this course</span> -->
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <i class="bi bi-clock rating-color"></i>
+                                        <span class="text-white small">Last updated {{course.updated_at|naturaltime}}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-4" style="display: flex;align-items: center;">
+                                    <div>
+                                        {% if course.user.profile_image %}
+                                        <img src="{{ course.user.profile_image.url }}" alt="Profile" height="50" class="rounded-circle">
+                                        {% else %}
+                                        <img src="{% static 'img/user.png' %}" class="rounded-circle" height="50" alt="Profile">
+                                        {% endif %}
+                                    </div>
+                                    <div style="margin-left: 10px;">
+                                        <span class="text-white small my-auto">{{ course.user.full_name }}</span>
+                                        <p class="small p-0 m-0" style="color: #cdc3c3;font-size: 13px;font-weight: normal;">Founder of Relik</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+<div class="pt-4" style=" left: 50px;">
+    <div class="row ">
+        <div class="col-lg-8 col-md-8" >
+            <div class="card mb-3 px-3" >
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Description</h5>
+                    {% with text=course.description %}
+                        {% if text|wordcount > 60 %}
+                        <p class="half-content" id="half-{{ course.id }}" style="display: block;">{{text|truncatewords:60}}
+                            <br><a data-id="{{ course.id }}" href="javascript:void(0)" class="show-hide-btn">Show more</a>
+                        </p>
+                        <p class="full-content" id="full-{{ course.id }}" style="display: none;">{{ text }}
+                            <br><a data-id="{{ course.id }}" href="javascript:void(0)" class="show-hide-btn">Show less</a>
+                        </p>
+                        {% else %}
+                        <p class="">{{ text }}</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+
+            <div class="card mb-3 px-3" >
+                <div class="card-body">
+                    <h5 class="card-title mb-0">What you'll learn</h5>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Create quick wireframes.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Downloadable exercise files.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Build a UX project from beginning to end.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Learn to design websites & mobile phone apps.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>You will be able to talk correctly with other UX design.</p></span>
+                        </div>
+                        <div class="col-lg-6">
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Become a UX designer.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>You will be able to add UX designer to your CV</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Become a UI designer.</p></span>
+                            <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p>Build & test a full website design.</p></span>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="card mb-3 px-3 py-3">
+                {% comment %} <div class="card-body">
+                    <h5 class="card-title mb-0">Course Content</h5>
+                    <span class="small">27 chapters • 95 topics</span>        
+                    {% for chapter in course.chapter_course.all %}
+
+                    <div class="accordion accordion-flush" id="accordionChapter">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header bg-primary px-3" id="heading{{chapter.id}}">
+                                <button class="accordion-button" style="color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{chapter.id}}" aria-expanded="true" aria-controls="collapse{{chapter.id}}">
+                                    <div class="col-lg-11 col-md-11 mt-auto d-flex justify-content-between">
+                                        <span>{{ chapter.chapter_name }}</span>
+                                        <span class="text-right">6 topics • 87 min min</span>
+                                    </div>
+                                </button>
+                            </h2>
+
+                            
+                            <div id="collapse{{chapter.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{chapter.id}}" data-bs-parent="#accordionChapter">
+                                <div class="accordion-body px-3">
+                                    {% for topic in chapter.topic_chapter.all %}
+                                    <div class="d-flex justify-content-between pt-3">
+                                        <div class="d-flex">
+                                            <h1 class="my-auto pt-2">
+                                                {% if user_has_purchased_course %}
+                                                    <a class="video-btn" data-bs-toggle="modal" data-bs-target="#videoModal" data-bs-src="{{topic.chapter.course.course_video.url}}">
+                                                        <i class="bi bi-play-btn"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a href="#" onclick="showAlert()">
+                                                        <i class="bi bi-play-btn"></i>
+                                                    </a>
+                                                {% endif %}
+
+                                                <script>
+                                                    function showAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access videos.'
+                                                        });
+                                                    }
+                                                </script> 
+                                            </h1>&emsp;
+                                            <div class="my-auto">
+                                                <p class="mb-0 fw-bold">{{ topic.topic_name }}</p>
+                                                
+                                                <a href="{% if topic.quiz_available %}
+                                                            {% if user_has_purchased_course %}{{ topic.quiz_url }}
+                                                            {% else %}javascript:void(0);
+                                                            {% endif %}
+                                                        {% else %}javascript:void(0);
+                                                        {% endif %}" 
+                                                        {% if not user_has_purchased_course %}
+                                                            onclick="showQuizAlert()"
+                                                        {% endif %}>
+                                                    <span class="badge bg-primary small {% if not topic.quiz_available or not user_has_purchased_course %}disabled{% endif %}">Quiz</span>
+                                                </a>&emsp;
+
+                                                <a href="{% if topic.assignment_available %}
+                                                            {% if user_has_purchased_course %}{{ topic.assignment_url }}
+                                                            {% else %}javascript:void(0);
+                                                            {% endif %}
+                                                        {% else %}javascript:void(0);
+                                                        {% endif %}" 
+                                                        {% if not user_has_purchased_course %}
+                                                            onclick="showAssignmentAlert()"
+                                                        {% endif %}>
+                                                    <span class="badge bg-primary small {% if not topic.assignment_available or not user_has_purchased_course %}disabled{% endif %}">Assignment</span>
+                                                </a>
+
+                                                <script>
+                                                    function showQuizAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access quizzes.'
+                                                        });
+                                                    }
+
+                                                    function showAssignmentAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access assignments.'
+                                                        });
+                                                    }
+                                                </script>
+
+                                            </div>
+                                        </div>
+                                        <span class="my-auto">03:08</span>
+                                    </div>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div> {% endcomment %}
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Course Content</h5>
+                    <span class="small">{{ course.chapter_course.count }} chapters • {{ total_topics }} topics</span>
+                    {% for chapter in course.chapter_course.all %}
+                    <div class="accordion accordion-flush" id="accordionChapter">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header bg-primary px-3" id="heading{{chapter.id}}">
+                                <button class="accordion-button" style="color: white;" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{chapter.id}}" aria-expanded="true" aria-controls="collapse{{chapter.id}}">
+                                    <div class="col-lg-11 col-md-11 mt-auto d-flex justify-content-between">
+                                        <span>{{ chapter.chapter_name }}</span>
+                                        <span class="text-right">{{ chapter.topic_chapter.count }} topics • 87 min min</span>
+                                    </div>
+                                </button>
+                            </h2>
+                            <div id="collapse{{chapter.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{chapter.id}}" data-bs-parent="#accordionChapter">
+                                <div class="accordion-body px-3">
+                                    {% for topic in chapter.topic_chapter.all %}
+                                    <div class="d-flex justify-content-between pt-3">
+                                        <div class="d-flex">
+                                            <h1 class="my-auto pt-2">
+                                                {% if user_has_purchased_course %}
+                                                    <a class="video-btn" data-bs-toggle="modal" data-bs-target="#videoModal" data-bs-src="{{topic.chapter.course.course_video.url}}">
+                                                        <i class="bi bi-play-btn"></i>
+                                                    </a>
+                                                {% else %}
+                                                    <a href="#" onclick="showAlert()">
+                                                        <i class="bi bi-play-btn"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <script>
+                                                    function showAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access videos.'
+                                                        });
+                                                    }
+                                                </script>
+                                            </h1>&emsp;
+                                            <div class="my-auto">
+                                                <p class="mb-0 fw-bold">{{ topic.topic_name }}</p>
+                                                <a href="{% if topic.quiz_available %}
+                                                            {% if user_has_purchased_course %}{{ topic.quiz_url }}
+                                                            {% else %}javascript:void(0);
+                                                            {% endif %}
+                                                        {% else %}javascript:void(0);
+                                                        {% endif %}"
+                                                    {% if not user_has_purchased_course %}
+                                                        onclick="showQuizAlert()"
+                                                    {% endif %}>
+                                                    <span class="badge bg-primary small {% if not topic.quiz_available or not user_has_purchased_course %}disabled{% endif %}">Quiz</span>
+                                                </a>&emsp;
+                                                <a href="{% if topic.assignment_available %}
+                                                            {% if user_has_purchased_course %}{{ topic.assignment_url }}
+                                                            {% else %}javascript:void(0);
+                                                            {% endif %}
+                                                        {% else %}javascript:void(0);
+                                                        {% endif %}"
+                                                    {% if not user_has_purchased_course %}
+                                                        onclick="showAssignmentAlert()"
+                                                    {% endif %}>
+                                                    <span class="badge bg-primary small {% if not topic.assignment_available or not user_has_purchased_course %}disabled{% endif %}">Assignment</span>
+                                                </a>
+                                                <script>
+                                                    function showQuizAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access quizzes.'
+                                                        });
+                                                    }
+                
+                                                    function showAssignmentAlert() {
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Please purchase this course to access assignments.'
+                                                        });
+                                                    }
+                                                </script>
+                                            </div>
+                                        </div>
+                                        <span class="my-auto">03:08</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                
+            </div>
+
+            <div class="card mb-3 px-3" >
+                <div class="card-body">
+                    <div class="row ">
+                        <div class="col-lg-8 col-md-8">
+                            <h5 class="card-title">Our Instructor</h5>
+                            <span class="text-muted">Praesent interdum eu magna aimperdiet. Ut orci ipsum, rutrum id tortor sit amet,.</span>
+                            <br>
+                            <br>
+                            <h6 class="card-sub-title">{{ course.user.full_name }}</h6>
+                            <h6 class="small">Founder of <span class="text-success">Relik</span></h6>
+                            <br>
+                            <br>
+                        </div>
+
+                        {% if course.user.profile_image %}
+                        <div class="col-lg-4 col-md-4 my-3 rounded" style="background-image: url('{{ course.user.profile_image.url }}');background-repeat: no-repeat;background-size: contain;background-position: center;">
+                        {% else %}
+                        <div class="col-lg-4 col-md-4 my-3 rounded" style="background-image: url('{% static 'img/user.png' %}');background-repeat: no-repeat;background-size: contain;background-position: center;"></div>
+                        {% endif %}
+                            
+                        </div>
+                    </div>
+                    
+                    <p class="pt-3">{{ course.user.about }}</p>
+                </div>
+            </div>
+            
+            <div class="card mb-3 px-3  rvw-card" >
+                <div class="card-body rvw-card">
+                    <div class="d-flex justify-content-between border-bottom">
+                        <h5 class="card-title mb-0 my-auto">Reviews</h5>
+                        {% if request.user.is_authenticated %}
+                        <button class="btn btn-primary btn-sm my-auto" {% if course.id|is_reviewed:request.user %} disabled {% endif %} data-bs-toggle="modal" data-bs-target="#addReview">Add Review</button>
+                        {% else %}
+                        <button class="btn btn-primary btn-sm my-auto" disabled>Add Review</button>
+                        {% endif %}
+                    </div>
+                    <p class="mt-2 small fw-bold">Ratings</p>
+                    
+                    <div class="row">
+                        <div class="col-lg-9 ">
+                            <div class="flex-grow-1">
+                                <div class="row align-items-center">
+                                  <div class="col-1 text-center fw-bold">5</div>
+                                  <div class="col-8">
+                                    <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                      <div class="progress-bar rounded" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-1 text-center fw-bold">8</div>
+                                </div>
+                                <div class="row align-items-center">
+                                  <div class="col-1 text-center fw-bold">4</div>
+                                  <div class="col-8">
+                                    <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                      <div class="progress-bar rounded" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-1 text-center fw-bold">5</div>
+                                </div>
+                                <div class="row align-items-center">
+                                  <div class="col-1 text-center fw-bold">3</div>
+                                  <div class="col-8">
+                                    <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                      <div class="progress-bar rounded" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-1 text-center fw-bold">2</div>
+                                </div>
+                                <div class="row align-items-center">
+                                  <div class="col-1 text-center fw-bold">2</div>
+                                  <div class="col-8">
+                                    <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                      <div class="progress-bar rounded" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-1 text-center fw-bold">5</div>
+                                </div>
+                                <div class="row align-items-center">
+                                  <div class="col-1 text-center fw-bold">1</div>
+                                  <div class="col-8">
+                                    <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                      <div class="progress-bar rounded" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                  </div>
+                                  <div class="col-1 text-center fw-bold">0</div>
+                                </div>
+                              </div>
+                        </div>
+                        <div class="col-lg-3 text-center" style="border-left: 1px solid;">
+                            <span class="display-4 font-weight-bolder">{{ course.averagereview }}</span>
+                            <div class="ratings">
+                                <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-3 small fw-bold">Rating's & Reviews</p>
+                    {% for review in course.course_feedbacks.all %}
+                        {% if forloop.counter < 4 %}
+                            <div class="row py-1">
+                                <div class="col-lg-1 text-center ">
+                                    <img class="rounded-circle " src="{% static 'img/imageplaceholder.png' %}" alt="" height="40" width="40">
+                                </div>
+                                <div class="col-lg-11">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-sub-title">{{review.title}}</h5>
+                                        <span class="small text-muted my-auto">{{review.updated_at|naturaltime}}</span>
+                                    </div>
+                                    <p class="small text-muted mb-0">{{review.user.full_name}}</p>
+                                    <div class="ratings">
+                                        <i class="fa fa-star {% if review.rating > 0 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if review.rating > 1 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if review.rating > 2 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if review.rating > 3 %} rating-color {% endif %}"></i>
+                                        <i class="fa fa-star {% if review.rating > 4 %} rating-color {% endif %}"></i>
+                                        <small class="rating-color">({{ review.rating }})</small>
+                                    </div>
+                                    {% with text=review.description %}
+                                        {% if text|wordcount > 40 %}
+                                            <p class="half-content" id="half-{{ review.id }}" style="display: block;">{{text|truncatewords:40}}
+                                                <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="show-hide-btn small">Show more</a>
+                                            </p>
+                                            <p class="full-content" id="full-{{ review.id }}" style="display: none;">{{ text }}
+                                                <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="show-hide-btn small">Show less</a>
+                                            </p>
+                                            
+                                            {% else %}
+                                            <p class="">{{ text }}</p>
+                                        {% endif %}
+                                    {% endwith %}
+                                    {% if review.user.id == request.user.id %}
+                                    <div>
+                                        <a href=""  data-bs-toggle="modal" data-bs-target="#editReview{{review.id}}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+                                        <a onclick="deletereview('{{review.id}}')" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                    </div>
+                                    {% endif %}
+                                    <!-- edit review modal -->
+                                    <div class="modal fade" id="editReview{{review.id}}" tabindex="-1" aria-labelledby="editReviewModalLabel{{review.id}}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title card-title mb-0 p-0" id="editReviewModalLabel{{review.id}}">Update a Review</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h6 class="card-sub-title">What is it like to Course?</h6>
+                                                    <form action="{% url 'update_course_review' course.id %}" method="post" >
+                                                        {% csrf_token %}
+                                                        <input type="hidden" value="{{review.id}}" name="review" class="form-control" required>
+                                                        <div class="mb-3">
+                                                            <div class="star-rating">
+                                                                <style>
+                                                                    /* component */
+
+                                                                    .star-rating {
+                                                                    
+                                                                    display:flex;
+                                                                    flex-direction: row-reverse;
+                                                                    font-size:3em;
+                                                                    justify-content:space-around;
+                                                                    /* padding:0 .2em; */
+                                                                    text-align:center;
+                                                                    width:5em;
+                                                                    }
+
+                                                                    .star-rating input {
+                                                                    display:none;
+                                                                    }
+
+                                                                    .star-rating label {
+                                                                    color:#ccc;
+                                                                    cursor:pointer;
+                                                                    }
+
+                                                                    .star-rating :checked ~ label {
+                                                                    color:#f90;
+                                                                    }
+
+                                                                    .star-rating label:hover,
+                                                                    .star-rating label:hover ~ label {
+                                                                    color:#fc0;
+                                                                    }
+
+                                                                </style>
+                                                                    <input class="form-control" type="radio" id="5-stars" name="rating" value="5" />
+                                                                    <label for="5-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="4-stars" name="rating" value="4" />
+                                                                    <label for="4-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="3-stars" name="rating" value="3" />
+                                                                    <label for="3-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="2-stars" name="rating" value="2" />
+                                                                    <label for="2-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="1-star" name="rating" value="1" />
+                                                                    <label for="1-star" class="star">&#9733;</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="title" class="form-label">Review Title</label>
+                                                            <input type="text" value="{{review.title}}" name="title" class="form-control" required>
+                                                            
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="description" class="form-label">Review Content</label>
+                                                            <textarea class="form-control" name="description" maxlength="800">{{review.description}}</textarea>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Update Review</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <div>
+                            <p class="h3 text-muted my-5 text-center">Not Reviews Yet!!!</p>
+                        </div>
+                    {% endfor %}
+                    {% if course.course_feedbacks.all %}
+                    <div class="text-center">
+                        <a href="" class="text-primary small mx-auto" data-bs-toggle="modal" data-bs-target="#allReviews">View All Reviews</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    <div class="col-lg-4 col-md-4 ml-2 text-center" style="margin-top: -29%; ">
+            <div class="card mb-3 border " style="border-radius:0px !important;border-top-right-radius: 0px; border-top-left-radius: 0px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;">
+                <div id="container" style="position: relative;">
+                <div style="position: relative; ">
+                    <div class="w-100 h-100" style="position: relative;">
+                        {% if item.thumb_image %}
+                            <img class="card-img-top" src="{{ item.thumb_image.url }}" alt="" style="width: 50px; height: 200px;">
+                        {% else %}
+                            <img class="card-img-top" src="{% static 'img/icons/placeholder.png' %}" alt="Default Image" style="width: 100%; height: 200px;">
+                        {% endif %}
+                        {% comment %} <a class="video-btn" data-bs-toggle="modal" data-bs-target="#videoModal" data-bs-src="{{ course.video_url }}">
+                            <div class="w-100 h-100" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgb(112 158 211 / 90%) !important; opacity: 0.8;">
+                                <i class="bi bi-play-circle text-white" style="font-size: 2pc; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+                                <p class="text-white fw-bold" style="position: absolute; left: 30%; bottom: 5%; transform: translate(0%, 0%);">Preview this course</p>
+                            </div>
+                        </a> {% endcomment %}
+                        <a class="video-btn" data-bs-toggle="modal" data-bs-target="#videoModal" data-bs-src="{{ course.video_url }}">
+                            <div class="w-100 h-100" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgb(112 158 211 / 90%) !important; opacity: 0.8;">
+                                <i class="bi bi-play-circle text-white" style="font-size: 2pc; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+                                <p class="text-white fw-bold" style="position: absolute; left: 30%; bottom: 5%; transform: translate(0%, 0%);">Preview this course</p>
+                            </div>
+                        </a>
+                    </div>
+              
+                 <div  id="cardContainer"  class="card-body1 px-4 mt-3  "style="margin-top:20px ">
+                    <span class="d-flex">
+                        <h5 class="pt-2 ml-3">₹ {{ course.discount_fee }}</h5>&emsp;
+                        <h5 class="pt-2 small ml-3 text-decoration-line-through text-center" >₹ {{ course.actual_fee }}</h5>
+                    </span>
+                    <p class="card-text fw-bold text-left">Get this course, plus 10,500+ of our top-rated courses,with Personal Plan. Learn more</p>
+                    
+                    {% if course.id|is_purchased:request.user %}
+                    <a href="{% url 'play_course' course.id %}" class="btn btn-primary btn-sm text-white  mb-3">Start learning NOW!</a>
+                    {% else %}
+                    <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ course.discount_fee }}",id:"{{course.id}}"})' class="btn btn-primary btn-sm w-100 ">Buy Now</button>
+                    <div class="d-flex my-3">
+                        {% comment %} <a class="btn btn-outline-primary btn-sm w-100" href="{% url 'add_to_cart' course.id %}">Add To Cart</a> {% endcomment %}
+                        {% if cart_item %}
+                            <a class="btn btn-outline-primary btn-sm w-100" href="#">Added</a>
+                        {% else %}
+                            <a class="btn btn-outline-primary btn-sm w-100" href="{% url 'add_to_cart' course.id %}">Add To Cart</a>
+                        {% endif %} 
+                        {% comment %} {% if not user in course.wishlist.all %}
+                        
+                        &emsp;<a class="btn btn-outline-primary btn-sm w-100" onclick="AddToWishlist('{{course.id}}')">Add To WishList</a>
+                        {% endif %} {% endcomment %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="px-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small">Chapters</span>
+                            <span class="text-muted small">{{ course|topicCount }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small">Quizzes</span>
+                            <span class="text-muted small">{{course|form_count}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small">Duration</span>
+                            <span class="text-muted small">13 Hours</span>
+                        </div>
+                       
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small">Language</span>
+                            <span class="text-muted small">{{course.select_language}}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-bold small">Certificate</span>
+                            <span class="text-muted small">Yes</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    window.addEventListener('scroll', function() {
+        var cardContainer = document.getElementById('cardContainer');
+        var scrollPosition = window.scrollY || document.documentElement.scrollTop;
+
+        // Check if the scroll position is within the desired range
+        if (scrollPosition > 400 && scrollPosition < 2000) {
+            // Add a class to make the card fixed
+            cardContainer.classList.add('fixed-card');
+        } else {
+            // Remove the class to make the card scrollable
+            cardContainer.classList.remove('fixed-card');
+        }
+    });
+</script>
+<style>
+    /* Style for the fixed card */
+   
+    
+</style>
+
+ <div class="container-fluid  pb-3 mt-3" style="padding-left: 30px;">
+    <div class="text-left">
+        <h1>Most <span class="text-primary">Recommended</span> Courses for you</h1>
+        <p class="mb-4">The latest news, technologies, and resources from our team.</p>
+    </div>
+    <div class="col-lg-12 cc">
+    <div id="carouselNCC" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-inner" style="height: inherit;">
+           
+            <div class="carousel-item active" style="height: inherit;">
+                {% for item in most_purchased_course|slice:":3" %}
+                <div class="col-lg-3 col-md-4 p-2 align-items-stretch course_boxs_body">
+                    <div class="card rounded border  border-box" style="width: 100%;">
+                        <div class="card-body ccd">
+                            <img class="card-img-top" src="{{ item.thumb_image.url }}" alt="" >
+                            <div class="box_content">
+                                <h6 class="card-title mb-0 one-line-text"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                                <h6 class="card-sub-title text-muted">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                                
+                                <p class="small text-muted">{{ item.created_at|date:"d-m-Y h:i A" }}</p>
+                                <span class="d-flex">
+                                    <h4 class="text-warning fw-bold my-auto mb-2">₹ {{ item.discount_fee }}</h4>&emsp13;
+                                    <h5 class="small text-muted text-decoration-line-through my-auto">₹ {{ item.actual_fee }}</h5>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer rounded d-flex justify-content-between">                 
+                             
+                            <span class="d-flex">
+                                {% if item.id|is_purchased:request.user %}
+                                <a class="btn btn-warning btn-sm border my-auto text-white" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                                {% else %}
+                                    <button class="btn btn-default btn-sm border my-auto" onclick="AddToWishlist2('{{item.id}}'), 'atwl{{item.id}}'" id="atwlrc{{item.id}}">
+                                        <i class="bi bi-heart{% if user in item.wishlist.all %}-fill{% endif %}" id="heartIconmr{{item.id}}"></i>
+                                    </button>
+    
+                                    {% if item.id|is_cart:request.user %}
+                                                <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border my-auto" style="margin-left: -58px;"><i class="bi bi-cart-check"></i></a>
+                                            {% else %}
+                                                <a id="cart-btn-mr-{{ item.id }}" style="margin-left: -58px;" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                            {% endif %}
+
+
+                                        <script type="text/javascript">
+                                            $(document).ready(function() {
+                                            $('.add-to-cart-btn').on('click', function(e) {
+                                            e.preventDefault(); 
+                                            var itemId = $(this).attr('id').split('-')[3];             
+                                        $.ajax({
+                                            url: $(this).attr('href'),
+                                            type: 'GET',
+                                            success: function(data) {
+                                            $('#cart-btn-mr-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                            $('#cart-btn-mr-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                        },
+                                        error: function(error) {
+                                        console.log(error); 
+                                        }
+                                    });
+                                });
+                            });
+                        
+                            </script> 
+                            <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto enr">Enroll Now</button>
+                            
+                            
+                            <script>
+                                function AddToWishlist2(itemId) {
+                                    var heartIcon = document.getElementById('heartIconmr' + itemId);
+                                    if (heartIcon.classList.contains('bi-heart')) {
+                                        heartIcon.classList.remove('bi-heart');
+                                        heartIcon.classList.add('bi-heart-fill');
+                                    } else {
+                                        heartIcon.classList.remove('bi-heart-fill');
+                                        heartIcon.classList.add('bi-heart');
+                                    }
+                                }
+                            </script>
+                            {% endif %}
+
+                            </span>
+
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}    
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        $('#carouselNCC .carousel-item').each(function () {
+            var minPerSlide = 3;
+            var next = $(this).next();
+            if (!next.length) {
+            next = $(this).siblings(':first');
+            }
+            next.children(':first-child').clone().appendTo($(this));
+    
+                for (var i = 0; i < minPerSlide; i++) { 
+                    next=next.next(); 
+                    if (!next.length) { next=$(this).siblings(':first'); }
+                    next.children(':first-child').clone().appendTo($(this));
+                } 
+            });
+    </script>
+</div> 
+
+
+<!-- submit review modal -->
+<div class="modal fade" id="addReview" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title card-title mb-0 p-0" id="addReviewModalLabel">Write a Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="card-sub-title">What is it like to Course?</h6>
+                <form id="addreview" method="post" >
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <div class="star-rating">
+                           
+                            <input class="form-control" type="radio" id="5-stars" name="rating" value="5" />
+                            <label for="5-stars" class="star">&#9733;</label>
+                            <input class="form-control" type="radio" id="4-stars" name="rating" value="4" />
+                            <label for="4-stars" class="star">&#9733;</label>
+                            <input class="form-control" type="radio" id="3-stars" name="rating" value="3" />
+                            <label for="3-stars" class="star">&#9733;</label>
+                            <input class="form-control" type="radio" id="2-stars" name="rating" value="2" />
+                            <label for="2-stars" class="star">&#9733;</label>
+                            <input class="form-control" type="radio" id="1-star" name="rating" value="1" />
+                            <label for="1-star" class="star">&#9733;</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Review Title</label>
+                        <input type="text" name="title" class="form-control" id="title" required>
+                        
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Review Content</label>
+                        <textarea class="form-control" name="description" id="description" maxlength="800"></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="start_review">Submit Review</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- all reviews modal -->
+<div class="modal fade" id="allReviews" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content ">
+            <div class="modal-header">
+                <h5 class="modal-title card-title mb-0 p-0" id="allReviewsModalLabel">All Reviews</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mt-2 small fw-bold">Ratings</p>    
+                <div class="row">
+                    <div class="col-lg-9 ">
+                        <div class="flex-grow-1">
+                            <div class="row align-items-center">
+                                <div class="col-1 text-center fw-bold">5</div>
+                                <div class="col-8">
+                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                    <div class="progress-bar rounded" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                </div>
+                                <div class="col-1 text-center fw-bold">8</div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-1 text-center fw-bold">4</div>
+                                <div class="col-8">
+                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                    <div class="progress-bar rounded" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                </div>
+                                <div class="col-1 text-center fw-bold">5</div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-1 text-center fw-bold">3</div>
+                                <div class="col-8">
+                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                    <div class="progress-bar rounded" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                </div>
+                                <div class="col-1 text-center fw-bold">2</div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-1 text-center fw-bold">2</div>
+                                <div class="col-8">
+                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                    <div class="progress-bar rounded" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                </div>
+                                <div class="col-1 text-center fw-bold">5</div>
+                            </div>
+                            <div class="row align-items-center">
+                                <div class="col-1 text-center fw-bold">1</div>
+                                <div class="col-8">
+                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                    <div class="progress-bar rounded" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                </div>
+                                <div class="col-1 text-center fw-bold">0</div>
+                            </div>
+                            </div>
+                    </div>
+                    <div class="col-lg-3 text-center" style="border-left: 1px solid;">
+                        <span class="display-4 font-weight-bolder">{{ course.averagereview }}</span>
+                        <div class="ratings">
+                            <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-3 small fw-bold">Rating's & Reviews</p>
+                {% for review in course.course_feedbacks.all %}
+                    <div class="row py-1">
+                        <div class="col-lg-1 text-center ">
+                            <img class="rounded-circle " src="{{review.user.image_url}}" alt="" height="40" width="40">
+                        </div>
+                        <div class="col-lg-11">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-sub-title">{{review.title}}</h5>
+                                <span class="small text-muted my-auto">{{review.created_at|naturaltime}}</span>
+                            </div>
+                            <p class="small text-muted mb-0">{{review.user.full_name}}</p>
+                            <div class="ratings">
+                                <i class="fa fa-star {% if review.rating > 0 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if review.rating > 1 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if review.rating > 2 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if review.rating > 3 %} rating-color {% endif %}"></i>
+                                <i class="fa fa-star {% if review.rating > 4 %} rating-color {% endif %}"></i>
+                                <small class="rating-color">({{ review.rating }})</small>
+                            </div>
+                            {% with text=review.description %}
+                                {% if text|wordcount > 40 %}
+                                    <p class="half-content" id="dhalf-{{ review.id }}" style="display: block;">{{text|truncatewords:40}}
+                                        <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="dshow-hide-btn small">Show more</a>
+                                    </p>
+                                    <p class="full-content" id="dfull-{{ review.id }}" style="display: none;">{{ text }}
+                                        <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="dshow-hide-btn small">Show less</a>
+                                    </p>
+                                    {% else %}
+                                    <p class="">{{ text }}</p>
+                                {% endif %}
+                            {% endwith %}
+                            {% if review.user.id == request.user.id %}
+                            <div>
+                                <a href=""  data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editReview{{review.id}}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+                                <a onclick="deletereview('{{review.id}}')" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+                            </div>
+                            {% endif %}
+                            <!-- edit review modal -->
+                            <div class="modal fade" id="editReview{{review.id}}" tabindex="-1" aria-labelledby="editReviewModalLabel{{review.id}}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title card-title mb-0 p-0" id="editReviewModalLabel{{review.id}}">Update a Review</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <h6 class="card-sub-title">What is it like to Course?</h6>
+                                            <form action="{% url 'update_course_review' course.id %}" method="post" >
+                                                {% csrf_token %}
+                                                <input type="hidden" value="{{review.id}}" name="review" class="form-control" required>
+                                                <div class="mb-3">
+                                                    <div class="star-rating">
+                                                        
+                                                        <input class="form-control" type="radio" name="rating" value="5" />
+                                                        <label for="5-stars" class="star">&#9733;</label>
+                                                        <input class="form-control" type="radio" name="rating" value="4" />
+                                                        <label for="4-stars" class="star">&#9733;</label>
+                                                        <input class="form-control" type="radio" name="rating" value="3" />
+                                                        <label for="3-stars" class="star">&#9733;</label>
+                                                        <input class="form-control" type="radio" name="rating" value="2" />
+                                                        <label for="2-stars" class="star">&#9733;</label>
+                                                        <input class="form-control" type="radio" name="rating" value="1" />
+                                                        <label for="1-star" class="star">&#9733;</label>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="title" class="form-label">Review Title</label>
+                                                    <input type="text" value="{{review.title}}" name="title" class="form-control" required>
+                                                    
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="description" class="form-label">Review Content</label>
+                                                    <textarea class="form-control" name="description" maxlength="800">{{review.description}}</textarea>
+                                                </div>
+                                                <div class="text-right">
+                                                    <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Update Review</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <script>
+                    $(document).ready(function() {
+                        $(".dshow-hide-btn").click(function() {
+                            var id = $(this).data("id");
+                            $("#dhalf-" + id).toggle();
+                            $("#dfull-" + id).toggle();
+                        })
+                    })
+
+
+                    
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- video player modal -->
+{% comment %} <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="dbschemaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title card-title mb-0 p-0" id="allReviewsModalLabel">Course Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ratio ratio-16x9">
+                    <iframe class="embed-responsive-item" src="" id="video" allowscriptaccess="always" allow="autoplay"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="dbschemaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title card-title mb-0 p-0" id="allReviewsModalLabel">Course Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ratio ratio-16x9">
+                    <iframe class="embed-responsive-item" src="" id="video" allowscriptaccess="always" allow="autoplay"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    {% comment %} $(document).ready(function() {
+        $(".show-hide-btn").click(function() {
+            var id = $(this).data("id");
+            $("#half-" + id).toggle();
+            $("#full-" + id).toggle();
+        })
+    })
+
+    var videoBtn = document.querySelector('.video-btn')
+    var videoModal = document.getElementById('videoModal')
+    var video = document.getElementById('video')
+    var videoSrc
+
+    videoBtn.addEventListener('click',function(e){
+        videoSrc = videoBtn.getAttribute('data-bs-src')
+    })
+
+    videoModal.addEventListener('shown.bs.modal',(e)=>{
+        video.setAttribute('src', videoSrc)
+    })
+
+    videoModal.addEventListener('hide.bs.modal',(e)=>{
+        video.setAttribute('src', videoSrc)
+    })
+     {% endcomment %}
+     $(document).ready(function () {
+        $(".show-hide-btn").click(function () {
+            var id = $(this).data("id");
+            $("#half-" + id).toggle();
+            $("#full-" + id).toggle();
+        })
+    })
+
+    var videoBtn = document.querySelector('.video-btn')
+    var videoModal = document.getElementById('videoModal')
+    var video = document.getElementById('video')
+
+    videoBtn.addEventListener('click', function (e) {
+        var videoSrc = videoBtn.getAttribute('data-bs-src');
+        video.setAttribute('src', videoSrc);
+    })
+
+    videoModal.addEventListener('hide.bs.modal', (e) => {
+        video.removeAttribute('src');
+    })
+
+    function AddToWishlist(id){
+        if("{{request.user.is_authenticated}}" == "True"){
+            const csrf = Cookies.get('csrftoken');
+            fetch("{% url 'add_to_wishlist' %}", {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: id
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+            window.location = `/detail_course/${id}`;
+            })
+        }
+        else{
+            window.location = "{% url 'user_login' %}";
+        }
+    }
+
+    $("#start_review").click(function (){
+        const formData = new FormData(document.getElementById('addreview'));
+        console.log(formData);
+        const csrf = Cookies.get('csrftoken');
+        fetch('{{site_domain}}/teacher/create_course_review/{{course.id}}', {
+            method: "POST",
+            headers: { 'X-CSRFToken': csrf},
+            body : formData,
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if (result['status']) {
+                window.location = '{{site_domain}}/detail_course/{{course.id}}';
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    })
+
+
+    function deletereview(rid){
+                        const csrf = Cookies.get('csrftoken');
+                        fetch(`{{site_domain}}/teacher/delete_course_review/${rid}`, {
+                            method: "Get",
+                            headers: { 'X-CSRFToken': csrf},
+
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log(result);
+                            if (result['status']) {
+                                window.location = '{{site_domain}}/detail_course/{{course.id}}';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error sending message:', error);
+                        });
+                    }
+
+    function removeFromWishlist(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('{% url "remove_from_wishlist" %}', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `/detail_course/${id}`;
+        })
+    }
+</script>
+<script>
+
+    function enrollNow(args){
+        
+        if("{{request.user.is_authenticated}}" == "True"){
+            var oid = "";
+            fetch(`{% url 'initEnrollPayment' %}`, {
+                method: "POST",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "amount":args.p,
+                    "currency":"INR"
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                var optionData = result['result']
+                var options = {
+                    "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                    "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                    "currency": optionData['currency'],
+                    "name": "Course Enrollment",
+                    "description": "Course Enrollment",
+                    "image": "{% static 'img/icons/logo1.png'%}",
+                    "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                    // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                    "handler": function (response){
+                        if(response.razorpay_payment_id){
+                            console.log(response.razorpay_payment_id);
+                            oid = response.razorpay_order_id;
+                            fetch(`{% url 'verifySignature' %}`, {
+                                method: "POST",
+                                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                body: JSON.stringify({
+                                    "razorpay_paymentId":response.razorpay_payment_id,
+                                    "razorpay_orderId":response.razorpay_order_id,
+                                    "razorpay_signature":response.razorpay_signature
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                if(result['result']){
+                                    fetch(`{% url 'purchaseCourse' %}`, {
+                                        method: "POST",
+                                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                        body: JSON.stringify({
+                                            "course_id":args.id,
+                                            "order_id":oid
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log(result);
+                                        const swalWithBootstrapButtons = Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: "btn btn-success",
+                                                    cancelButton: "btn btn-danger"
+                                                },
+                                                buttonsStyling: false
+                                                });
+                                                swalWithBootstrapButtons.fire({
+                                                title: "Payment Successful.",
+                                                text: "Thanks for purchesed the course!",
+                                                icon: "success",
+                                                showCancelButton: false,
+                                                confirmButtonText: "Ok",
+                                                reverseButtons: true
+                                                }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    window.location = "{% url 'user_dashboard' %}";
+                                                }
+                                                });
+
+                                    })
+                                }
+                            })
+                        }else{
+                            console.log(response);
+                        }
+                    },
+                    "prefill": {
+                        "name": "{{ request.user.full_name }}",
+                        "email": "{{ request.user.email }}",
+                        "contact": "{{ request.user.mobile }}"
+                    },
+                    "notes": {
+                        "address": "Sphurit"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+
+                rzp1.open();
+                rzp1.on('payment.failed', function (response){})
+            });
+        }
+        else{
+            window.location = "{% url 'user_login' %}";
+        }
+    }
+
+ 
+
+</script>
+{% endblock content %}

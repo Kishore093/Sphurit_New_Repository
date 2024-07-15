@@ -1,0 +1,194 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load datetime %}
+{% load filter %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+<style>
+.card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'js/viewform.js' %}" defer></script>
+<script src="{% static 'js/quiz.js' %}" defer></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between mb-2">
+        <div class="col-lg-8 col-md-8 ">
+            <h5 class="card-title">{{chapter.course.course_name|capfirst }} -> {{chapter.chapter_name|capfirst }}</h5>
+        </div>
+        <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <a href="{% url 'add_topic' chapter.id %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> New Topic</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-3" >
+                <div class="card-body p-0">
+                    <div class="accordion accordion-flush" id="accordionTopic">
+                        {% for obj in topic %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{obj.id}}">
+                                <button class="accordion-button p-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{obj.id}}" aria-expanded="true" aria-controls="collapse{{obj.id}}">
+                                    <span class="card-title p-0 mb-0">{{ obj.topic_name }}</span>
+                                </button>
+                            </h2>
+                            <div id="collapse{{obj.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{obj.id}}" data-bs-parent="#accordionTopic">
+                                <div class="accordion-body px-3 bg-grey">
+                                    {% if obj.topic_video %}
+                                        <h5 class="card-title">Topic Video</h5>
+                                        <div class="card p-3  mb-0">
+                                            <div class="row ">
+                                                <div class="col-lg-3 col-md-4">
+                                                    <video  width="150" height="80" controls controlsList="nodownload">
+                                                        <source src="{{obj.topic_video.url}}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                    </video> 
+                                                </div>
+                                                <div class="col-lg-7 col-md-4">
+                                                    <h6>{{ obj.topic_video|cut:'topic_resources/' }}</h6>
+                                                </div>
+                                                <div class="col-lg-2 col-md-4"></div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if obj.topic_assignments.all|is_quiz:False %}
+                                        <h5 class="card-title">Topic Assigment</h5>
+                                        {% for form in obj.topic_assignments.all|is_quiz:False %}
+                                            <div class="card px-3 py-0 pt-3 mb-1">
+                                                <div class="pagetitle mb-0">
+                                                    <h1>{{form.title}}</h1>
+                                                </div>
+                                                <span class="card-text">{{form.description|linebreaksbr}}</span>
+                                                <hr>
+                                                
+                                                {% for question in form.questions.all %}
+                                                <div class="question mb-3" data-id="{{question.id}}">
+                                                    <!-- <span class="card-title">Q.{{forloop.counter}}&emsp13; {{question.question}} <span>|{{question.question_type}}</span> </span> -->
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="card-title p-0 my-auto">Q.{{forloop.counter}}&emsp13; {{question.question}}</span>
+                                                        <div class="checkbox-container my-auto">  
+                                                            <input type="checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked="checked"{% endif %}  disabled="disabled"/>
+                                                            <label for="required-{{question.id}}">Required</label>    
+                                                        </div>
+                                                    </div>
+                                                    {% if question.question_type == "multiple choice" %}
+                                                    
+                                                    <div class=" d-flex" data-id="{{question.id}}">
+                                                        {% for choice in question.choices.all %}
+                                                            <div class="choice">
+                                                                <input type="radio" id="{{choice.id}}" disabled>&emsp13;
+                                                                <span>{{choice.choice}}</span>
+                                                            </div>&emsp;&emsp;
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% elif question.question_type == "checkbox" %}
+                                                    <div class=" d-flex" data-id="{{question.id}}">
+                                                        {% for choice in question.choices.all %}
+                                                            <div class="choice d-flex">
+                                                                <input type="checkbox" id="{{choice.id}}" disabled>&emsp13;
+                                                                <span>{{choice.choice}}</span> 
+                                                            </div>&emsp;&emsp;
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% elif question.question_type == "dropdown" %}
+                                                    <div class=" d-flex" data-id="{{question.id}}">
+                                                        {% for choice in question.choices.all %}
+                                                            <div class="choice">
+                                                                <input type="radio" id="{{choice.id}}" disabled>&emsp13;
+                                                                <span>{{choice.choice}}</span>
+                                                            </div>&emsp;&emsp;
+                                                        {% endfor %}
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                {% endfor %}
+                                                <hr class="m-0">
+                                                <div class="d-flex justify-content-between" id="">
+                                                    <div class="pt-2">
+                                                        <p class="fw-bold">View All Response and Edit Assigment</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <a href="{% url 'quiz_responses' form.code %}" class="btn btn-outline-secondary btn-sm my-auto mx-2" title="View Response"><i class="bi bi-people"></i></a>
+                                                        <a href="{% url 'edit_form' form.code %}" class="btn btn-outline-secondary btn-sm my-auto" title="Edit Assigment"><i class="bi bi-pencil"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    {% if obj.topic_assignments.all|is_quiz:True %}
+                                        <h5 class="card-title">Topic Quiz</h5>
+                                        {% for form in obj.topic_assignments.all|is_quiz:True %}
+                                            <div class="card px-3 py-0 pt-3 mb-1">
+                                                <div class="pagetitle mb-0">
+                                                    <h1>{{form.title}}</h1>
+                                                </div>
+                                                <span class="card-text">{{form.description|linebreaksbr}}</span>
+                                                <hr>
+                                                {% for question in form.questions.all %}
+                                                <div class="question mb-3" data-id="{{question.id}}">
+                                                    <div class="d-flex justify-content-between">
+                                                        <span class="card-title p-0 my-auto">Q.{{forloop.counter}}&emsp13; {{question.question}}</span>
+                                                        <div class="checkbox-container my-auto">  
+                                                            <input type="checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked="checked"{% endif %}  disabled="disabled"/>
+                                                            <label for="required-{{question.id}}">Required</label>    
+                                                        </div>
+                                                    </div>
+                                                    {% if question.question_type == "multiple choice" %}
+                                                    <div class="" data-id="{{question.id}}">
+                                                        <div class="d-flex">
+                                                            <span>Options -</span>&emsp;
+                                                            {% for choice in question.choices.all %}
+                                                                <div class="choice">
+                                                                    <input type="radio" id="{{choice.id}}" disabled>&emsp13;
+                                                                    <span>{{choice.choice}}</span>
+                                                                </div>&emsp;&emsp;
+                                                            {% endfor %}
+                                                        </div>
+                                                        <div id="answer-key" style="display: {% if question.choices.all.count > 3 %}block{% else %}none{% endif %};">
+                                                            <span>Answer Key -</span>&emsp13;
+                                                            {% for i in question.choices.all %}
+                                                                {% if i.is_answer %}
+                                                                <label for="choice-{{i.id}}">{{i.choice}}</label>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                </div>
+                                                {% endfor %}
+                                                <hr class="m-0">
+                                                <div class="d-flex justify-content-between" id="">
+                                                    <div class="pt-2">
+                                                        <p class="fw-bold">View All Response and Edit Quiz</p>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <a href="{% url 'quiz_responses' form.code %}" class="btn btn-outline-secondary btn-sm my-auto mx-2" title="View Response"><i class="bi bi-people"></i></a>
+                                                        <a href="{% url 'edit_quiz' form.code %}" class="btn btn-outline-secondary btn-sm my-auto" title="Edit Assigment"><i class="bi bi-pencil"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}

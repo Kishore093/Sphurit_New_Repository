@@ -1,0 +1,58 @@
+{% load static %}
+{% load filter %}
+{% for item in courses %}
+<style>
+ .cat-border-box {
+    min-height: 347px;
+    margin: 0 0 20px !important;
+}
+.card {
+    box-shadow: 0 0 0px 1px #00000017 !important;
+}
+.card-title {
+    padding: 5px 0 5px 0 !important;
+}
+.card-sub-title {
+    font-weight: 300;
+}
+</style>
+<div class="col-lg-3 col-md-3 align-items-stretch category_card">
+    <div class="card mb-4 rounded border cat-border-box">
+        <div class="card-body">
+            <img class="card-img-top" src="{{ item.thumb_image.url }}" alt="" >
+            <div class="">
+                {% if item.id|is_purchased:user %}
+                <h6 class="card-title mb-0 one-line-text" style="font-size: 15px;"><a href="{% url 'play_course' item.id %}">{{ item.course_name }}</a></h6>
+                {% else %}
+                <h6 class="card-title mb-0 one-line-text" style="font-size: 15px;"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                {% endif %}
+                <h6 class="card-sub-title text-muted"  style="font-size: 11px;">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                <p class="small text-muted" style="font-size: 11px;">{{ item.created_at }}</p>
+            </div>
+            <span class="d-flex">
+                <h4 class="text-warning fw-bold my-auto" style="font-size: 15px;">₹ {{ item.discount_fee }}</h4>&emsp13;
+                <h5 class="small text-muted text-decoration-line-through my-auto" >₹ {{ item.actual_fee }}</h5>
+            </span>
+        </div>
+        <div class="card-footer d-flex rounded justify-content-between">
+         
+            <span class="d-flex">
+                {% if item.id|is_purchased:user %}
+                <a class="btn btn-warning btn-sm border my-auto text-white" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                {% else %}
+                <a class="btn btn-secondary btn-sm border my-auto" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                
+                <button class="btn btn-default btn-sm border my-auto" style="margin-left: -50px;" onclick="AddToWishlist('{{item.id}}')" id="atwl{{item.id}}">
+                    {% if user in item.wishlist.all %}
+                    <i class="bi bi-heart-fill"></i>
+                    {% else %}
+                    <i class="bi bi-heart"></i>
+                    {% endif %}
+                </button>
+                <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto">Enroll Now</button>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</div>
+{% endfor %}

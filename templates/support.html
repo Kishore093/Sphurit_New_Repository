@@ -1,0 +1,72 @@
+
+{% extends 'user-face/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+   
+</style>
+
+
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card mt-5 mb-0">
+                <div class="card-header text-center">
+                    <img src="{% static 'img/icons/logo1.png' %}" class="shadow-lg rounded p-3" alt="">
+                    <p class="mt-3"><a href="" class="fw-bold">https://www.sphurit.com/</a></p>
+                </div>
+               
+                <div class="card-body">
+                    <form action="{% url 'support' %}" method="post" class="row px-4">
+                        {% csrf_token %}
+                        <div class="col-12">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-control" id="full_name" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="mobile_number" class="form-label">Mobile Number</label>
+                            <input type="text" maxlength="10" name="mobile" class="form-control" id="mobile_number" required>
+                            
+                        </div>
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="query" class="form-label">Query</label>
+                            <textarea name="query" class="form-control" id="query" required></textarea>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <button class="btn btn-primary w-100" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+      $('#mobile_number').keypress(function (e) {
+            var regex = new RegExp("^[0-9]+$");
+            var str = String.fromCharCode(!e.charCode ? e.which : e.charCode);
+            if (regex.test(str)) {
+                return true;
+            }
+            e.preventDefault();
+            return false;
+        }); 
+    })
+</script>
+{% endblock content %}
+
+
+

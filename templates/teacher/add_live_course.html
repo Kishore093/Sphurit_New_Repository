@@ -1,0 +1,848 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<link href="path/to/select2.min.css" rel="stylesheet">
+
+<style>
+    .step-content {
+        display: none;
+    }
+
+    .step-content.active {
+        display: block;
+    }
+
+    .stepper-indicator {
+        width: 50px;
+        height: 3px;
+        background-color: #6c757d;
+        margin: 0;
+    }
+
+    .stepper-indicator.active {
+        background-color: #007bff;
+    }
+    select {
+    font-size: 14px !important;
+    width: 100%;
+    padding: 5px 0px;
+}
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<!-- Include Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+
+<!-- Include Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+    <div class="stepper" style="background-color: #DBEDFF;">
+        <img src="{% static 'img/add_course_banner.png' %}" class="w-100 " style="height: 300px; " alt="">
+
+        <div class="row mb-3" style="margin-top: -230px; padding: 0px 30px;">
+            <div class="container">
+                <div id="progress-bar" class="progress-bar">
+                </div>
+                <div class="bg-light p-3">
+                    <!-- Indicators -->
+                    <!-- <div class="row justify-content-center">
+                        <div class="col-lg-8 justify-content-center">
+                            <div class="text-left">
+                                <h6 style="color: green;  margin-top: 4px;">step <span id="indicator_count">1</span></h6>
+                                <div class="d-flex justify-content-start mb-2">
+                                    <div class="stepper-indicator w-25 active" id="step-category-indicator"></div>
+                                    <div class="stepper-indicator mx-5 w-25" id="step-type-indicator"></div>
+                                    <div class="stepper-indicator w-25" id="step-details-indicator"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <form class="row g-3" action="{% url 'add_live_course' %}" method="post" enctype="multipart/form-data"
+                        autocomplete="off" onsubmit="openLoader()">
+                        {% csrf_token %}
+
+                        <!-- Step 1: Course Category -->
+                        <div class="col-md-12 step-content active" id="step-category" style="height: 160px;display: none;">
+                            <label for="id_category" class="form-label" style="margin-top: 6px;">Course Category</label>
+                            <div class="input-group">
+                                <select class="form-select" name="category_id" id="id_category" required
+                                    aria-describedby="add-category">
+                                    <option>Select Course Category</option>
+                                    {% for cat in modules %}
+                                    <option value="{{cat.id}}">{{cat.category_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="btn btn-secondary border-0" type="button" id="add-category"
+                                    data-bs-toggle="modal" data-bs-target="#category_request_modal">
+                                    <i class="bi bi-plus-square"></i>
+                                </button>
+                            </div>
+                            <!-- ... Your category select input ... -->
+                            <button type="button" class="btn btn-secondary border-0"
+                                onclick="nextStep('step-category', 'step-type')" style="margin-top: 10px;">
+                                Next
+                            </button>
+                        </div>
+                        <script>
+                            // Retrieve the value from localStorage
+                            var storedCategoryId = localStorage.getItem('Course_Category');
+                        
+                            // If there's a stored value, set it as the selected option
+                            if (storedCategoryId) {
+                                document.getElementById('id_category').value = storedCategoryId;
+                            }
+                        
+                            // Event listener to store the selected value in localStorage when the selection changes
+                            document.getElementById('id_category').addEventListener('change', function() {
+                                var selectedCategoryId = this.value;
+                                localStorage.setItem('selectedCategoryId', selectedCategoryId);
+                            });
+                        </script>
+                        
+
+                        <!-- Step 2: Course Type -->
+                      <div class="col-md-12 step-content" id="step-type">
+                            <label for="id_type" class="form-label mt-3">Course Type</label>
+                            <select class="form-select" name="course_type" id="id_type" required>
+                                <option value="Select_Course_type">Select Course Type</option>
+                                <option value="Pre Recorded">Pre Recorded</option>
+                                <option value="Live" selected>Live</option>
+                                <option value="Hybrid">Hybrid</option>
+                            </select>
+
+                            <div class="row justify-content-between">
+                                <div class="col-lg-6">
+
+                                    <button type="button" class="btn btn-secondary border-0 mt-2"
+                                        onclick="prevStep('step-type', 'step-category')">
+                                        Previous
+                                    </button>
+                                </div>
+                                <div class="col-lg-6 text-end">
+                                    <button type="button" class="btn btn-secondary border-0 mt-2"
+                                        onclick="nextStep1('step-type', 'step-details')">
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        </div> 
+
+                        <!-- Step 3: Course Details -->
+                        <div class="col-md-12 " id="step-details">
+
+                            <div id="lcfields" style="display: block;">
+                                <div class="col-md-12">
+                                      <label for="validationDefault02" class="form-label">Title</label>
+                                    <textarea type="text" class="form-control" name="title" value=""
+                                        id="validationDefault02"></textarea>
+                                </div>
+                                <label for="validationDefault02" class="form-label">Host Name</label>
+                                <input type="text" class="form-control" name="host_name" id="validationDefault02" value="" >
+
+                                <div class="col-md-12">
+                                    <label for="validationDefault03" class="form-label">About Host</label>
+                                    <textarea type="text" class="form-control" name="about_host" value=""
+                                        id="validationDefault03"></textarea>
+                                </div>
+                                <!-- <div class="col-md-12">
+                                    <label for="validationDefault02" class="form-label">Title</label>
+                                    <textarea type="text" class="form-control" name="title" value=""
+                                        id="validationDefault02"></textarea>
+                                </div> -->
+                                <div class="col-md-12">
+                                    <label for="validationDefault03" class="form-label">Description</label>
+                                    <textarea type="text" class="form-control" name="description" id="validationDefault03"></textarea>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                <label for="profile" class="form-label">Profile</label>
+                                <div class="row">
+                                <div class="col-md-6">
+                                    <!-- File input for uploading an image -->
+                                    <input class="form-control" type="file" name="thumb_image" accept="image/*" id="profile" onchange="previewProfile()" required>
+                                </div>
+                                <div class="col-md-1">
+                                    <!-- Button to clear the selected image -->
+                                    <button type="button" onclick="clearProfileImage()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </div>
+                                <div class="col-md-12 text-left mt-2">
+                                    <!-- Image preview -->
+                                    <img id="profilePreview" src="" class="img-fluid"  style="width: 30%;"/>
+                                </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                function previewProfile() {
+                                    var fileInput = document.getElementById('profile');
+                                    var imagePreview = document.getElementById('profilePreview');
+                                    
+                                    if (fileInput.files && fileInput.files[0]) {
+                                        var reader = new FileReader();
+                                        
+                                        reader.onload = function (e) {
+                                            var image = new Image();
+                                            image.src = e.target.result;
+                                            
+                                            image.onload = function () {
+                                                if (this.width >= 600 && this.height >= 400) {
+                                                    // Display the image preview
+                                                    imagePreview.src = this.src;
+                                                } else {
+                                                    alert("The image resolution should be at least 600x400.");
+                                                    clearProfileImage();
+                                                }
+                                            };
+                                        };
+                                        
+                                        reader.readAsDataURL(fileInput.files[0]);
+                                    }
+                                }
+
+                                function clearProfileImage() {
+                                    // Clear the selected image and preview
+                                    document.getElementById('profile').value = null;
+                                    document.getElementById('profilePreview').src = "";
+                                }
+                            </script>
+
+
+                              <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="urlSelect" class="mt-1">Choose a URL : </label><br/>
+                                        <select id="urlSelect" class="mt-2" name="url" onchange="showURLInput(this)">
+                                            <option value="">Select option</option>
+                                            <option value="https://meet.google.com">Google Meet</option>
+                                            <option value="https://zoom.us">Zoom</option>
+                                            <!-- <option value="https://www.google.com">Chrome</option>
+                                                <option value="https://www.microsoft.com">Microsoft</option> -->
+                                            </select>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                    <div id="urlInput" class="mt-1" style="display: none; margin-top: 10px;"> 
+                                            <label for="urlInputField">Enter Meeting URL :</label><br/>
+                                            <input class="mt-2" style="width: 100%;padding: 3px 0px;" type="url" id="urlInputField" name="url" onchange="validateURL(this)">
+                                            <small id="urlError" style="color: red; display: none;">URL must start with 'http://' or 'https://'</small>
+                                        </div>
+                                    </div>
+                                </div> 
+                                </div>
+                                <script>
+                                function showURLInput(select) {
+                                    var urlInput = document.getElementById('urlInput');
+                                    var selectedOption = select.options[select.selectedIndex];
+                                    
+                                    if (selectedOption.value === "") {
+                                        urlInput.style.display = 'none';
+                                    } else {
+                                        urlInput.style.display = 'block';
+                                        document.getElementById("urlInputField").value = ""; // Clear the URL input field when opening
+                                    }
+                                }
+                                
+                                function validateURL(input) {
+                                    var urlError = document.getElementById('urlError');
+                                    var urlInputField = input.value.trim();
+                                    
+                                    if (!urlInputField.startsWith('http://') && !urlInputField.startsWith('https://')) {
+                                        urlError.style.display = 'block'; // Show error message if URL does not start with 'http://' or 'https://'
+                                        input.value = ""; // Clear the input field
+                                    } else {
+                                        urlError.style.display = 'none';
+                                    }
+                                }
+                                </script>
+</div>
+
+                                
+                                <div class="row d-flex mt-3">
+                                    <div class="col-md-6">
+                                        <label for="schedule_date" class="form-label">Schedule Date *</label>
+                                        <input type="date" class="form-control" name="schedule_date" value=""
+                                            placeholder="Schedule the Date for the live" id="schedule_date">
+                                    </div>
+                                    
+                                    <script>
+                                        // Get today's date
+                                        var today = new Date();
+                                        var dd = String(today.getDate()).padStart(2, '0');
+                                        var mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+                                        var yyyy = today.getFullYear();
+                                        
+                                        today = yyyy + '-' + mm + '-' + dd;
+                                        
+                                        document.getElementById("schedule_date").min = today;
+                                    </script>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="schedule_time" class="form-label">Schedule Time *</label>
+                                        <input type="time" class="form-control" name="schedule_time" value=""
+                                            placeholder="Schedule the timing for the live" id="schedule_time">
+                                    </div>
+                                </div>
+                                <div class="container col-md-12 mt-3">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="validationDefault02" class="form-label">Join Fee</label>
+                                    <div class="d-flex">
+                                        <span class="input-group-text" id="">₹</span>
+                                        <input type="number" class="form-control" name="fees" placeholder="Enter Join Fee" id="fees" value="" required>
+                                    </div>
+                                    <small id="feeError" style="color: red; display: none;">Fee must be 5 characters or less.</small>
+                                </div>
+                                
+                                <script>
+                                    document.getElementById("fees").addEventListener("input", function() {
+                                        var fee = this.value;
+                                        var feeError = document.getElementById("feeError");
+                                        
+                                        if (fee.length > 5) {
+                                            feeError.style.display = "block";
+                                            this.value = ''; 
+                                        } else {
+                                            feeError.style.display = "none";
+                                        }
+                                    });
+                                </script>
+                                
+                            </div>
+
+                            <div id="prcfields" style="display: none;">
+
+                                <div class="container col-md-12 mt-3">
+                                    <label for="course_thumb_image" class="form-label">ThumbImage</label>
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="file" name="thumb_image" accept="image/*"
+                                                id="course_thumb_image" onchange="previewThumb()">
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" onclick="clearThumbImage()"
+                                                class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <img id="thumb_frame" src="" class="img-fluid" height="100" width="100" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="container col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-8 my-auto">
+                                            <label for="course_promo_video" class="form-label">Promo Video</label>
+                                            <div class="d-flex">
+                                                <input class="form-control" type="file" name="course_video"
+                                                    accept="video/mp4,video/x-m4v,video/*" id="course_promo_video">
+                                                &emsp;<button type="button" onclick="clearVideo()"
+                                                    class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <div id="inner-spinner"
+                                                class="w-100 d-flex flex-column align-items-center justify-content-center"
+                                                style="height: 0px;">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+
+                                            <video id="promo_frame" width="220" height="100" style="display:none"
+                                                controls controlsList="nodownload">
+                                                Your browser does not support the video tag.
+                                            </video>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="col-12">&emsp13;
+                                    <label for="tag-input">Language</label>
+                                    <select class="js-select2" multiple="multiple" name="tags" placeholder="Click to select languages">
+                                    {% for obj in language %}
+                                        <option value="{{ obj.id }}" data-badge="">{{ obj.name }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </div>
+                                <script>
+                                    $(document).ready(function() {
+                                      $(".js-select2").select2({
+                                        closeOnSelect: false,
+                                        placeholder: "Click to select languages",
+                                        allowHtml: true,
+                                        allowClear: true,
+                                        tags: true 
+                                        
+                                      });
+                                    });
+                                  </script>
+
+
+                                <div class="col-md-12 mt-3">
+                                    <div class="form-check form-switch">
+                                        <label class="form-check-label" for="flexSwitchCheckDefault">Generate A
+                                            Coupon</label>
+                                        <input class="form-check-input" value="Yes" type="checkbox"
+                                            onclick="ShowHideCoupon(this)" name="generated_coupon" role="switch"
+                                            id="courseCoupon">
+                                    </div>
+                                </div>
+                                <script type="text/javascript">
+                                    function ShowHideCoupon(btnPaid) {
+                                        var couponDiv = document.getElementById("couponSection");
+                                        if (btnPaid.value == "Yes") {
+                                            couponDiv.style.display = "block";
+                                            document.getElementById("couponeCodeValue").setAttribute('required', '');
+                                            document.getElementById("coupon_date").setAttribute('required', '');
+                                            document.getElementById("coupon_time").setAttribute('required', '');
+                                            btnPaid.value = "No";
+                                        } else {
+                                            couponDiv.style.display = "none";
+                                            document.getElementById("couponeCodeValue").removeAttribute('required');
+                                            document.getElementById("coupon_date").removeAttribute('required');
+                                            document.getElementById("coupon_time").removeAttribute('required');
+                                            btnPaid.value = "Yes";
+                                        }
+                                    }
+                                </script>
+                                <div class="" style="display: none;" id="couponSection">
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <label for="couponeCodeValue" class="form-label">Create A Coupon</label>
+                                            <input type="text" class="form-control" placeholder="Create a Coupon"
+                                                value="" name="coupon_code" id="couponeCodeValue">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="couponePercentValue" class="form-label">Coupon Percent</label>
+                                            <div class="d-flex">
+                                                <input type="text" class="form-control number_input"
+                                                    onkeypress="if (this.value.length >= 3) return false;"
+                                                    placeholder="Coupon Percent" value="" name="coupon_percent"
+                                                    id="couponePercentValue">
+                                                <span class="input-group-text" id="basic-addon2">%</span>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-4"></div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <label for="coupon_date" class="form-label">Coupon valid date*</label>
+                                            <input type="date" class="form-control" onchange="TDate()"
+                                                name="coupon_valid_date" value="" placeholder="Select Date"
+                                                id="coupon_date">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="coupon_time" class="form-label">Coupon valid Time*</label>
+                                            <input type="time" class="form-control" name="coupon_valid_time" value=""
+                                                placeholder="Select Time" id="coupon_time">
+                                        </div>
+                                        <div class="col-md-4"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
+                                        <label class="form-check-label" for="flexSwitchCheckDefault">Paid courses</label>
+                                        <input class="form-check-input" value="Yes" type="checkbox"
+                                            onclick="ShowHideFee(this)" name="paid_course" role="switch" id="paidCourse">
+                                    </div>
+                                </div>
+                                <div style="display: none;" id="feeSection">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="validationDefault02" class="form-label">Actual Fee</label>
+                                            <div class="d-flex">
+                                                <span class="input-group-text" id="">₹</span>
+                                                <input type="number" class="form-control" name="actual_fee"
+                                                    placeholder="Enter Actual Fee" id="price" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="validationDefault03" class="form-label">Discount Fee</label>
+                                            <div class="d-flex">
+                                                <span class="input-group-text" id="">₹</span>
+                                                <input type="number" class="form-control" name="discount_fee" value=""
+                                                    placeholder="Enter Discount Fee" id="discount" oninput="getPercent()">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 ">
+                                            <label for="validationDefault03" class="form-label">Total Discount</label>
+                                            <div class="d-flex">
+                                                <input type="text" class="form-control " name="total_discount" value=""
+                                                    placeholder="Enter Discount Percent" id="discount_percent"
+                                                    oninput="getDiscountedPrice()">
+                                                <span class="input-group-text" id="basic-addon2">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row justify-content-between">
+                                <!-- <div class="col-lg-6">
+                                    <button type="button" class="btn btn-secondary border-0 mt-2"
+                                        onclick="prevStep('step-details', 'step-type')">
+                                        Previous
+                                    </button>
+                                </div> -->
+                                <div class="col-lg-6 text-end">
+                                    <button type="submit" class="btn btn-primary mt-2">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowHideFee(btnPaid) {
+                                var feeDiv = document.getElementById("feeSection");
+                                if (btnPaid.value == "Yes") {
+                                    feeDiv.style.display = "block";
+                                    document.getElementById("price").setAttribute('required', '');
+                                    document.getElementById("discount").setAttribute('required', '');
+                                    document.getElementById("discount_percent").setAttribute('required', '');
+                                    btnPaid.value = "No";
+                                } else {
+                                    feeDiv.style.display = "none";
+                                    document.getElementById("price").removeAttribute('required');
+                                    document.getElementById("discount").removeAttribute('required');
+                                    document.getElementById("discount_percent").removeAttribute('required');
+                                    btnPaid.value = "Yes";
+                                }
+                            }
+                        
+                            function getPercent() {
+                                var numVal1 = Number(document.getElementById("price").value);
+                                var numVal2 = Number(document.getElementById("discount").value);
+                                // var totalValue = Math.round(100 - ((numVal2 / numVal1) * 100));
+                                var totalValue = ((numVal1 - numVal2) / numVal1) * 100;
+                                document.getElementById("discount_percent").value = totalValue;
+                            }
+                            
+                            function getDiscountedPrice() {
+                                var numVal1 = Number(document.getElementById("price").value);
+                                var numVal2 = Number(document.getElementById("discount_percent").value);
+                                var totalValue = Math.round(numVal1 - (numVal1 * numVal2 / 100));
+                                document.getElementById("discount").value = totalValue;
+                            }
+                            
+                            function nextStep(currentStepId, nextStepId) {
+                                var categorySelect = document.getElementById('id_category');
+                                var selectedCategory = categorySelect.value;
+
+                                if (selectedCategory === '' || selectedCategory === 'Select Course Category') {
+                                    alert('Please select a course category before moving to the next step.');
+                                    return;
+                                }
+
+                                handleStepTransition(currentStepId, nextStepId);
+                                updateIndicators(nextStepId);
+                            }
+
+                            function handleStepTransition(currentStepId, nextStepId) {
+                                document.getElementById(currentStepId).classList.remove('active');
+                                document.getElementById(currentStepId + '-indicator').classList.remove('active');
+                                document.getElementById(nextStepId).classList.add('active');
+                                document.getElementById(nextStepId + '-indicator').classList.add('active');
+                            }
+                        
+                            function prevStep(currentStepId, prevStepId) {
+                                document.getElementById(currentStepId).classList.remove('active');
+                                document.getElementById(prevStepId).classList.add('active');
+                                updateIndicators(prevStepId);
+                            }
+                        
+                            function nextStep1(currentStepId, nextStepId) {
+                                var courseSelect = document.getElementById('id_type');
+                                var selectedCourse = courseSelect.value;
+
+                                if (selectedCourse === '' || selectedCourse === 'Select_Course_type') {
+                                    alert('Please select a course type before moving to the next step.');
+                                    return;
+                                }
+
+                                handleStepTransition1(currentStepId, nextStepId);
+                                updateIndicators(nextStepId);
+                            }
+
+                            function handleStepTransition1(currentStepId, nextStepId) {
+                                document.getElementById(currentStepId).classList.remove('active');
+                                document.getElementById(currentStepId + '-indicator').classList.remove('active');
+                                document.getElementById(nextStepId).classList.add('active');
+                                document.getElementById(nextStepId + '-indicator').classList.add('active');
+                            }
+                        
+                            function updateIndicators(activeStepId) {
+                                // Reset all indicators
+                                document.getElementById('step-category-indicator').classList.remove('active');
+                                document.getElementById('step-type-indicator').classList.remove('active');
+                                document.getElementById('step-details-indicator').classList.remove('active');
+                                var ic = document.getElementById('indicator_count');
+                                if(`${activeStepId}-indicator` === "step-category-indicator"){
+                                    ic.innerText = '1';
+                                }
+                                else if(`${activeStepId}-indicator` === "step-type-indicator"){
+                                    ic.innerText = '2';
+                                }
+                                else if(`${activeStepId}-indicator` === "step-details-indicator"){
+                                    ic.innerText = '3';
+                                }
+
+                                // Set the active indicator
+                                document.getElementById(`${activeStepId}-indicator`).classList.add('active');
+                                if (activeStepId !== 'step-category') {
+                                    let progressBar = document.getElementById('progress-bar');
+                                    progressBar.style.width = ((activeStepId === 'step-type') ? '33.333%' : '66.666%');
+                                }
+                            }
+
+                            function downloadFile(url) {
+                                fetch(url)
+                                    .then(response => response.blob())
+                                    .then(blob => {
+                                        const url = window.URL.createObjectURL(new Blob([blob]));
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.setAttribute('download', 'file');
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        link.parentNode.removeChild(link);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error downloading file:', error);
+                                    });
+                            }
+                        </script>
+                    </form>
+                </div>
+                <div class="row" style="display: none;" id="coursetable">
+                    <div class="col-lg-12 col-md-12">
+                        <table class="table table-hover" >
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="custTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- new category Modal -->
+        <div class="modal fade" id="category_request_modal" data-bs-backdrop="static" data-bs-keyboard="false"
+            tabindex="-1" aria-labelledby="category_request_modalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="category_request_modalLabel">Request For Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+
+                        <div class="mb-3">
+                            <label for="sgc-name" class="form-label">Suggested Category Name</label>
+                            <input type="text" class="form-control" id="sgc-name" name="query" required>
+                            <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="new_cat_sub_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script>
+    var _URL = window.URL || window.webkitURL;
+    $(document).ready(function () {
+        $(".number_input").keypress(function (event) {
+            var key = event.keyCode;
+            // Only allow numbers to be entered
+            if (key < 48 || key > 57) {
+                event.preventDefault();
+            }
+        });
+        $(".number_input").change(function () {
+            var inputvalues = $(this).val();
+            // var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            if (inputvalues > 100) {
+                // $(".pan").val("");
+                alert("Coupon Percent value must be less than or equalto 100!");
+                return false;
+            }
+        });
+    });
+
+    function TDate() {
+        var UserDate = document.getElementById("coupon_date").value;
+        var ToDate = new Date();
+
+        if (new Date(UserDate).getTime() <= ToDate.getTime()) {
+            alert("The Date must be Bigger or Equal to today date");
+            return false;
+        }
+        return true;
+    }
+
+    function previewThumb() {
+        var image = new Image();
+        image.src = URL.createObjectURL(event.target.files[0]);
+
+        image.onload = function () {
+            if (this.width >= 600 && this.height >= 400) {
+                thumb_frame.src = image.src;
+            } else {
+                alert("The image resolution is greater than 600*400.");
+                document.getElementById('course_thumb_image').value = null;
+                thumb_frame.src = "";
+            }
+        };
+    }
+    function clearThumbImage() {
+        document.getElementById('course_thumb_image').value = null;
+        thumb_frame.src = "";
+    }
+
+    document.getElementById("course_promo_video").addEventListener("change", function (event) {
+        var sp = document.getElementById("inner-spinner");
+        debugger
+        sp.style.height = '40px';
+        sp.classList.add('show');
+        let file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function () {
+            var aud = new Audio(reader.result);
+            aud.onloadedmetadata = function () {
+                sp.classList.remove('show');
+                sp.style.height = '0px';
+                if (aud.duration <= 35.0) {
+                    let blobURL = URL.createObjectURL(file);
+                    document.querySelector("video").style.display = 'block';
+                    document.querySelector("video").src = blobURL;
+                } else {
+                    alert("Video length must be 35 seconds only");
+                    document.getElementById('course_promo_video').value = null;
+                    promo_frame.src = "";
+                    promo_frame.style.display = 'none';
+                }
+                console.log(aud.duration);
+            };
+        };
+        reader.readAsDataURL(file);
+
+    });
+
+    function clearVideo() {
+        document.getElementById('course_promo_video').value = null;
+        promo_frame.src = "";
+        promo_frame.style.display = 'none';
+    }
+
+    document.getElementById("id_type").addEventListener("change", function () {
+        var selectedType = $(this).val();
+        console.log(selectedType);
+        if (selectedType === "Pre Recorded") {
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'none';
+        } else if (selectedType === "Live") {
+            document.getElementById("prcfields").style.display = 'none';
+            document.getElementById("lcfields").style.display = 'block';
+        } else {
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'block';
+        }
+    });
+    // document.getElementById("id_category").addEventListener("change", function () {
+    //     $.ajax({
+    //         type: 'GET',
+    //         url: '{% url "get_course" %}',
+    //         data: {
+    //             'category_id': $('#id_category').val(),
+    //             csrfmiddlewaretoken: '{{ csrf_token }}',
+    //         },
+    //         dataType: 'json',
+    //         success: function (data) {
+    //             document.getElementById("coursetable").style.display = "block";
+    //             var c = JSON.parse(data['courses']);
+    //             var html = "";
+    //             for (var i = 0; i < c.length; i++) {
+    //                 html += "<tr>";
+    //                 html += `<td class="small">${[i + 1]}</td>`;
+    //                 html += `<td class="small">${c[i]['course_name']}</td>`;
+    //                 html += `<td class="small">${c[i]['type']}</td>`;
+                    
+    //                 html += `<td class="small"><a href="delete_course/${c[i]['id']}" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a></td>`;
+                    
+    //                 html += "</tr>";
+    //             }
+    //             $("#custTable").html(html);
+
+    //         }
+    //     });
+    // });
+
+    document.getElementById("new_cat_sub_btn").addEventListener("click", function (e) {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            animation: false,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        const csrf = Cookies.get('csrftoken');
+        var q = document.getElementById('sgc-name').value;
+        console.log(q);
+        if (q) {
+            fetch("{% url 'new_category_request' %}", {
+                method: "POST",
+                headers: { 'X-CSRFToken': csrf },
+                body: JSON.stringify({
+                    id: '{{request.user.id}}',
+                    'query': q,
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    $('#category_request_modal').hide();
+                    $('.modal-backdrop').hide();
+                    Toast.fire({
+                        icon: "success",
+                        title: result['message']
+                    });
+                })
+        }
+    });
+
+    function openLoader() {
+        document.getElementById("spinner").classList.add('show');
+    }
+
+</script>
+{% endblock content %}

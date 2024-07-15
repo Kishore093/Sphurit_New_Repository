@@ -1,0 +1,68 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+
+.row{
+    flex-wrap: nowrap; 
+}
+.card-body {
+    /* margin-right: 50px; */
+    /* padding-right: 50px; */
+    min-width: fit-content;
+}
+.card{
+    margin: 0px!important;
+}
+</style>
+
+{% endblock extrastyle %}
+{% block script %}
+
+{% endblock %}
+{% block content %}
+<div class="container-fluid curved-box pt-2 m-0">
+    <p class="fs-4 text-white mb-2 ">My purchased</p>
+    <p class="fs-6 text-white ">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-2 card py-0 ">
+        {% include 'user-face/sidebar.html' %}
+    </div>
+    <div class="col-lg-10 ">
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-hover table-sm">
+                    <thead>
+                        <tr>
+                          <th scope="col">SN</th>
+                          <th scope="col">Host Name</th>
+                          <th scope="col">Course Fee</th>
+                          <th scope="col">Purchase Date</th>
+                          <th scope="col">Files</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in courses %}
+                        <tr>
+                          <th scope="row">{{ forloop.counter }}</th>
+                          <td>{{ obj.course.host_name }}</td>
+                          <td>{{ obj.course.fees }}</td>
+                          <td>{{ obj.created_at|date:"d-m-Y h:i A" }}</td>
+                          <td><a href="{% url 'download_invoice' obj.id %}" class="btn btn-primary btn-sm" title="Invoice"><i class="bi bi-file-earmark-text"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+   
+</script>
+
+{% endblock content %}

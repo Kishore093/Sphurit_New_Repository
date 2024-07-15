@@ -1,0 +1,957 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load count %}
+{% load filter %}
+{% block extrastyle %}
+ <style>
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent; 
+}
+
+.bg-image:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  .card {
+    margin: 0 2px 10px;
+    border: none;
+    border-radius: 3px !important;
+    box-shadow: 0 0 5px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h4 class="py-4">{{ course.course_name }}</h4>
+        </div>
+    </div>
+    <div class="row">
+        {% comment %} <div class="col-lg-4 p-0 m-0">
+            {% for chaptar in course.chapter_course.all %}
+                <div class="card mb-2 px-2 py-2">
+                    <div class="card-body">
+                        <a class="collapse-indicator-plus d-flex justify-content-between" data-bs-toggle="collapse" href="#collapse-chaptar{{chaptar.id}}" role="button" aria-expanded="false" aria-controls="collapse-chaptar{{chaptar.id}}">
+                            <span class="d-flex">
+                                <h6 class="text-primary fw-bold small">Section {{forloop.counter}}&emsp;:&emsp;</h6>
+                                <h6 class="small" style="color: black;">{{chaptar.chapter_name}}</h6>
+                            </span>
+                            <span class="arrow-icon" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-caret-down"></i>
+                            </span>
+                        </a>
+                        <div class="progress rounded" style="height: 15px;">
+                            <div id="cp{{chaptar.id}}" class="progress-bar rounded small" style="width:{{chaptar.id|get_chapter_progress:request.user}}%;" role="progressbar"  aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">{{chaptar.id|get_chapter_progress:request.user}}%</div>
+                        </div>
+                        <script>
+                            $(document).ready(function() {
+                                $('.arrow-icon').on('click', function() {
+                                    $(this).find('i').toggleClass('bi-caret-down bi-caret-up');
+                                });
+                            });
+                        </script>
+                        <div class="collapse pt-3" id="collapse-chaptar{{chaptar.id}}">
+                            {% for topic in chaptar.topic_chapter.all %}
+                                <div class="d-flex mb-3">
+                                    <!-- <a href="javascript:void(0)" onclick="selectChaptor('{{chaptar.chapter_name}} : {{topic.topic_name}}','{{topic.video_url}}','{{chaptar.id}}','{{topic.id}}')" class="text-dark my-auto">
+                                    <h2 class="mb-0"><i class="bi bi-play-circle"></i></h2>
+                                    </a>&emsp; -->
+
+                                    {% if topic.video_url %}
+                                        <a href="javascript:void(0)" onclick="selectChaptor('{{chaptar.chapter_name}} : {{topic.topic_name}}','{{topic.video_url}}','{{chaptar.id}}','{{topic.id}}')" class="text-dark my-auto">
+                                            <h2 class="mb-0"><i class="bi bi-play-circle"></i></h2>
+                                        </a>&emsp;
+                                    {% else %}
+                                        <div class="text-dark my-auto">
+                                            <h2 class="mb-0"><i class="bi bi-play-circle"></i></h2>
+                                        </div>&emsp;
+                                    {% endif %}
+                                    <div class="w-100">
+                                        <p class="small mb-2 fw-bold">{{forloop.counter}}. {{ topic.topic_name }}</p>
+                                        <div class="progress rounded" style="height: 12px;">
+                                            <div id="tp{{topic.id}}" class="progress-bar rounded" style="width: {{topic.id|get_topic_progress:request.user}}%; font-size: smaller;" role="progressbar" aria-valuenow="{{topic.id|get_topic_progress:request.user}}" aria-valuemin="0" aria-valuemax="100">
+                                                {{topic.id|get_topic_progress:request.user}} %
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            {% if topic.topic_assignments.all %}
+                                                {% for form in topic.topic_assignments.all %}
+                                                    <a href="{% url 'view_form' form.code %}">
+                                                        <span class="badge bg-primary small">
+                                                            {% if form.is_quiz %}Quiz{% else %}Assignment{% endif %}
+                                                        </span>
+                                                    </a>&emsp14;
+                                                {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>&emsp;
+                                    <span class="mt-auto pt-2 small">{{ topic.video_url|vduration }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div> {% endcomment %}
+        <div class="col-lg-4 p-0 m-0">
+            {% for chaptar in course.chapter_course.all %}
+                {% if chaptar.topic_chapter.all %}
+                    <div class="card mb-2 px-2 py-2">
+                        <div class="card-body">
+                            <a class="collapse-indicator-plus d-flex justify-content-between" data-bs-toggle="collapse" href="#collapse-chaptar{{chaptar.id}}" role="button" aria-expanded="false" aria-controls="collapse-chaptar{{chaptar.id}}">
+                                <span class="d-flex">
+                                    <h6 class="text-primary fw-bold small">Section {{forloop.counter}}&emsp;:&emsp;</h6>
+                                    <h6 class="small" style="color: black;">{{chaptar.chapter_name}}</h6>
+                                </span>
+                                <span class="arrow-icon" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="bi bi-caret-down"></i>
+                                </span>
+                            </a>
+                            <div class="progress rounded" style="height: 15px;">
+                                <div id="cp{{chaptar.id}}" class="progress-bar rounded small" style="width:{{chaptar.id|get_chapter_progress:request.user}}%;" role="progressbar"  aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">{{chaptar.id|get_chapter_progress:request.user}}%</div>
+                            </div>
+                            <script>
+                                $(document).ready(function() {
+                                    $('.arrow-icon').on('click', function() {
+                                        $(this).find('i').toggleClass('bi-caret-down bi-caret-up');
+                                    });
+                                });
+                            </script>
+                            <div class="collapse pt-3" id="collapse-chaptar{{chaptar.id}}">
+                                {% for topic in chaptar.topic_chapter.all %}
+                                    <div class="d-flex mb-3">
+                                        
+        
+                                        {% if topic.video_url %}
+                                            <a href="javascript:void(0)" onclick="selectChaptor('{{chaptar.chapter_name}} : {{topic.topic_name}}','{{topic.video_url}}','{{chaptar.id}}','{{topic.id}}')" class="text-dark my-auto">
+                                                <h2 class="mb-0"><i class="bi bi-play-circle"></i></h2>
+                                            </a>&emsp;
+                                        {% else %}
+                                            <div class="text-dark my-auto">
+                                                <h2 class="mb-0"><i class="bi bi-play-circle"></i></h2>
+                                            </div>&emsp;
+                                        {% endif %}
+                                        <div class="w-100">
+                                            <p class="small mb-2 fw-bold">{{forloop.counter}}. {{ topic.topic_name }}</p>
+                                            <div class="progress rounded" style="height: 12px;">
+                                                <div id="tp{{topic.id}}" class="progress-bar rounded" style="width: {{topic.id|get_topic_progress:request.user}}%; font-size: smaller;" role="progressbar" aria-valuenow="{{topic.id|get_topic_progress:request.user}}" aria-valuemin="0" aria-valuemax="100">
+                                                    {{topic.id|get_topic_progress:request.user}} %
+                                                </div>
+                                            </div>
+                                            <div class="mt-2">
+                                                {% if topic.topic_assignments.all %}
+                                                    {% for form in topic.topic_assignments.all %}
+                                                        <a href="{% url 'view_form' form.code %}">
+                                                            <span class="badge bg-primary small">
+                                                                {% if form.is_quiz %}Quiz{% else %}Assignment{% endif %}
+                                                            </span>
+                                                        </a>&emsp14;
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>&emsp;
+                                        <span class="mt-auto pt-2 small">{{ topic.video_url|vduration }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+
+        
+        <div class="col-lg-8 p-0 m-0">
+            <div class="card">
+                <div class="card-body">
+                    <video src="{{course.course_video.url}}" height="415" controls id="video-player"></video>
+                    <p class="small fw-bold " id="selected_lecture">{{ course.course_name }}</p>
+                    <div class="row d-flex">
+                        <div class="col-1">
+                            {% if course.user.profile_image %}
+                            <img src="{{course.user.profile_image.url}}" class="rounded-circle" height="40" width="40">
+                            {% else %}
+                            <img src="{% static 'img/user.png' %}" class="rounded-circle" height="40" width="40">
+                            {% endif %}
+                        </div>
+                        <div class="col-11">
+                            <p class="text-primary mb-0 small fw-bold">{{course.user.full_name}}</p>
+                            <div class="d-flex justify-content-between">
+                                <p class="text-primary small fw-bold">Lecture {{course.chapter_course.all.count}} &emsp13;<span class="small fw-bold text-secondary">|&emsp13;{{course.created_at|naturaltime}}</span></p>
+                                <div class="ratings">
+                                    <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                                    &emsp13;<small class="rating-color">({{ course.averagereview }})</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bordered Tabs -->
+                    <ul class="nav nav-tabs nav-tabs-bordered">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#resource">Resources</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews">Reviews</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="btn btn-primary btn-sm mt-1 mx-4" id="start_chat">Chats</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content pt-2">
+                        <div class="tab-pane fade show active" id="resource">
+                            <!-- Content for Resources -->
+                            <div class="px-2">
+                                <div class="card mb-3">
+                                    <div class="card-body d-flex justify-content-between">
+                                        <h6 class="card-sub-title my-auto">Download Setup File</h6>
+                                        {% if course.setup_url %}
+                                            <a href="{{ course.setup_url }}" download>
+                                                <h4 class="my-auto"><i class="bi bi-cloud-arrow-down"></i></h4>
+                                            </a>
+                                        {% else %}
+                                            <p>No setup file available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="card mb-3">
+                                    <div class="card-body d-flex justify-content-between">
+                                        <h6 class="card-sub-title my-auto">Download Course Content</h6>
+                                        {% if course.content_url %}
+                                            <a href="{{ course.content_url }}" download>
+                                                <h4 class="my-auto"><i class="bi bi-cloud-arrow-down"></i></h4>
+                                            </a>
+                                        {% else %}
+                                            <p>No course content available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-body d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="card-title">Certification Terms</h6>
+                                        <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p class="fw-bold">Watch All Topics</p></span>
+                                        <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p class="fw-bold">Submit All Assignments&Quiz</p></span>
+                                        <span class="d-flex"><i class="bi bi-check"></i>&emsp13;<p class="fw-bold">Complete The Course</p></span>
+                                        <a href="" class="btn btn-primary btn-sm {% if course.id|get_course_progress:request.user != 100.0 %}disabled{% endif %}"><i class="bi bi-cloud-arrow-down"></i>&emsp13; Download Certificate</a>
+                                    </div>
+                                    <div class="bg-image position-relative">
+                                        <img height="200" class="w-100" src="https://media.istockphoto.com/id/1268162605/vector/blue-gold-color-creative-style-certificate-template-with-badge-vector-template.jpg?s=1024x1024&w=is&k=20&c=qz33V8u533A_f2VACrjNxIbnzD2lbtuCub6GpJHlltU=" alt="">
+                                        <div class="" style="position: absolute; top: 35%; left: 45%;">
+                                            <h1><i class="bi bi-cloud-arrow-down position-absolute text-dark"></i></h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    
+                       
+                        <div class="tab-pane fade" id="reviews">
+                            <div class="px-2">
+                                <div class="d-flex justify-content-between border-bottom">
+                                    <h5 class="card-title mb-0 my-auto">Reviews</h5>
+                                    <button {% if course.id|is_reviewed:request.user %} disabled {% endif %} class="btn btn-primary btn-sm my-auto" data-bs-toggle="modal" data-bs-target="#addReview">Add Review</button>
+                                </div>
+                                <p class="mt-2 small fw-bold">Ratings</p>
+                                <div class="row">
+                                    <div class="col-lg-9 ">
+                                        <div class="flex-grow-1">
+                                            <div class="row align-items-center">
+                                            <div class="col-1 text-center fw-bold">5</div>
+                                            <div class="col-8">
+                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                <div class="progress-bar rounded" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1 text-center fw-bold">8</div>
+                                            </div>
+                                            <div class="row align-items-center">
+                                            <div class="col-1 text-center fw-bold">4</div>
+                                            <div class="col-8">
+                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                <div class="progress-bar rounded" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1 text-center fw-bold">5</div>
+                                            </div>
+                                            <div class="row align-items-center">
+                                            <div class="col-1 text-center fw-bold">3</div>
+                                            <div class="col-8">
+                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                <div class="progress-bar rounded" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1 text-center fw-bold">2</div>
+                                            </div>
+                                            <div class="row align-items-center">
+                                            <div class="col-1 text-center fw-bold">2</div>
+                                            <div class="col-8">
+                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                <div class="progress-bar rounded" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1 text-center fw-bold">5</div>
+                                            </div>
+                                            <div class="row align-items-center">
+                                            <div class="col-1 text-center fw-bold">1</div>
+                                            <div class="col-8">
+                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                <div class="progress-bar rounded" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-1 text-center fw-bold">0</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 text-center" style="border-left: 1px solid;">
+                                        <span class="display-4 font-weight-bolder">{{ course.averagereview }}</span>
+                                        <div class="ratings">
+                                            <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="mt-3 small fw-bold">Rating's & Reviews</p>
+                                {% for review in course.course_feedbacks.all %}
+                                {% if forloop.counter < 4 %}
+                                <div class="row py-1">
+                                    <div class="col-lg-1 text-center ">
+                                        <img class="rounded-circle " src="{% static 'img/imageplaceholder.png' %}" alt="" height="40" width="40">
+                                        {% comment %} <img class="rounded-circle " src="{{review.user.image_url}}" alt="" height="40" width="40"> {% endcomment %}
+                                    </div>
+                                    <div class="col-lg-11">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="card-sub-title">{{review.title}}</h5>
+                                            <span class="small text-muted my-auto">{{review.created_at|naturaltime}}</span>
+                                        </div>
+                                        <p class="small text-muted mb-0">{{review.user.full_name}}</p>
+                                        <div class="ratings">
+                                            <i class="fa fa-star {% if review.rating > 0 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if review.rating > 1 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if review.rating > 2 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if review.rating > 3 %} rating-color {% endif %}"></i>
+                                            <i class="fa fa-star {% if review.rating > 4 %} rating-color {% endif %}"></i>
+                                            <small class="rating-color">({{ review.rating }})</small>
+                                        </div>
+                                        {% with text=review.description %}
+                                            {% if text|wordcount > 40 %}
+                                                <p class="half-content" id="half-{{ review.id }}" style="display: block;">{{text|truncatewords:40}}
+                                                    <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="show-hide-btn small">Show more</a>
+                                                </p>
+                                                <p class="full-content" id="full-{{ review.id }}" style="display: none;">{{ text }}
+                                                    <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="show-hide-btn small">Show less</a>
+                                                </p>
+                                            {% else %}
+                                                <p class="">{{ text }}</p>
+                                            {% endif %}
+                                        {% endwith %}
+                                        {% if review.user.id == request.user.id %}
+                                        <div>
+                                            <a href=""  data-bs-toggle="modal" data-bs-target="#editReview{{review.id}}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+                                            <a onclick="deletereview('{{review.id}}')" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                        </div>
+                                        {% endif %}
+
+
+
+
+                                        <!-- edit review modal -->
+                                        <div class="modal fade" id="editReview{{review.id}}" tabindex="-1" aria-labelledby="editReviewModalLabel{{review.id}}" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title card-title mb-0 p-0" id="editReviewModalLabel{{review.id}}">Update a Review</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h6 class="card-sub-title">What is it like to Course?</h6>
+                                                        <form action="{% url 'update_course_reviews' course.id %}" method="post" >
+                                                            {% csrf_token %}
+                                                            <input type="hidden" value="{{review.id}}" name="review" class="form-control" required>
+                                                            <div class="mb-3">
+                                                                <div class="star-rating">
+                                                                    <style>
+                                                                        /* component */
+    
+                                                                        .star-rating {
+                                                                        
+                                                                        display:flex;
+                                                                        flex-direction: row-reverse;
+                                                                        font-size:3em;
+                                                                        justify-content:space-around;
+                                                                        /* padding:0 .2em; */
+                                                                        text-align:center;
+                                                                        width:5em;
+                                                                        }
+    
+                                                                        .star-rating input {
+                                                                        display:none;
+                                                                        }
+    
+                                                                        .star-rating label {
+                                                                        color:#ccc;
+                                                                        cursor:pointer;
+                                                                        }
+    
+                                                                        .star-rating :checked ~ label {
+                                                                        color:#f90;
+                                                                        }
+    
+                                                                        .star-rating label:hover,
+                                                                        .star-rating label:hover ~ label {
+                                                                        color:#fc0;
+                                                                        }
+    
+                                                                    </style>
+                                                                    <input class="form-control" type="radio" id="5-stars" name="rating" value="5" />
+                                                                    <label for="5-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="4-stars" name="rating" value="4" />
+                                                                    <label for="4-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="3-stars" name="rating" value="3" />
+                                                                    <label for="3-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="2-stars" name="rating" value="2" />
+                                                                    <label for="2-stars" class="star">&#9733;</label>
+                                                                    <input class="form-control" type="radio" id="1-star" name="rating" value="1" />
+                                                                    <label for="1-star" class="star">&#9733;</label>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="title" class="form-label">Review Title</label>
+                                                                <input type="text" value="{{review.title}}" name="title" class="form-control" required>
+                                                                
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="description" class="form-label">Review Content</label>
+                                                                <textarea class="form-control" name="description" maxlength="800">{{review.description}}</textarea>
+                                                            </div>
+                                                            <div class="text-right">
+                                                                <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% empty %}
+                                    <div class="">
+                                        <p class="h3 text-muted my-5 text-center">No Reviews Yeat!!</p>
+                                    </div>
+                                {% endfor %}
+                                {% if course.course_feedbacks.all %}
+                                <div class="text-center">
+                                    <a href="" class="text-primary small mx-auto" data-bs-toggle="modal" data-bs-target="#allReviews">View All Reviews</a>
+                                </div>
+                                {% endif %}
+
+                                <!-- submit review modal -->
+                                <div class="modal fade" id="addReview" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title card-title mb-0 p-0" id="addReviewModalLabel">Write a Review</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h6 class="card-sub-title">What is it like to Course?</h6>
+                                                <form method="post" id="addreview" >
+                                                    {% csrf_token %}
+                                                    <div class="mb-3">
+                                                        <div class="star-rating">
+                                                            <style>
+                                                                /* component */
+
+                                                                .star-rating {
+                                                                
+                                                                display:flex;
+                                                                flex-direction: row-reverse;
+                                                                font-size:3em;
+                                                                justify-content:space-around;
+                                                                /* padding:0 .2em; */
+                                                                text-align:center;
+                                                                width:5em;
+                                                                }
+
+                                                                .star-rating input {
+                                                                display:none;
+                                                                }
+
+                                                                .star-rating label {
+                                                                color:#ccc;
+                                                                cursor:pointer;
+                                                                }
+
+                                                                .star-rating :checked ~ label {
+                                                                color:#f90;
+                                                                }
+
+                                                                .star-rating label:hover,
+                                                                .star-rating label:hover ~ label {
+                                                                color:#fc0;
+                                                                }
+
+                                                            </style>
+                                                            <input class="form-control" type="radio" id="5-stars" name="rating" value="5" />
+                                                            <label for="5-stars" class="star">&#9733;</label>
+                                                            <input class="form-control" type="radio" id="4-stars" name="rating" value="4" />
+                                                            <label for="4-stars" class="star">&#9733;</label>
+                                                            <input class="form-control" type="radio" id="3-stars" name="rating" value="3" />
+                                                            <label for="3-stars" class="star">&#9733;</label>
+                                                            <input class="form-control" type="radio" id="2-stars" name="rating" value="2" />
+                                                            <label for="2-stars" class="star">&#9733;</label>
+                                                            <input class="form-control" type="radio" id="1-star" name="rating" value="1" />
+                                                            <label for="1-star" class="star">&#9733;</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="title" class="form-label">Review Title</label>
+                                                        <input type="text" name="title" class="form-control" id="title" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="description" class="form-label">Review Content</label>
+                                                        <textarea class="form-control" name="description" id="description" maxlength="800"></textarea>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary" id="start_review">Submit Review</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- all reviews modal -->
+                                <div class="modal fade" id="allReviews" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content ">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title card-title mb-0 p-0" id="allReviewsModalLabel">All Reviews</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="mt-2 small fw-bold">Ratings</p>    
+                                                <div class="row">
+                                                    <div class="col-lg-9 ">
+                                                        <div class="flex-grow-1">
+                                                            <div class="row align-items-center">
+                                                                <div class="col-1 text-center fw-bold">5</div>
+                                                                <div class="col-8">
+                                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                                    <div class="progress-bar rounded" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                </div>
+                                                                <div class="col-1 text-center fw-bold">8</div>
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <div class="col-1 text-center fw-bold">4</div>
+                                                                <div class="col-8">
+                                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                                    <div class="progress-bar rounded" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                </div>
+                                                                <div class="col-1 text-center fw-bold">5</div>
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <div class="col-1 text-center fw-bold">3</div>
+                                                                <div class="col-8">
+                                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                                    <div class="progress-bar rounded" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                </div>
+                                                                <div class="col-1 text-center fw-bold">2</div>
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <div class="col-1 text-center fw-bold">2</div>
+                                                                <div class="col-8">
+                                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                                    <div class="progress-bar rounded" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                </div>
+                                                                <div class="col-1 text-center fw-bold">5</div>
+                                                            </div>
+                                                            <div class="row align-items-center">
+                                                                <div class="col-1 text-center fw-bold">1</div>
+                                                                <div class="col-8">
+                                                                <div class="progress rounded" style="height: 5px; background-color: rgb(184, 184, 184);">
+                                                                    <div class="progress-bar rounded" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                                                </div>
+                                                                </div>
+                                                                <div class="col-1 text-center fw-bold">0</div>
+                                                            </div>
+                                                            </div>
+                                                    </div>
+                                                    <div class="col-lg-3 text-center" style="border-left: 1px solid;">
+                                                        <span class="display-4 font-weight-bolder">{{ course.averagereview }}</span>
+                                                        <div class="ratings">
+                                                            <i class="fa fa-star {% if course.averagereview > 0 %} rating-color {% endif %}"></i>
+                                                            <i class="fa fa-star {% if course.averagereview > 1 %} rating-color {% endif %}"></i>
+                                                            <i class="fa fa-star {% if course.averagereview > 2 %} rating-color {% endif %}"></i>
+                                                            <i class="fa fa-star {% if course.averagereview > 3 %} rating-color {% endif %}"></i>
+                                                            <i class="fa fa-star {% if course.averagereview > 4 %} rating-color {% endif %}"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <p class="mt-3 small fw-bold">Rating's & Reviews</p>
+                                                {% for review in course.course_feedbacks.all %}
+                                                    <div class="row py-1">
+                                                        <div class="col-lg-1 text-center ">
+                                                            <img class="rounded-circle " src="{{review.user.image_url}}" alt="" height="40" width="40">
+                                                        </div>
+                                                        <div class="col-lg-11">
+                                                            <div class="d-flex justify-content-between">
+                                                                <h5 class="card-sub-title">{{review.title}}</h5>
+                                                                <span class="small text-muted my-auto">{{review.created_at|naturaltime}}</span>
+                                                            </div>
+                                                            <p class="small text-muted mb-0">{{review.user.full_name}}</p>
+                                                            <div class="ratings">
+                                                                <i class="fa fa-star {% if review.rating > 0 %} rating-color {% endif %}"></i>
+                                                                <i class="fa fa-star {% if review.rating > 1 %} rating-color {% endif %}"></i>
+                                                                <i class="fa fa-star {% if review.rating > 2 %} rating-color {% endif %}"></i>
+                                                                <i class="fa fa-star {% if review.rating > 3 %} rating-color {% endif %}"></i>
+                                                                <i class="fa fa-star {% if review.rating > 4 %} rating-color {% endif %}"></i>
+                                                                <small class="rating-color">({{ review.rating }})</small>
+                                                            </div>
+                                                            {% with text=review.description %}
+                                                                {% if text|wordcount > 40 %}
+                                                                    <p class="half-content" id="dhalf-{{ review.id }}" style="display: block;">{{text|truncatewords:40}}
+                                                                        <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="dshow-hide-btn small">Show more</a>
+                                                                    </p>
+                                                                    <p class="full-content" id="dfull-{{ review.id }}" style="display: none;">{{ text }}
+                                                                        <br><a data-id="{{ review.id }}" href="javascript:void(0)" class="dshow-hide-btn small">Show less</a>
+                                                                    </p>
+                                                                    {% else %}
+                                                                    <p class="">{{ text }}</p>
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                            {% if review.user.id == request.user.id %}
+                                                            <div>
+                                                                <a href=""  data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editReview{{review.id}}" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil"></i></a>
+                                                                <a onclick="deletereview('{{review.id}}')" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></a>
+                                                            </div>
+                                                            {% endif %}
+                                                            
+                                                            <!-- edit review modal -->
+                                                            <div class="modal fade" id="editReview{{review.id}}" tabindex="-1" aria-labelledby="editReviewModalLabel{{review.id}}" aria-hidden="true">
+                                                                <div class="modal-dialog modal-dialog-centered">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title card-title mb-0 p-0" id="editReviewModalLabel{{review.id}}">Update a Review</h5>
+                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            <h6 class="card-sub-title">What is it like to Course?</h6>
+                                                                            <form action="{% url 'update_course_reviews' course.id %}" method="post" >
+                                                                                {% csrf_token %}
+                                                                                <input type="hidden" value="{{review.id}}" name="review" class="form-control" required>
+                                                                                <div class="mb-3">
+                                                                                    <div class="star-rating">
+                                                                                        <style>
+                                                                                            /* component */
+
+                                                                                            .star-rating {
+                                                                                            
+                                                                                            display:flex;
+                                                                                            flex-direction: row-reverse;
+                                                                                            font-size:3em;
+                                                                                            justify-content:space-around;
+                                                                                            /* padding:0 .2em; */
+                                                                                            text-align:center;
+                                                                                            width:5em;
+                                                                                            }
+
+                                                                                            .star-rating input {
+                                                                                            display:none;
+                                                                                            }
+
+                                                                                            .star-rating label {
+                                                                                            color:#ccc;
+                                                                                            cursor:pointer;
+                                                                                            }
+
+                                                                                            .star-rating :checked ~ label {
+                                                                                            color:#f90;
+                                                                                            }
+
+                                                                                            .star-rating label:hover,
+                                                                                            .star-rating label:hover ~ label {
+                                                                                            color:#fc0;
+                                                                                            }
+
+                                                                                        </style>
+                                                                                        <input class="form-control" type="radio" name="rating" value="5" />
+                                                                                        <label for="5-stars" class="star">&#9733;</label>
+                                                                                        <input class="form-control" type="radio" name="rating" value="4" />
+                                                                                        <label for="4-stars" class="star">&#9733;</label>
+                                                                                        <input class="form-control" type="radio" name="rating" value="3" />
+                                                                                        <label for="3-stars" class="star">&#9733;</label>
+                                                                                        <input class="form-control" type="radio" name="rating" value="2" />
+                                                                                        <label for="2-stars" class="star">&#9733;</label>
+                                                                                        <input class="form-control" type="radio" name="rating" value="1" />
+                                                                                        <label for="1-star" class="star">&#9733;</label>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="mb-3">
+                                                                                    <label for="title" class="form-label">Review Title</label>
+                                                                                    <input type="text" value="{{review.title}}" name="title" class="form-control" required>
+                                                                                    
+                                                                                </div>
+                                                                                <div class="mb-3">
+                                                                                    <label for="description" class="form-label">Review Content</label>
+                                                                                    <textarea class="form-control" name="description" maxlength="800">{{review.description}}</textarea>
+                                                                                </div>
+                                                                                <div class="text-right">
+                                                                                    <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                    <button type="submit" class="btn btn-primary">Update Review</button>
+                                                                                </div>
+                                                                            </form>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                    <script>
+                                        $(document).ready(function() {
+                                            $(".nav-link").click(function() {
+                                                var target = $(this).data("bs-target");
+                                                $(".tab-pane").hide(); // Hide all tab content
+                                                $(target).show(); // Show the clicked tab content
+                                            });
+                                        });
+                                    </script>
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+ 
+    $(document).ready(function() {
+        $("#start_review").click(function () {
+            const formData = new FormData(document.getElementById('addreview'));
+            console.log(formData);
+            const csrf = Cookies.get('csrftoken');
+            fetch('{{site_domain}}/teacher/create_course_review/{{course.id}}', {
+                method: "POST",
+                headers: { 'X-CSRFToken': csrf},
+                body : formData,
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                if (result['status']) {
+                    window.location = '{{site_domain}}/play_course/{{course.id}}';
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+            });
+        });
+    });
+
+   function deletereview(rid){
+        const csrf = Cookies.get('csrftoken');
+        fetch(`{{site_domain}}/teacher/delete_course_review/${rid}`, {
+            method: "POST",
+            headers: { 'X-CSRFToken': csrf},
+    
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if (result['status']) {
+                window.location = '{{site_domain}}/play_course/{{course.id}}';
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    }
+
+    
+
+
+    let selected_chapter = '';
+    let selected_topic = '';
+    $(document).ready( function(){
+        const video = document.getElementById('video-player');
+        // Update current time display as the video plays
+        video.addEventListener('timeupdate', function() {
+            const percentPlayed = ((video.currentTime / video.duration) * 100)/2;
+            var videopercent = percentPlayed.toFixed(2);
+            var progressBar = document.getElementById(`tp${selected_topic}`);
+            var currentWidth = parseInt(progressBar.style.width, 10) || 0;
+            var newWidth = parseInt(videopercent, 10) || 0;
+            if (newWidth > currentWidth) {
+                progressBar.style.width = newWidth + '%';
+                progressBar.innerText = newWidth + ' %';
+            }
+            const csrf = Cookies.get('csrftoken');
+            fetch("{% url 'update_topic_progress' %}", {
+                method: "POST",
+                headers: { 'X-CSRFToken': csrf },
+                body: JSON.stringify({
+                    'topic_id': selected_topic,
+                    'progress': videopercent,
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                var chapterProgressBar = document.getElementById(`cp${selected_chapter}`);
+                chapterProgressBar.style.width = result['chapter_progress'] + '%';
+                chapterProgressBar.innerText = result['chapter_progress'] + ' %';
+            });
+        });
+    });
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    var sender = '{{request.user.id}}';
+    var receiver = '{{course.user.id}}';
+
+    $("#start_chat").click(function () {
+        const csrf = Cookies.get('csrftoken');
+        fetch('{{site_domain}}/chat/fetch_thread', {
+            method: "GET",
+            headers: { 'X-CSRFToken': csrf, "sender": sender },
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log("testing", result);
+            var ids = JSON.parse(result['ids']);
+            var data = result['data'];
+            if (data.length === 0) {
+                const { value: text } = Swal.fire({
+                    input: "textarea",
+                    inputLabel: "Start Chat",
+                    inputPlaceholder: "Type your message here...",
+                    inputAttributes: {
+                        "aria-label": "Type your message here"
+                    },
+                    inputValidator: (value) => {
+                        return new Promise((resolve) => {
+                            if (value !== "") {
+                                resolve();
+                                sendMessagesNew(value);
+                            } else {
+                                resolve("Please type your message!");
+                            }
+                        });
+                    },
+                    showCancelButton: true
+                });
+                if (text) {
+                    Swal.fire(text);
+                }
+            } else {
+                window.location = '{{site_domain}}/chat/chats';
+            }
+        });
+    });
+
+
+
+    // $(document).ready(function () {
+    //     $('#updateReviewForm').submit(function (event) {
+    //         event.preventDefault(); 
+            
+    //         var form = $(this);
+    //         var url = form.attr('action');
+            
+    //         $.ajax({
+    //             type: "POST",
+    //             url: url,
+    //             data: form.serialize(), 
+    //             success: function (data) {
+    //                 window.location = '{{site_domain}}/play_course/{{course.id}}';
+    //             },
+    //             error: function (data) {
+    //                 console.log('Error:', data);
+    //             }
+    //         });
+    //     });
+    // });
+    
+
+    function sendMessagesNew(messageContent) {
+        if (!messageContent.trim()) {
+            return;
+        }
+        const csrf = Cookies.get('csrftoken');
+        const formData = new FormData();
+        formData.append("receiver", receiver);
+        formData.append("sender", sender);
+        formData.append("message", messageContent);
+
+        fetch('{{site_domain}}/chat/send_messages', {
+            method: "POST",
+            headers: { 'X-CSRFToken': csrf },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if (result['status']) {
+                window.location = '{{site_domain}}/chat/chats';
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+        });
+    }
+
+    function selectChaptor(name,url,cid,tid){
+        selected_chapter = cid;
+        selected_topic = tid;
+        document.getElementById('selected_lecture').innerText = name;
+        document.getElementById('video-player').src = url;
+    }
+</script>
+
+</div>
+</div>
+</div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,242 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+{% block extrastyle %}
+ <style>
+ #main{
+    margin-top: 0%;
+    padding: 0%;
+ }
+ .card {
+    margin-top: 40px;
+}
+.content-des ul li {
+    padding-bottom: 10px;
+}
+.content-des ul li::marker {
+    color: #0073E4;
+}
+.btn-outline-primary:hover {
+    color: #fff;
+ 
+}
+.mt-5 {
+    margin-top: 2rem !important;
+}
+
+.col-lg-4.mt-5 {
+    margin: -1.5rem;
+    width: 23rem;
+}
+.img {
+   
+    margin-top: -25px;
+}
+
+.container.content-des {
+    min-height: 50px;
+}
+img.simg {
+    margin-top: -22px;
+}
+.display-6 {
+    font-size: 2rem;
+}
+.content-des ul li {
+    padding-bottom: 0px;
+}
+.plan-card{
+    margin-top: -230px;
+}
+.card-scaled {
+    transform: scale(1.1); 
+    transition: transform 0.3s ease;
+}
+ </style>
+{% endblock extrastyle %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+     <div class="container-fluid bg-primary" style="height: 280px;">
+        <div class="row align-items-center mt-5 ">
+            <div class="row align-items-center mt-5">
+                    <h1 class="text-white text-center pt-2">Flexible Plans & Pricing</h1>
+                    <p class="text-white text-center">Lorem, ipsum dolor sit amet consectetur adipisicing elit !.</p>
+            </div>
+        </div>
+    </div> 
+
+    <div class="row mx-3 gy-3 plan-card  ">
+        {% for plan in subscriptions %}
+            <div class="col-lg-4 mb-md-0 mt-5 p-4">
+                <div class="card {% if user.user_membership.membership.id == plan.id %} {% endif %} border shadow-none" >
+                    <div class="card-body position-relative ">
+
+                    <h3 class="card-title text-center text-capitalize mb-1" style="color: #3c94f8;">{{ plan.membership_type }}</h3>
+                    <div class="my-3 text-center">
+                        {% if plan.image %}
+                        <img class="simg" src="{{ plan.image.url }}" alt="Starter Image" height="80">
+                        {% else %}
+                        {% if plan.slug == basic %}
+                        <img src="{% static 'img/basic.png' %}">
+                        {% elif plan.slug == enterprise %}
+                        <img src="{% static  'img/enterprise.png' %}">
+                        {% else %}
+                        <img src="{% static  'img/advanced.png' %}"  height="80" style="margin-top: -22px;">
+                        {% endif%}
+
+                        
+                        {% endif %}
+                    </div>
+                    <p class="text-center">{{ plan.title }}</p>
+                    <div class="text-center">
+                        <div class="d-flex justify-content-center">
+                        <sup class="h6 pricing-currency mt-1 mb-0 me-1 text-primary"  style="font-size: 1.8em;">₹</sup>
+                        <h2 class="display-6  text-primary">{{ plan.price }}</h2>
+                         
+                        <sub class="h6 pricing-duration mt-auto text-muted fw-normal"> /  {{ plan.duration_period }}</sub>
+                        </div>
+                    </div>
+                    <hr style="width: 100%; border-color: #000;">  
+                    <div class="container content-des" style="font-size: 14px;">
+                
+                        {{ plan.description|safe }}
+                    </div>
+                    <div>
+                    {% if user.user_membership.membership %}
+                        {% if user.user_membership.membership.id == plan.id %}
+                        <button type="button" disabled class="btn btn-primary d-grid w-100 ">Currently Used</button>
+                        {% else %}
+                        <!-- <a type="button" href="{% url 'subscribe' %}?sub_plan={{plan.membership_type}}" class="btn btn-primary d-grid w-100">Upgrade</a> -->
+                        <button type="button" disabled id="rzp-button1" class="btn btn-outline-primary d-grid w-100 upg-btn">Upgrade</button>
+                 
+
+                        {% endif %}
+                    {% else %}
+                        <button type="button" id="rzp-button1" onclick='checkout({p:"{{ plan.price }}",id:"{{plan.id}}"})' class="btn btn-outline-primary d-grid w-100 upg-btn">Upgrade</button>
+
+                        {% endif %}
+                    </div>
+                   </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+    <script>
+        // Function to toggle the scaling class on click
+        function toggleScaleOnClick(element) {
+            element.classList.toggle('card-scaled');
+        }
+    
+        // Function to add the scaling class on hover
+        function addScaleOnHover(element) {
+            element.classList.add('card-scaled');
+        }
+    
+        // Function to remove the scaling class on hover out
+        function removeScaleOnHover(element) {
+            element.classList.remove('card-scaled');
+        }
+    
+        // Add event listeners to each card
+        var cards = document.querySelectorAll('.card');
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                toggleScaleOnClick(this);
+            });
+            card.addEventListener('mouseenter', function() {
+                addScaleOnHover(this);
+            });
+            card.addEventListener('mouseleave', function() {
+                removeScaleOnHover(this);
+            });
+        });
+    </script>
+</main>
+
+
+<script>
+    function checkout(args){
+        fetch(`checkoutSubscription`, {
+            method: "POST",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                "amount":args.p*100,
+                "currency":"INR"
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            var optionData = result['result']
+            var options = {
+                "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": optionData['currency'],
+                "name": "Sphurit Subscription",
+                "description": "Sphurit Subscription",
+                "image": "{% static 'img/icons/logo1.png'%}",
+                "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                "handler": function (response){    
+                    if(response.razorpay_payment_id){
+                        console.log(response.razorpay_payment_id);
+                        fetch(`{% url 'verifySignature' %}`, {
+                            method: "POST",
+                            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                            body: JSON.stringify({
+                                "razorpay_paymentId":response.razorpay_payment_id,
+                                "razorpay_orderId":response.razorpay_order_id,
+                                "razorpay_signature":response.razorpay_signature
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log(result);
+                            if(result['result']){
+                                fetch(`{% url 'subscribe' %}`, {
+                                    method: "POST",
+                                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                    body: JSON.stringify({
+                                        "plan_id":args.id
+                                    })
+                                }) 
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log(result);
+                                    window.location = `{% url 'home' %}`
+                                })
+                            }else{}
+                        })
+                    }else{
+                        console.log(response);
+                    }
+                },
+                "prefill": {
+                    "name": "{{ user.full_name }}",
+                    "email": "{{ user.email }}",
+                    "contact": "{{ user.mobile }}"
+                },
+                "notes": {
+                    "address": "Sphurit"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+
+            rzp1.open();
+            rzp1.on('payment.failed', function (response){})
+        });
+
+    }
+</script>
+{% endblock content %} 
+

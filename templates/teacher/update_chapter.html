@@ -1,0 +1,57 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+ <style>
+
+ </style>
+{% endblock extrastyle %}
+{% block content %}
+<main id="main" class="main">
+
+    <div class="row">
+        <div class="col-lg-8 col-md-8 wow fadeInUp" data-wow-delay="0.1s">
+            <h4>Update Chapter</h4>
+        </div>
+        
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.3s">
+            <div class="bg-light p-3">
+                <form class="row g-3" action="{% url 'update_chapter' chapter.id %}" method="post" autocomplete="off">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <label for="validationDefault04" class="form-label">Select course</label>
+                        <select class="form-select" disabled name="course_id" id="id_course" required>
+                          <option selected disabled >Select Course</option>
+                          {% for obj in course %}
+                          <option {% if obj.id == chapter.course.id %}selected{% endif %} value="{{obj.id}}">{{obj.course_name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    <div class="col-md-12">
+                      <label for="validationDefault02" class="form-label">Chapter Name</label>
+                      <input type="text" class="form-control" name="chapter_name" id="validationDefault02" value="{{chapter.chapter_name}}" required>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="validationDefault03" class="form-label">Description</label>
+                      
+                      <textarea class="form-control tinymce-editor" name="description" id="validationDefault03">{{chapter.description}}</textarea>
+                    </div>
+                    <div class="col-md-12 text-right">
+                      <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+
+    
+
+</main>
+
+<script>
+
+</script>
+{% endblock content %}

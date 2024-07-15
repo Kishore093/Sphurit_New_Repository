@@ -1,0 +1,320 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% block script %}
+
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block extrastyle %}
+ <style>
+  .row{
+    flex-wrap: nowrap;   
+  }
+  .col-lg-8 {
+    margin-left:0px !important;
+    margin-top: 0px !important;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="">
+  <div class="container-fluid curved-box pt-2 m-0">
+      <p class="fs-4 text-white mb-2">My Profile</p>
+      <p class="fs-6 text-white mb-2">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+  </div>
+
+  <div class="row">
+      <div class="col-lg-2 card py-0 ">
+        {% include 'user-face/sidebar.html' %}
+      </div>
+      <div class="col-lg-10 justify-content-right profile-sec">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="card" style = "background-color: #DBEDFF;">
+              <div class="card-body pt-3">
+                <!-- Bordered Tabs -->
+                <ul class="nav nav-tabs nav-tabs-bordered">
+
+                  <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                  </li>
+
+                  <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                  </li>
+
+                  <!-- <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#subscription">Subscription</button>
+                  </li> -->
+
+                  <!-- <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Other</button>
+                  </li> -->
+
+                </ul>
+                <div class="tab-content pt-2">
+                  <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                      
+                    {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="Profile" class="border mb-3" id="profileImageId1" height="100">
+                    {% else %}
+                    <img src="assets/img/profile-img.jpg" alt="Profile" class="border mb-3" height="100">
+                    {% endif %}
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 fw-bold">Full Name</div>
+                      <div class="col-lg-9 col-md-8">{{ user.full_name }}</div>
+                    </div>
+
+                    <!-- <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Company</div>
+                      <div class="col-lg-9 col-md-8">Lueilwitz, Wisoky and Leuschke</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Job</div>
+                      <div class="col-lg-9 col-md-8">Web Designer</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Country</div>
+                      <div class="col-lg-9 col-md-8">USA</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Address</div>
+                      <div class="col-lg-9 col-md-8">A108 Adam Street, New York, NY 535022</div>
+                    </div> -->
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 fw-bold">Phone</div>
+                      <div class="col-lg-9 col-md-8">{{ user.mobile }}</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 fw-bold">Email</div>
+                      <div class="col-lg-9 col-md-8">{{ user.email }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-3 col-md-4 fw-bold">Date Of Birth</div>
+                        <div class="col-lg-9 col-md-8">{{ user.date_of_birth|default_if_none:"&nbsp;" }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 fw-bold">Gender</div>
+                      <div class="col-lg-9 col-md-8">{{ user.gender|default_if_none:"&nbsp;" }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 fw-bold">Area Of Intrest</div>
+                      <div class="col-lg-9 col-md-8">
+                        {% for tag in user.intrest_area.all %}
+                          <span class="badge bg-primary">{{ tag }}</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <h5 class="card-title">About</h5>
+                    <p class="fst-italic">{{user.about|default_if_none:"&nbsp;"}}</p>
+                  </div>
+                  <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                    <!-- Profile Edit Form -->
+                    <form action="{% url 'uploadUserProfile' %}" method="post" >
+                      {% csrf_token %}
+                      <div class="row mb-3">
+                        <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
+                        <div class="col-md-8 col-lg-9">
+                          {% if user.profile_image %}
+                          <img src="{{ user.profile_image.url }}" alt="Profile" id="profileImageId" height="100" class="border">
+                          {% else %}
+                          <img src="{% static 'img/user.png' %}" class="rounded-circle" id="profileImageId" alt="" height="100">
+                          {% endif %}
+                          <div class="pt-2">
+                              <a href="#" class="btn btn-primary btn-sm" onclick="pickFile(event)" title="Upload new profile image"><i class="bi bi-upload"></i></a>
+                              <!-- <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a> -->
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Name</label>
+                        <div class="col-md-4 col-lg-4">
+                          <input name="first_name" type="text" class="form-control" id="fullName" value="{{ user.first_name }}">
+                        </div>
+                        <div class="col-md-4 col-lg-4">
+                            <input name="last_name" type="text" class="form-control" id="fullName" value="{{ user.last_name }}">
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
+                        <div class="col-md-8 col-lg-9">
+                          <input name="phone" readonly type="text" class="form-control" id="Phone" value="{{user.mobile}}">
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="Email" class="col-md-4 col-lg-3 col-form-label">Email</label>
+                        <div class="col-md-8 col-lg-9">
+                          <input name="email" readonly type="email" class="form-control" id="Email" value="{{user.email}}">
+                        </div>
+                      </div>
+                      <div class="row mb-3">
+                        <label for="gender" class="col-md-4 col-lg-3 col-form-label">Gender</label>
+                        <div class="col-md-8 col-lg-9">
+                          <select name="gender" class="form-select" id="gender" >
+                            <option value="">Select Gender</option>
+                            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %} >Male</option>
+                            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Others" {% if user.gender == 'Others' %}selected{% endif %}>Others</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="date_of_birth" class="col-md-4 col-lg-3 col-form-label">Date Of Birth</label>
+                        <div class="col-md-8 col-lg-9">
+                          <input name="date_of_birth" type="date" class="form-control date-of-birth" id="date_of_birth" value="{{ user.date_of_birth|date:'Y-m-d' }}">
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="tag-input" class="col-md-4 col-lg-3 col-form-label">Area of Intrest</label>
+                        <div class="col-md-8 col-lg-9 ">
+                          <select class="js-select2" multiple="multiple" name="tags">
+                                                        
+                            {% for tag in user.intrest_area.all %}
+                            <option value="{{ tag }}" selected>{{ tag }}</option>
+                            {% endfor %}
+                            <option value="Pyhton" data-badge="">Pyhton</option>
+                            <option value="Django" data-badge="">Django</option>
+                            <option value="HTML" data-badge="">HTML</option>
+                            <option value="CSS" data-badge="">CSS</option>
+                            <option value="Bootstrap" data-badge="">Bootstrap</option>
+                            <option value="JavaScript" data-badge="">JavaScript</option>
+                            <option value="Java" data-badge="">Java</option>
+                            <option value="PHP" data-badge="">PHP</option>
+                            <option value="Flutter" data-badge="">Flutter</option>
+                            <option value="C++" data-badge="">C++</option>
+                            <option value="MySql" data-badge="">MySql</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="row mb-3">
+                        <label for="about" class="col-md-4 col-lg-3 col-form-label">About</label>
+                        <div class="col-md-8 col-lg-9">
+                          <textarea name="about" type="text" class="form-control" id="about">{{user.about}}</textarea>
+                        </div>
+                      </div>
+
+                      <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                      </div>
+                    </form><!-- End Profile Edit Form -->
+
+                  </div>
+
+                  <!-- <div class="tab-pane fade pt-3" id="subscription">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-4 label">Plan</div>
+                        <div class="col-lg-9 col-md-8">{{ user.user_membership.membership.membership_type }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Amount</div>
+                      <div class="col-lg-9 col-md-8">{{ user.user_membership.membership.price }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Start Date</div>
+                      <div class="col-lg-9 col-md-8">{{ user.user_membership.updated_at }}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Duration</div>
+                      <div class="col-lg-9 col-md-8">{{ user.user_membership.membership.duration }} {{ user.user_membership.membership.duration_period }}</div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col-lg-3 col-md-4 label">Description</div>
+                      <div class="col-lg-9 col-md-8">
+                        {{ user.user_membership.membership.description|safe }}
+                      </div>
+                    </div>
+                    
+                  </div> -->
+                  <!-- <div class="tab-pane fade pt-3" id="profile-change-password"></div> -->
+
+                </div><!-- End Bordered Tabs -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+
+<script>
+    function pickFile(event) {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept="image/*";
+        input.onchange = _ => {
+            let files =   Array.from(input.files);
+            var file = files[0];
+            var img=document.getElementById("profileImageId");
+            img.file = file;
+            var reader = new FileReader();
+            reader.onload = (function(aImg) { 
+                return function(e) {
+                    aImg.src = e.target.result;
+                };
+            })(img);
+            reader.readAsDataURL(file);
+            console.log(file);
+            var form_data = new FormData();
+            form_data.append("image", file);
+            form_data.append("csrfmiddlewaretoken", Cookies.get('csrftoken'));
+            $.ajax({
+                url: "{% url 'uploadProfileImage' %}",
+                dataType: 'json',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: form_data,
+                type: 'post',
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (response) {
+                    console.log(response);
+                }
+            })
+            .then(result => {
+                window.location = '/view_user_profile'
+            });
+        };
+        input.click();
+    }
+    $(document).ready(function(){
+      $(".date-of-birth").change(function () {
+        var today = new Date();
+        var nowyear = today.getFullYear();
+        var nowmonth = today.getMonth();
+        var nowday = today.getDate();
+        var dob = $(this).val();
+        var birth = new Date(dob);
+
+        var birthyear = birth.getFullYear();
+        var birthmonth = birth.getMonth();
+        var birthday = birth.getDate();
+
+        var age = nowyear - birthyear;
+        var age_month = nowmonth - birthmonth;
+        var age_day = nowday - birthday;
+        if ((age == 18 && age_month <= 0 && age_day <= 0) || age < 18) {
+          alert("Age should be more than 18 years.Please enter a valid Date of Birth");
+          $(this).val('');
+          return false;
+        }
+      });
+    });
+</script>
+{% endblock content %}

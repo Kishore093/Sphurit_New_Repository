@@ -1,0 +1,194 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load count %}
+{% load datetime %}
+{% block extrastyle %}
+ <style>
+    .card {
+    margin: 0px 0px 10px 0px;
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 0 1px 1px #00000017;
+}
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h5 class="card-title">My Course List</h5>
+        </div>
+        <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <a href="{% url 'import_users' %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> Allot Course</a>
+            <a href="{% url 'add_course' %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> New Course</a>
+        </div>
+    </div>
+
+    <div class="col-12">
+        
+
+        {% for obj in course %}
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-3" style="margin: auto;">
+                    <a href="{% url 'chapter_list' obj.id %}">
+                        {% if obj.thumb_image %}
+                        <img class="img-fluid" style="height: 9rem; margin-left: 1rem;" src="{{ obj.thumb_image.url }}" alt="">
+                        {% else %}
+                        <img class="img-fluid" style="height: 9rem; margin-left: 1rem;" src="{% static 'img/placeholder.png' %}" alt="">
+                        {% endif %}
+                    </a>
+                </div>
+                <div class="col-md-9" style="padding-left: 1rem;">
+                    <div class="card-body">
+                        <h5 class="text-primary"><a href="{% url 'chapter_list' obj.id %}">{{ obj.course_name }}</a></h5>
+                        <h6 class="text-muted">{{ obj.category.category_name }}</h6>
+                        <h6 class="small text-muted ie11Support" >{{ obj.description }}</h6>
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <span class="fw-bold small">Actual Fee - </span>
+                                <span class="small text-muted">₹{{ obj.actual_fee }}</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold small">Discounted Fee - </span>
+                                <span class="small text-muted">₹{{ obj.discount_fee }}</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold small">Chapter's - </span>
+                                <span class="small text-muted">{{ obj.chapter_course.all.count }}</span>
+                            </div>
+                            <div>
+                                <span class="fw-bold small">Topic's - </span>
+                                <span class="small text-muted">{{ obj|topicCount }}</span>
+                            </div>
+                            
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div class="d-flex mt-1">
+                                <div class="ratings">
+                                    <i class="fa fa-star {% if obj.averagereview > 0 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.averagereview > 1 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.averagereview > 2 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.averagereview > 3 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.averagereview > 4 %} rating-color {% endif %}"></i>
+                                </div>
+                                <span class="fw-bold small">{{ obj.averagereview }}</span>&emsp;
+                                <span class="small">{{ obj.course_feedbacks.all.count }} 
+                                    <a href="{% url 'course_feedback_list' obj.id %}">Reviews</a>
+                                </span>
+                            </div>
+                            <div class="my-auto">
+                                <a href="{% url 'course_students_list' obj.id %}">
+                                <span class="fw-bold small">Enroll's - </span>
+                                <span class="small text-muted">{{ obj.course_purchased.all.count }}</span>
+                            </a>
+                            </div>
+                            <div class="mt-2 d-flex">
+                                <h6 class="small text-muted mt-1"> {{ obj.created_at|date:"d-m-Y h:i A" }} </h6>&emsp;
+                            
+
+                                {% if not obj.approved %}
+                                    {% if obj.hide %}
+                                        <button class="btn btn-secondary btn-sm" onclick="showCourse('{{obj.id}}')">Show</button>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" onclick="hideCourse('{{obj.id}}')">Hide</button>
+                                    {% endif %}
+                                    <a href="{% url 'update_course' obj.id %}" class="btn btn-outline-secondary btn-sm mx-3"><i class="bi bi-pencil"></i></a>
+                                    <button data-bs-toggle="modal" data-bs-target="#delete-course{{obj.id}}" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                                {% else %}
+                                    &emsp13;<button class="btn btn-success btn-sm " disabled style="opacity:1;">Approved</button>
+                                {% endif %}
+
+                                
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="delete-course{{obj.id}}" tabindex="-1" role="dialog" aria-labelledby="delete-modal-title" aria-hidden="true">
+                                    <div class="modal-dialog modal-confirm">
+                                        <div class="modal-content">
+                                            <div class="modal-header flex-column">
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <div class="icon-box">
+                                                    <i class="bi bi-trash material-icons"></i>
+                                                </div>
+                                                <!-- <h4 class="modal-title w-100">Are you sure?</h4> -->
+                                                <h4>Do you want to permanently <br>delete this course with</h4>
+                                            </div>
+                                            <div class="modal-body text-left border">
+                                                {% for ch in obj.chapter_course.all %}
+                                                    <span class="d-block fw-bold" style="margin-left: 2rem;">Chapter {{forloop.counter}}. {{ch.chapter_name}}</span>
+                                                    {% for t in ch.topic_chapter.all %}
+                                                        <span class="d-block" style="margin-left: 3rem;">Topic {{forloop.counter}}. {{t.topic_name}}</span>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </div>
+                                            <div class="modal-footer justify-content-center">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a href="{% url 'delete_course' obj.id %}" type="button" class="btn btn-danger">Delete</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+</main>
+<script>
+    function showCourse(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/show_course', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            if(result['status'] == false){
+                alert(result['message']);
+            }else{
+                window.location = `/teacher/course_list/{{ user.id }}`
+            }
+            
+        })
+    }
+    function hideCourse(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/hide_course', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `/teacher/course_list/{{ user.id }}`
+        })
+    }
+
+    
+
+</script>
+{% endblock content %}

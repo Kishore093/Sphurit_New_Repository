@@ -1,0 +1,274 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load filter%}
+
+{% block extrastyle %}
+ <style>
+    .course-card {
+        height: 100%;
+        display: inherit;
+    }
+    .row{
+        flex-wrap: nowrap;
+    }
+    .container{
+        max-width: 1000px;
+        margin-left: 20px;
+        margin-right: 40px;
+    }
+    .p-1 {
+        padding: 0.25rem !important;
+        margin: -11px;
+    }
+    @media (min-width: 768px)
+        .col-md-4 {
+        flex: 0 0 auto;
+        width: 25.33333333%;
+    }
+    .px-5 {
+        padding-right: 17rem !important;
+        padding-left: 1rem !important;
+    }
+    .course-name {
+        max-width: 100%; /* Ensure it doesn't exceed container width */
+        overflow: hidden;
+        white-space: nowrap; /* Prevents wrapping */
+        text-overflow: ellipsis;
+    }
+    h6.text-secondary {
+        font-size: small;
+    }
+    .card-img-top {
+        border-radius: 20px;
+        height: 10vw;
+    }
+    button#rzp-button1 {
+        margin-left: 3.2rem;
+    }
+    .card-img-top {
+    border-radius: 0px !important;
+    height: 12vw !important;
+} .card {
+    box-shadow: 0 0 0px 1px #00000017 !important;
+}
+
+ </style>
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container-fluid curved-box  pt-2 m-0">
+    <p class="fs-4 text-white mb-2">My Wishlist</p>
+    <p class="fs-6 text-white ">You have 20 courses in which 10 are new and <br>5 are half and 5 are complete</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-2 card py-0 ">
+        {% include 'user-face/sidebar.html' %}
+    </div>
+    <div class="col-lg-10">
+        <div class="container-fluid px-5 mt-2 ">
+            <div class="row">
+                {% for item in courses|slice:":4" %}
+                <div class="col-lg-4 col-md-4 align-items-stretch p-1" >
+                    <div class="card">
+                    <div class="card-body">
+                        <img class="card-img-top" src="{{ item.thumb_image.url }}" alt="" >
+                        
+                        <div class="d-flex pt-3">
+                            <h6 class="my-auto course-name"><a href="{% url 'detail_course' item.id %}">{{ item.course_name }}</a></h6>
+                            &emsp;<span class="small badge bg-danger rounded-pill my-auto">Bestseller</span>
+                        </div>
+                        <div class="">
+                            <h6 class="text-secondary">{{ item.user.first_name }} {{ item.user.last_name }}</h6>
+                        </div>
+                        <div class="d-flex">
+                            <h5 class="text-warning fw-bold my-auto">₹ {{ item.discount_fee }}</h5>&emsp13;
+                            <h6 class="small text-muted text-decoration-line-through my-auto" >₹ {{ item.actual_fee }}</h6>&emsp;
+                        </div>
+                        <div class="ratings d-flex my-auto">
+                            <i class="fa fa-star {% if item.averagereview > 0 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if item.averagereview > 1 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if item.averagereview > 2 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if item.averagereview > 3 %} rating-color {% endif %}"></i>
+                            <i class="fa fa-star {% if item.averagereview > 4 %} rating-color {% endif %}"></i>
+                            &emsp13;<small>({{ item.averagereview }})</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 justify-content-between d-flex">
+                                
+                                <div>
+                                    <span class="d-flex">
+                                                {% if item.id|is_purchased:request.user %}
+                                                <a class="btn btn-warning btn-sm border my-auto text-white" href="{% url 'play_course' item.id %}">Start learning NOW!</a>
+                                                {% else %}
+                                                <button class="btn btn-default btn-sm border my-auto" onclick="removeFromWishlist('{{item.id}}')"><i class="bi bi-heart-fill"></i></button>
+                                                {% if item.id|is_cart:request.user %}
+                                                    <a id="cart-btn-mr-{{ item.id }}" class="btn btn-primary btn-sm border my-auto"><i class="bi bi-cart-check"></i></a>
+                                                {% else %}
+                                                    <a id="cart-btn-mr-{{ item.id }}" class="btn btn-secondary btn-sm border my-auto add-to-cart-btn" href="{% url 'add_to_cart' item.id %}"><i class="bi bi-cart-plus"></i></a>
+                                                {% endif %}
+    
+    
+                                                <script type="text/javascript">
+                                                    $(document).ready(function() {
+                                                    $('.add-to-cart-btn').on('click', function(e) {
+                                                    e.preventDefault(); 
+                                                    var itemId = $(this).attr('id').split('-')[3];             
+                                                $.ajax({
+                                                    url: $(this).attr('href'),
+                                                    type: 'GET',
+                                                    success: function(data) {
+                                                    $('#cart-btn-mr-' + itemId).removeClass('btn-secondary').addClass('btn-primary');
+                                                    $('#cart-btn-mr-' + itemId + ' i').removeClass('bi-cart-plus').addClass('bi-cart-check');
+                                                },
+                                                error: function(error) {
+                                                console.log(error); 
+                                                }
+                                            });
+                                        });
+                                    });
+                                
+                                    </script> 
+                                    
+                                     
+                                    
+                                 <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ item.discount_fee }}",id:"{{item.id}}"})' class="btn btn-primary btn-sm">Enroll Now</button>&emsp;
+                                    
+                                    {% endif %}
+
+                                </span> 
+
+                                </div>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+                </div>
+                {% empty %}
+                <div class="border py-5">
+                    <p class="h3 text-muted my-5 py-5 text-center">Not Added Yet!!!</p>
+                </div>
+               {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function removeFromWishlist(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('remove_from_wishlist', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `user_wish_list`
+        })
+    }
+    function AddToWishlist(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('add_to_wishlist', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                id: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `user_wish_list`
+        })
+    }
+
+    function enrollNow(args){
+        var oid = "";
+        fetch("{% url 'initEnrollPayment' %}", {
+            method: "POST",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            body: JSON.stringify({
+                "amount":args.p,
+                "currency":"INR"
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            var optionData = result['result']
+            var options = {
+                "key": result['RAZOR_KEY_ID'], // Enter the Key ID generated from the Dashboard
+                "amount": optionData['amount'], // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": optionData['currency'],
+                "name": "Course Enrollment",
+                "description": "Course Enrollment",
+                "image": "{% static 'img/icons/logo1.png'%}",
+                "order_id": optionData['id'], //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                "handler": function (response){
+                    if(response.razorpay_payment_id){
+                        console.log(response.razorpay_payment_id);
+                        oid = response.razorpay_order_id;
+                        fetch("{% url 'verifySignature' %}", {
+                            method: "POST",
+                            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                            body: JSON.stringify({
+                                "razorpay_paymentId":response.razorpay_payment_id,
+                                "razorpay_orderId":response.razorpay_order_id,
+                                "razorpay_signature":response.razorpay_signature
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            console.log(result);
+                            if(result['result']){
+                                fetch("{% url 'purchaseCourse' %}", {
+                                    method: "POST",
+                                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                    body: JSON.stringify({
+                                        "course_id":args.id,
+                                        "order_id":oid
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log(result);
+                                    window.location = "{{site_domain}}/user_purchased_list";
+                                })
+                            }else{}
+                        })
+                    }else{
+                        console.log(response);
+                    }
+                },
+                "prefill": {
+                    "name": "{{ request.user.full_name }}",
+                    "email": "{{ request.user.email }}",
+                    "contact": "{{ request.user.mobile }}"
+                },
+                "notes": {
+                    "address": "Sphurit"
+                },
+                "theme": {
+                    "color": "#3399cc"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+
+            rzp1.open();
+            rzp1.on('payment.failed', function (response){})
+        });
+
+    }
+</script>
+{% endblock content %}

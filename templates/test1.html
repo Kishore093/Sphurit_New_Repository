@@ -1,0 +1,483 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<style></style>
+{% endblock extrastyle %}
+{% block script %}
+<script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <div class="row mb-3">
+        <div class="col-lg-8 col-md-8 " >
+            <h4>Add Course</h4>
+        </div>
+        <div class="col-lg-4 col-md-4" style="text-align: end;">
+            <a href="{% url 'add_chapter' %}" class="btn btn-primary"><i class="bi bi-plus-square"></i> Add Chapter</a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 ">
+            <div class="bg-light p-3" >
+                <form class="row g-3" action="{% url 'add_course' %}" method="post" enctype="multipart/form-data" autocomplete="off" onsubmit="openLoader()">
+                    {% csrf_token %}
+                    
+                    <div class="col-md-12">
+                        <!-- <label for="id_category" class="form-label">Course Category</label>
+                        
+                        <select class="form-select" name="category_id" id="id_category" required>
+                            <option >Select Course Category</option>
+                            {% for cat in modules %}
+                            <option value="{{cat.id}}">{{cat.category_name}}</option>
+                            {% endfor %}
+                        </select> -->
+
+                        <label for="id_category" class="form-label">Course Category</label>
+                        <div class="input-group">
+                            <select class="form-select" name="category_id" id="id_category" required aria-describedby="add-category">
+                                <option >Select Course Category</option>
+                                {% for cat in modules %}
+                                <option value="{{cat.id}}">{{cat.category_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-secondary border-0" type="button" id="add-category" data-bs-toggle="modal" data-bs-target="#category_request_modal">
+                                <i class="bi bi-plus-square"></i>
+                            </button>
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="id_type" class="form-label">Course Type</label>
+                        <select class="form-select" name="course_type" id="id_type" required>
+                            <option >Select Course Type</option>
+                            <option value="Pre Recorded">Pre Recorded</option>
+                            <option value="Live">Live</option>
+                            <option value="Hybrid">Hybrid</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="validationDefault02" class="form-label">Course Name</label>
+                        <input type="text" class="form-control" name="course_name" id="validationDefault02" value="" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="validationDefault03" class="form-label">Description</label>
+                        <textarea type="text" class="form-control" name="description" value="" id="validationDefault03"></textarea>
+                    </div>
+
+                    <div id="lcfields" style="display: none;">
+                        <div class="row d-flex mt-3" >
+                            <div class="col-md-6">
+                                <label for="schedule_date" class="form-label">Schedule Date *</label>
+                                <input type="date" class="form-control" name="schedule_date" value="" placeholder="Schedule the Date for the live" id="schedule_date" >
+                            </div>
+                            <div class="col-md-6">
+                                <label for="schedule_time" class="form-label">Schedule Time *</label>
+                                <input type="time" class="form-control" name="schedule_time" value="" placeholder="Schedule the timing for the live" id="schedule_time">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="prcfields" style="display: none;">
+                        <div class="container col-md-12 mt-3">
+                            <label for="course_thumb_image" class="form-label">Thumbnail</label>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <input class="form-control" type="file" name="thumb_image" accept="image/*" id="course_thumb_image" onchange="previewThumb()">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" onclick="clearThumbImage()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <img id="thumb_frame" src="" class="img-fluid" height="100" width="100" />
+                                </div>
+                            </div>        
+                        </div>
+                        
+                        <div class="container col-md-12">
+                            <div class="row">
+                                <div class="col-md-8 my-auto">
+                                    <label for="course_promo_video" class="form-label">Promo Video</label>
+                                    <div class="d-flex">
+                                        <input class="form-control" type="file" name="course_video" accept="video/mp4,video/x-m4v,video/*" id="course_promo_video">
+                                        &emsp;<button type="button" onclick="clearVideo()" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <div id="inner-spinner" class="w-100 d-flex flex-column align-items-center justify-content-center" style="height: 0px;">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
+
+                                    <video id="promo_frame" width="220" height="100" style="display:none" controls controlsList="nodownload">
+                                        Your browser does not support the video tag.
+                                    </video>
+
+                                </div>
+                            </div>        
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <label for="languageId" class="form-label">Language</label>
+                            <select class="form-select" name="language" id="languageId" required>
+                                <option value="" disabled >Select Language</option>
+                                <option value="English">English</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="Marathi">Marathi</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Bengali">Bengali</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <div class="form-check form-switch">
+                                <label class="form-check-label" for="flexSwitchCheckDefault">Generate A Coupon</label>
+                                <input class="form-check-input" value="Yes" type="checkbox" onclick="ShowHideCoupon(this)" name="generated_coupon" role="switch" id="courseCoupon">
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            function ShowHideCoupon(btnPaid) {
+                                var couponDiv = document.getElementById("couponSection");
+                                if (btnPaid.value == "Yes") {
+                                    couponDiv.style.display = "block";
+                                    document.getElementById("couponeCodeValue").setAttribute('required', '');
+                                    document.getElementById("coupon_date").setAttribute('required', '');
+                                    document.getElementById("coupon_time").setAttribute('required', '');
+                                    btnPaid.value = "No";
+                                } else {
+                                    couponDiv.style.display = "none";
+                                    document.getElementById("couponeCodeValue").removeAttribute('required');
+                                    document.getElementById("coupon_date").removeAttribute('required');
+                                    document.getElementById("coupon_time").removeAttribute('required');
+                                    btnPaid.value = "Yes";
+                                }
+                            }
+                        </script>
+                        <div class="" style="display: none;" id="couponSection">
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label for="couponeCodeValue" class="form-label">Create A Coupon</label>
+                                    <input type="text" class="form-control" placeholder="Create a Coupon" value="" name="coupon_code" id="couponeCodeValue" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="couponePercentValue" class="form-label">Coupon Percent</label>
+                                    <div class="d-flex">
+                                        <input type="text" class="form-control number_input" onkeypress="if (this.value.length >= 3) return false;" placeholder="Coupon Percent" value="" name="coupon_percent" id="couponePercentValue" >
+                                        <span class="input-group-text" id="basic-addon2">%</span>
+                                    </div>
+                                    
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label for="coupon_date" class="form-label">Coupon valid date*</label>
+                                    <input type="date" class="form-control" onchange="TDate()" name="coupon_valid_date" value="" placeholder="Select Date" id="coupon_date" >
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="coupon_time" class="form-label">Coupon valid Time*</label>
+                                    <input type="time" class="form-control" name="coupon_valid_time" value="" placeholder="Select Time" id="coupon_time">
+                                </div>
+                                <div class="col-md-4"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="form-check form-switch">
+                            <label class="form-check-label" for="flexSwitchCheckDefault">Paid courses</label>
+                            <input class="form-check-input" value="Yes" type="checkbox" onclick="ShowHideFee(this)" name="paid_course" role="switch" id="paidCourse">
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        function ShowHideFee(btnPaid) {
+                            var feeDiv = document.getElementById("feeSection");
+                            if (btnPaid.value == "Yes") {
+                                feeDiv.style.display = "block";
+                                document.getElementById("price").setAttribute('required', '');
+                                document.getElementById("discount").setAttribute('required', '');
+                                document.getElementById("discount_percent").setAttribute('required', '');
+                                btnPaid.value = "No";
+                            } else {
+                                feeDiv.style.display = "none";
+                                document.getElementById("price").removeAttribute('required');
+                                document.getElementById("discount").removeAttribute('required');
+                                document.getElementById("discount_percent").removeAttribute('required');
+                                btnPaid.value = "Yes";
+                            }
+                        }
+                    </script>
+                    <div style="display: none;" id="feeSection">
+                        <div class="row" >
+                            <div class="col-md-4">
+                                <label for="validationDefault02" class="form-label">Actual Fee</label>
+                                <div class="d-flex">
+                                    <span class="input-group-text" id="">₹</span>
+                                    <input type="number" class="form-control" name="actual_fee" placeholder="Enter Actual Fee" id="price" value="" >
+                                </div>
+                                </div>
+                            <div class="col-md-4">
+                                <label for="validationDefault03" class="form-label">Discount Fee</label>
+                                <div class="d-flex">
+                                    <span class="input-group-text" id="">₹</span>
+                                    <input type="number" class="form-control" name="discount_fee" value="" placeholder="Enter Discount Fee" id="discount" oninput="getPercent()" >
+                                </div>
+                            </div>
+                            <div class="col-md-4 ">
+                                <label for="validationDefault03" class="form-label">Total Discount</label>
+                                <div class="d-flex">
+                                    <input type="text" class="form-control " name="total_discount" value="" placeholder="Enter Discount Percent" id="discount_percent" oninput="getDiscountedPrice()" >
+                                    <span class="input-group-text" id="basic-addon2">%</span>
+                                </div>
+                            </div>
+
+                            <script>
+                                function getPercent() {         
+                                    var numVal1 = Number(document.getElementById("price").value);
+                                    var numVal2 = Number(document.getElementById("discount").value);
+                                    // var totalValue = Math.round(100 - ((numVal2 / numVal1) * 100));
+                                    var totalValue = ((numVal1-numVal2)/numVal1)*100;
+                                    document.getElementById("discount_percent").value = totalValue;
+                                }
+                                function getDiscountedPrice(){
+                                    var numVal1 = Number(document.getElementById("price").value);
+                                    var numVal2 = Number(document.getElementById("discount_percent").value);
+                                    var totalValue = Math.round(numVal1-(numVal1*numVal2/100));
+                                    document.getElementById("discount").value = totalValue;
+                                }
+                            </script>
+                        </div>
+                    </div>
+                    <div class="col-md-12 text-right">
+                        <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.5s">
+            <div class="">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="custTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- new category Modal -->
+    <div class="modal fade" id="category_request_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="category_request_modalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="category_request_modalLabel">Request For Add New Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    
+                    <div class="mb-3">
+                        <label for="sgc-name" class="form-label">Suggested Category Name</label>
+                        <input type="text" class="form-control" id="sgc-name" name="query" required>
+                        <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="new_cat_sub_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+</main>
+
+<script>
+    var _URL = window.URL || window.webkitURL;
+    $(document).ready(function(){
+        $(".number_input").keypress(function(event) {
+            var key = event.keyCode;
+            // Only allow numbers to be entered
+            if (key < 48 || key > 57) {
+                event.preventDefault();
+            }
+        });
+        $(".number_input").change(function () {
+            var inputvalues = $(this).val();
+            // var regex = /[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            if(inputvalues > 100){
+                // $(".pan").val("");
+                alert("Coupon Percent value must be less than or equalto 100!");
+                return false;
+            }
+        });
+    });
+
+    function TDate() {
+        var UserDate = document.getElementById("coupon_date").value;
+        var ToDate = new Date();
+
+        if (new Date(UserDate).getTime() <= ToDate.getTime()) {
+            alert("The Date must be Bigger or Equal to today date");
+            return false;
+        }
+        return true;
+    }
+    
+    function previewThumb() {
+        var image = new Image();
+        image.src = URL.createObjectURL(event.target.files[0]);
+
+        image.onload = function() {
+            if (this.width >= 600 && this.height >= 400) {
+                thumb_frame.src = image.src;
+            } else {
+                alert("The image resolution is greater than 600*400.");
+                document.getElementById('course_thumb_image').value = null;
+                thumb_frame.src = "";
+            }
+        };
+    }
+    function clearThumbImage() {
+        document.getElementById('course_thumb_image').value = null;
+        thumb_frame.src = "";
+    }
+
+    
+    document.getElementById("course_promo_video").addEventListener("change",function(event) {
+        var sp = document.getElementById("inner-spinner");
+        sp.style.height = '40px';
+        sp.classList.add('show');
+        let file = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function() {
+            var aud = new Audio(reader.result);
+            aud.onloadedmetadata = function(){
+                sp.classList.remove('show');
+                sp.style.height = '0px';
+                if(aud.duration <= 35.0){
+                    let blobURL = URL.createObjectURL(file);
+                    document.querySelector("video").style.display = 'block';
+                    document.querySelector("video").src = blobURL;
+                }else{
+                    alert("Video length must be 35 seconds only");
+                    document.getElementById('course_promo_video').value = null;
+                    promo_frame.src = "";
+                    promo_frame.style.display='none';
+                }
+                console.log(aud.duration);
+            };    
+        };
+        reader.readAsDataURL(file);	
+        
+    });
+    
+
+    
+    function clearVideo() {
+        document.getElementById('course_promo_video').value = null;
+        promo_frame.src = "";
+        promo_frame.style.display='none';
+    }
+    
+    document.getElementById("id_type").addEventListener("change", function(){
+        var selectedType = $(this).val();
+        console.log(selectedType);
+        if(selectedType === "Pre Recorded"){
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'none';
+        } else if(selectedType === "Live"){
+            document.getElementById("prcfields").style.display = 'none';
+            document.getElementById("lcfields").style.display = 'block';
+        } else{
+            document.getElementById("prcfields").style.display = 'block';
+            document.getElementById("lcfields").style.display = 'block';
+        }
+    });
+
+    document.getElementById("id_category").addEventListener("change", function(){
+        $.ajax({
+            type: 'GET',
+            url: '{% url "get_course" %}',
+            data : {
+                'category_id':$('#id_category').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            dataType:'json',
+            success:function(data){
+                var c= JSON.parse(data['courses']);
+                var html = "";
+                for(var i = 0; i < c.length; i++){
+                html += "<tr>";
+                html += `<td class="small">${[i+1]}</td>`;
+                html += `<td class="small">${c[i]['course_name']}</td>`;
+                html += `<td class="small">${c[i]['type']}</td>`;
+                html += `<td class="small"><a href="delete_course/${c[i]['id']}" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a></td>`;
+                html += "</tr>";
+                }
+                $("#custTable").html(html);
+                
+            }
+        });
+    });
+
+    document.getElementById("new_cat_sub_btn").addEventListener("click", function(e){
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            animation:false,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        const csrf = Cookies.get('csrftoken');
+        var q = document.getElementById('sgc-name').value;
+        console.log(q);
+        if(q){
+            fetch("{% url 'new_category_request' %}", {
+                method: "POST",
+                headers: {'X-CSRFToken': csrf},
+                body: JSON.stringify({
+                    id: '{{request.user.id}}',
+                    'query':q,
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                $('#category_request_modal').hide();
+                $('.modal-backdrop').hide();
+                Toast.fire({
+                    icon: "success",
+                    title: result['message']
+                });
+            })
+        }
+    });
+    
+    function openLoader() {
+        document.getElementById("spinner").classList.add('show');
+    }
+</script>
+{% endblock content %}

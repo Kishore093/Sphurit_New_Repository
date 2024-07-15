@@ -1,0 +1,42 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load get_property %}
+{% load generate_color %}
+{% load count %}
+{% block extrastyle %}
+
+<link rel="stylesheet" href="{% static 'css/form_style.css' %}">
+{% endblock extrastyle %}
+{% block content %}
+<main id="main" class="main">
+    <div class="row ">
+        <div class="col-lg-12 col-md-12 d-flex justify-content-between">
+            <h5 class="card-title">{{form.title}} -> Responses</h5>
+            <a href="{% url 'export_csv' form.code  %}"><button class="btn btn-success" title="Download Responses in csv file" id="delete-responses">download</button></a>
+        </div>
+    </div>
+    {% if responses.count > 0 %}
+        {% for i in responses %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <a href = "{% url 'single_response' form.code i.response_code %}" class="">
+                            <span class="card-title p-0 mb-0">{{i.responder.full_name}}'s response</span>
+                        </a>
+                    </div>
+                </div>
+            </div> 
+        </div>
+        {% endfor %}
+        <!-- <div class="row my-3">
+            <div class="col-lg-12">
+                <button class="btn btn-danger" id="delete-responses">Delete all responses</button>
+                
+            </div>
+        </div> -->
+    {% else %}
+        <h1 class="response-title">0 responses</h1>
+    {% endif %}
+</main>
+{% endblock %}

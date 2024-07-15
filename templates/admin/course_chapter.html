@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+{% block content %}
+
+<div class="container bg-light mt-4 shadow">
+    <h1 class="mt-5">Course Name : {{ course.course_name }}</h1>
+    <ul class="list-group mt-5">
+        {% for chapter in chapters %}
+        <li class="list-group-item mb-3">
+            <a href="{% url 'ChapterTopicList' chapter.id %}"><strong>{{ chapter.chapter_name }}</strong></a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}

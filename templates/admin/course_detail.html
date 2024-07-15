@@ -1,0 +1,190 @@
+<!-- course_detail.html -->
+
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+{% block content %}
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Detail</title>
+</head>
+<body>
+    <h1>{{ course.course_name }}</h1>
+    <p>{{ course.description }}</p>
+
+    
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>User</td>
+            <td>{{ course.user }}</td>
+        </tr>
+        <tr>
+            <td>Category</td>
+            <td>{{ course.category }}</td>
+        </tr>
+        <tr>
+            <td>Type</td>
+            <td>{{ course.type }}</td>
+        </tr>
+        
+    </table>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Detail</title>
+</head>
+<body>
+    <!-- <h1>{{ course.course_name }}</h1> -->
+    {% if course.course_name %}
+        <h2>Course Name: {{ course.course_name }}</h2>
+        <p>{{ course.description }}</p>
+
+    {% elif course.host_name %}
+        <h2>Host Name: {{ course.host_name }}</h2>
+        <p>{{ course.about_host }}</p>
+    {% endif %}
+    
+
+    <!-- Render fields based on course type -->
+    {% if course.type == "Live" %}
+        <h2>Live Course Fields</h2>
+        <table>
+            <!-- Render fields specific to live courses -->
+            <tr>
+                <th>User</th>
+                <td>{{ course.user }}</td>
+            </tr>
+            <tr>
+                <th>Category</th>
+                <td>{{ course.category }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ course.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ course.description }}</td>
+            </tr>
+            <tr>
+                <th>Thumb Image</th>
+                <td>{{ course.thumb_image }}</td>
+            </tr>
+            <tr>
+                <th>Url</th>
+                <td>{{ course.url }}</td>
+            </tr>
+            <tr>
+                <th>Schedule Date</th>
+                <td>{{ course.schedule_date }}</td>
+            </tr>
+            <tr>
+                <th>Schedule Time</th>
+                <td>{{ course.schedule_time }}</td>
+            </tr>
+            <tr>
+                <th>Join Fees</th>
+                <td>{{ course.fees }}</td>
+            </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ course.created_at }}</td>
+            </tr>
+            <!-- Add more fields as needed -->
+        </table>
+    {% elif course.type == "Pre Recorded" %}
+        <h2>Pre Recorded Course Fields</h2>
+        <table>
+            <!-- Render fields specific to pre-recorded courses -->
+            <tr>
+                <th>user</th>
+                <td>{{ course.user }}</td>
+            </tr>
+            <tr>
+                <th>category</th>
+                <td>{{ course.category }}</td>
+            </tr>
+            <tr>
+                <th>Schedule Date</th>
+                <td>{{ course.schedule_date }}</td>
+            </tr>
+            <tr>
+                <th>Schedule Time</th>
+                <td>{{ course.schedule_time }}</td>
+            </tr>
+            <tr>
+                <th>Thumb Image</th>
+                <td>{{ course.thumb_image }}</td>
+            </tr>
+            
+            <tr>
+                <th>Course Video</th>
+                <td>{{ course.course_video }}</td>
+            </tr>
+            <tr>
+                <th>Setup File</th>
+                <td>{{ course.setup_file }}</td>
+            </tr>
+            <tr>
+                <th>Course Content</th>
+                <td>{{ course.course_content }}</td>
+            </tr>
+            <tr>
+                <th>Language</th>
+                <td>{{ course.language }}</td>
+            </tr>
+            <tr>
+                <th>Coupon Code</th>
+                <td>{{ course.coupon_code }}</td>
+            </tr>
+            <tr>
+                <th>Coupon Percent</th>
+                <td>{{ course.coupon_percent }}</td>
+            </tr>
+            <tr>
+                <th>Coupon Valid Date</th>
+                <td>{{ course.coupon_valid_date }}</td>
+            </tr>
+            <tr>
+                <th>Coupon Valid Time</th>
+                <td>{{ course.coupon_valid_time }}</td>
+            </tr>
+            <tr>
+                <th>Actual Fees</th>
+                <td>{{ course.actual_fee }}</td>
+            </tr>
+            <tr>
+                <th>Discount Fees</th>
+                <td>{{ course.discount_fee }}</td>
+            </tr>
+            <tr>
+                <th>Total Discount</th>
+                <td>{{ course.total_discount }}</td>
+            </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ course.created_at }}</td>
+            </tr>
+            <!-- Add more fields as needed -->
+        </table>
+    {% endif %}
+</body>
+</html>
+
+{% endblock content %} 
+

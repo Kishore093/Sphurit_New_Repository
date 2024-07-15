@@ -1,0 +1,330 @@
+{% extends 'user-face/base.html' %}
+{% load static %}
+{% load count %}
+{% load filter %}
+{% load humanize %}
+{% block extrastyle %}
+<style>
+  .bg-image:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  .card-img-top {
+        border-radius: 20px;    
+}
+
+.card-title a{
+    font-weight: bold;
+        color: #000;
+      
+}
+
+#box {
+    display: flex;
+    margin-top: 20px;
+    margin-left: 32px;
+    }
+
+    /* #div1, #div2, #div3, #div4 {
+        height: 50px;
+        width: 50px;
+        margin: 0;
+        background-color: white;
+        margin-left: 55px;
+        margin-right: 1px;
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;      
+    }  */
+    .row {
+        width: 10;
+    } h3.text-white.my-auto {
+        margin-left: 55px;
+    }
+    small.text-white {
+        margin-left: 55px;
+    }
+    h5.text-warning {
+        margin-left: 55px;
+    }
+    button.btn.btn-primary.btn-sm.border.my-auto.join-button {
+        background-color: chocolate;
+    }
+    .countdown-value {
+    height: 60px;
+    width: 80px;
+    margin-right: 10px;
+    background-color: transparent;
+    border-radius: 8px;
+    font: normal 1.50em "Lato";
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+</style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 p-0 " >
+            <div class="" style="height: 350px;
+                background-image: url({{course.img_url}});background-repeat: no-repeat;
+                background-size: cover;">
+                <div class="position-relative" style="height: 350px;background-color: #132c49e6!important;">
+                    <div class="container p-4  mx-4" style="top: 20%; bottom: 25%; right: 0; left: 0;opacity: 0.9;">
+                    
+                            
+                        <div class="row">
+                            <div class="col-md-8 col-lg-6">
+                                <div class="card-body">
+                                    
+                                    <h3 class="text-white my-auto">{{ course.title }}</h3>
+                                    <p class="card-text-white fw-bold mt-2"><small class="text-white">By {{ course.host_name }}</small></p>
+                                    <!-- <p class="card-text-white fw-bold"><small class="text-white">Description: {{ course.description }}</small></p> -->
+                                    <p class="card-text p-0"><small class="text-white">{{ course.schedule_date|date:"d-m-Y"  }} {{ course.schedule_time|time:"h:i A" }}</small></p>
+                                    {% comment %} <div class="d-flex justify-content-between m-0"> 
+                                        <h5 class="text-warning">₹ {{ course.fees }}</h5>
+                                    </div>  {% endcomment %}
+                                    <div class="d-flex"> 
+                                        <h5 class="text-warning">₹ {{ course.fees }}</h5>
+                                        <h6 class="text-warning">&emsp;(+ ₹ {{ gst_amount|floatformat:2 }} GST)</h6>
+                                        {% if course.id|is_purchased:request.user %}
+                                            <button type="button" class="btn btn-primary btn-sm border my-auto join-button mx-5" data-schedule="{{ course.schedule_date }}T{{ course.schedule_time }}" data-course-title="{{ course.title }}" data-time-left="{{ course.time_left }}">Join</button>
+                                        {% else %}
+                                            <button type="button" id="rzp-button1" onclick='enrollNow({p:"{{ course.fees }}", id:"{{course.id}}"})' class="btn btn-primary btn-sm mx-1 my-auto mx-5">Enroll Now</button>
+                                        {% endif %}
+
+                                    </div>
+                                        <div id="box">
+                                            <div id="div1" class="countdown-value"></div>
+                                            <div id="div2" class="countdown-value"></div>
+                                            <div id="div3" class="countdown-value"></div>
+                                            <div id="div4" class="countdown-value"></div>
+                                        </div>
+                                        
+                                    
+                                </div>
+                            </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    function updateCountdown() {
+                                        var scheduleDateTime = `{{ course.schedule_date|date:"Y-m-d" }} {{ course.schedule_time|time:"H:i:s" }}`;
+                                        var scheduleDateTimeObj = new Date(scheduleDateTime);
+                                        var currentTime = new Date();
+                                        console.log(scheduleDateTime)
+                                        console.log(scheduleDateTimeObj)
+                                        console.log(scheduleDateTime)
+                                        if (scheduleDateTimeObj > currentTime) {
+                                           
+                                            var timeLeftSeconds = Math.round((scheduleDateTimeObj - currentTime) / 1000);
+                                            var days = Math.floor(timeLeftSeconds / (24 * 60 * 60));
+                                            var hours = Math.floor((timeLeftSeconds % (24 * 60 * 60)) / (60 * 60));
+                                            var minutes = Math.floor((timeLeftSeconds % (60 * 60)) / 60);
+                                            var seconds = Math.floor(timeLeftSeconds % 60);
+
+                                            
+                                            document.getElementById('div1').innerHTML = days + " d";
+                                            document.getElementById('div2').innerHTML = hours + " h";
+                                            document.getElementById('div3').innerHTML = minutes + " m";
+                                            document.getElementById('div4').innerHTML = seconds + " s";
+                                        } else {
+                                            console.error("The schedule date and time is in the past.");
+                                            clearInterval(interval); 
+                                        }
+                                    }                                  
+                                    updateCountdown();                                   
+                                    var interval = setInterval(updateCountdown, 1000);
+                                });
+                           
+                            </script>
+                       
+                            <div class="col-md-2">
+                                <div class="card-body " style="width: 800px; height: 900px;">
+                                    <div class="row">
+                                        
+                                        <div class="col-lg-4 col-md-4">
+                                            <!-- <h5 class="card-title text-white mx-5">Our Instructor</h5>
+                                           
+                                            <h6 class="text-white mx-5">{{ course.host_name }}</h6>
+                                            &emsp14;
+                                            <p class="card-sub-title text-white mx-5">{{ course.about_host }}</p>
+                                            <br> -->
+                                            
+                                        </div>
+                
+                                        {% if course.user.profile_image %}
+                                        <div class="col-lg-4 col-md-4  rounded p-4" style="background-image: url('{{ course.img_url }}');background-repeat: no-repeat; background-size: cover;background-position: center; height: 292px; width: 400px;">
+                                        {% else %}
+                                        <div class="col-lg-4 col-md-4 my-3 rounded" style="background-image: url('{% static 'img/user.png' %}');background-repeat: no-repeat;background-size: cover;background-position: center;"></div>
+                                        {% endif %}
+                                            
+                                        </div>
+                                    </div>
+                                
+                                   
+                                </div> 
+                            </div>
+                          </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<div class="container-fluid">
+    <div class="container pt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-8 w-100">
+                        <h5 class="card-title mb-0">Description</h5>
+                        {% with text=course.description %}
+                            {% if text|wordcount > 60 %}
+                            <p class="half-content" id="half-{{ course.id }}" style="display: block;">{{text|truncatewords:60}}
+                                <br><a data-id="{{ course.id }}" href="javascript:void(0)" class="show-hide-btn">Show more</a>
+                            </p>
+                            <p class="full-content" id="full-{{ course.id }}" style="display: none;">{{ text }}
+                                <br><a data-id="{{ course.id }}" href="javascript:void(0)" class="show-hide-btn">Show less</a>
+                            </p>
+                            {% else %}
+                            <p class="">{{ text }}</p>
+                            {% endif %}
+                        {% endwith %}
+             
+                
+            </div>
+        </div>
+       
+    </div>
+    <div class="container-fluid" >
+        <div class="container pt-4">             
+        <h5 class="card-title mb-0">About Host</h5>
+        <p>Lorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectus.Lorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectusLorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectusLorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectusLorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectusLorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectusLorem ipsum  dolor sit amet consectetur adipisicing elit. Veniam, officiis vel molestiae esse natus beatae. Alias suscipit quaerat, tenetur accusantium libero nostrum reiciendis, fugit quam reprehenderit nobis eveniet laborum delectus</p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function enrollNow(args){
+        var oid = "";
+        if("{{request.user.is_authenticated}}" == "True"){
+            fetch("{% url 'initEnrollPayment' %}", {
+                method: "POST",
+                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                body: JSON.stringify({
+                    "amount":args.p,
+                    "currency":"INR"
+                })
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                var optionData = result['result']
+                var options = {
+                    "key": result['RAZOR_KEY_ID'], 
+                    "amount": optionData['amount'], 
+                    "currency": optionData['currency'],
+                    "name": "Course Enrollment",
+                    "description": "Course Enrollment",
+                    "image": "{% static 'img/icons/logo1.png'%}",
+                    "order_id": optionData['id'], 
+                    "handler": function (response){
+                        if(response.razorpay_payment_id){
+                            console.log(response.razorpay_payment_id);
+                            oid = response.razorpay_order_id;
+                            fetch("{% url 'verifySignature' %}", {
+                                method: "POST",
+                                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                body: JSON.stringify({
+                                    "razorpay_paymentId":response.razorpay_payment_id,
+                                    "razorpay_orderId":response.razorpay_order_id,
+                                    "razorpay_signature":response.razorpay_signature
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                if(result['result']){
+                                    fetch("{% url 'purchaseCourse' %}", {
+                                        method: "POST",
+                                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                        body: JSON.stringify({
+                                            "course_id":args.id,
+                                            "order_id":oid
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log(result);
+                                        const swalWithBootstrapButtons = Swal.mixin({
+                                            customClass: {
+                                                confirmButton: "btn btn-success",
+                                                cancelButton: "btn btn-danger"
+                                            },
+                                            buttonsStyling: false
+                                        });
+                                        swalWithBootstrapButtons.fire({
+                                        title: "Payment Successful.",
+                                        text: "Thanks for purchesed the course!",
+                                        icon: "success",
+                                        showCancelButton: false,
+                                        confirmButtonText: "Ok",
+                                        reverseButtons: true
+                                        }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            window.location = "{% url 'user_dashboard' %}";
+                                        }
+                                        });
+                                    })
+                                }
+                            })
+                        }else{
+                            console.log(response);
+                        }
+                    },
+                    "prefill": {
+                        "name": "{{ request.user.full_name }}",
+                        "email": "{{ request.user.email }}",
+                        "contact": "{{ request.user.mobile }}"
+                    },
+                    "notes": {
+                        "address": "Sphurit"
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+    
+                rzp1.open();
+                rzp1.on('payment.failed', function (response){});
+            });
+        }
+        else{
+            
+            window.location = "{% url 'user_login' %}";
+        }
+
+    }
+</sc>
+{% endblock content %}

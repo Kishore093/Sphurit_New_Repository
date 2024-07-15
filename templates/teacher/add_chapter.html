@@ -1,0 +1,139 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% block extrastyle %}
+<style></style>
+{% endblock extrastyle %}
+{% block script %}
+<script src="{% static 'lib/cookie.min.js' %}" defer></script>
+{% endblock %}
+{% block content %}
+<main id="main" class="main">
+    <!-- Spinner Start -->
+    <div id="spinner" class="bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <div class="row mb-2">
+        <div class="col-lg-8 col-md-8 wow fadeInUp" data-wow-delay="0.1s">
+            <h4>Add Chapter</h4>
+        </div>
+        <!-- <div class="col-lg-4 col-md-4 wow fadeInUp text-right" data-wow-delay="0.1s">
+            <a href="" class="btn btn-primary btn-sm"><i class="bi bi-plus-square"></i> Add Topics</a>
+        </div> -->
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.3s">
+            <div class="bg-light p-3">
+                <form class="row g-3" action="{% url 'add_chapter' course.id %}" method="post" autocomplete="off" onsubmit="openLoader()">
+                    {% csrf_token %}
+                    <div class="col-md-12">
+                        <label for="validationDefault04" class="form-label">Select course</label>
+                        <select class="form-select" name="course_id" id="id_course" required>
+                          <option value="{{course.id}}" selected>{{course.course_name}}</option>
+                        </select>
+                      </div>
+                    <div class="col-md-12">
+                      <label for="validationDefault02" class="form-label">Chapter Name</label>
+                      <input type="text" class="form-control" name="chapter_name" id="validationDefault02" value="" required>
+                    </div>
+                    <div class="col-md-12">
+                      <label for="validationDefault03" class="form-label">Description</label>
+                      <textarea type="text" class="form-control" name="description" value="" id="validationDefault03"></textarea>
+                    </div>
+                    <div class="col-md-12 text-right">
+                      <button class="btn btn-primary" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12 col-md-12 wow fadeInUp" data-wow-delay="0.3s">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Chapters</th>
+                      <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="custTable">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+</main>
+
+<script>
+    
+
+    $(document).ready( function(){
+        $.ajax({
+            type: 'GET',
+            url: '{% url "get_chapter" %}',
+            data : {
+                'course_id':$('#id_course').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+            },
+            dataType:'json',
+            success:function(data){
+                var c= JSON.parse(data['chapters']);
+                var html = "";
+                for(var i = 0; i < c.length; i++){
+                html += `<tr id="cid-${c[i]['id']}">`;
+                html += `<td>${[i+1]}</td>`;
+                html += `<td>${c[i]['chapter_name']}</td>`;
+                html += `<td class="small">
+                    <button onclick="deleteChapter('${c[i]['id']}')" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button>
+                    &emsp;<a href="{{site_domain}}/teacher/add_topic/${c[i]['id']}" class="btn btn-primary btn-sm"><i class="bi bi-plus-square"></i> Add Topics</a>
+                    </td>`;
+                html += "</tr>";
+                }
+                $("#custTable").html(html);
+            }
+        });
+    });
+    const AlertToast = Swal.mixin({
+        toast: true,
+        position: "bottom-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        animation:false,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+    function deleteChapter(id){
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/delete_chapter', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf},
+            body: JSON.stringify({
+                cid: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            document.getElementById(`cid-${id}`).remove();
+            AlertToast.fire({
+                icon: "success",
+                title: "Chapter Deleted",
+            });
+        });
+    }
+
+    function openLoader() {
+        document.getElementById("spinner").classList.add('show');
+    }
+</script>
+{% endblock content %}

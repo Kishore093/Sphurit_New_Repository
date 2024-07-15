@@ -1,0 +1,51 @@
+{% extends 'teacher/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block extrastyle %}
+
+{% endblock extrastyle %}
+
+{% block content %}
+<main id="main" class="main">
+    <div class="row justify-content-between">
+        <div class="col-lg-8 col-md-8 ">
+            <h4>{{ course.course_name }} <span class="text-muted">| Feedbacks</span></h4>
+        </div>
+    </div>
+
+    <div class="col-12">
+        {% for obj in feedbacks %}
+        <div class="card p-3 mb-2">
+            <div class="d-flex">
+                <img src="{{obj.user.image_url}}" class="rounded-circle" alt="" width="50" height="50">
+                &emsp;
+                <div class="row my-1">
+                    <div class="col-md-12">
+                        <div class="d-block ">
+                            <a href="{% url 'get_user_details' obj.user.id %}"><span class="fw-bold">{{ obj.user.first_name }} {{ obj.user.last_name }}</span></a>
+                            <div class="d-flex mt-1">
+                                <div class="ratings">
+                                    <i class="fa fa-star {% if obj.rating > 0 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.rating > 1 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.rating > 2 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.rating > 3 %} rating-color {% endif %}"></i>
+                                    <i class="fa fa-star {% if obj.rating > 4 %} rating-color {% endif %}"></i>
+                                </div>&emsp;
+                                <span class="text-muted small">{{ obj.created_at|naturaltime }}</span>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <span class="small">{{ obj.description }}</span>
+            </div>
+        </div>
+
+        {% endfor %}
+
+    </div>
+</main>
+{% endblock content %}
