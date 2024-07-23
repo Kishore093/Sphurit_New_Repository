@@ -37,7 +37,7 @@
                         
                         {% for question in form.questions.all %}
                         <div class="question mb-3" data-id="{{question.id}}">
-                            <!-- <span class="card-title">Q.{{forloop.counter}}&emsp13; {{question.question}} <span>|{{question.question_type}}</span> </span> -->
+                            
                             <div class="d-flex justify-content-between">
                                 <span class="card-title p-0 my-auto">Q.{{forloop.counter}}&emsp13; {{question.question}}</span>
                                 <div class="checkbox-container my-auto">  
@@ -76,89 +76,13 @@
                             {% endif %}
                         </div>
                         {% endfor %}
-                        <!-- <hr class="m-0">
-                        <div class="d-flex justify-content-between" id="">
-                            <div class="pt-2">
-                                <p class="fw-bold">View All Response and Edit Assigment</p>
-                            </div>
-                            <div class="d-flex">
-                                <a href="{% url 'quiz_responses' form.code %}" class="btn btn-outline-secondary btn-sm my-auto mx-2" title="View Response"><i class="bi bi-people"></i></a>
-                                <a href="{% url 'edit_form' form.code %}" class="btn btn-outline-secondary btn-sm my-auto" title="Edit Assigment"><i class="bi bi-pencil"></i></a>
-                            </div>
-                        </div> -->
+                        
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- <div class="container-fluid">
-        <form class="container" method="POST" action="{% url 'submit_form' form.code %}" autocomplete="off" enctype="multipart/form-data">
-            <span id="bg-color" style="display: none;">{{form.background_color}}</span>
-            <span id="text-color" style="display: none;">{{form.text_color}}</span>
-            {% csrf_token %}
-            <div class="margin-top-bottom box question-box">
-                <div class="form-title-box">
-                    <h1 class="form-title txtClr">{{form.title}}</h1>
-                    <p class="required-info">* Required</p>
-                </div>
-                <div class="form-description txtClr">{{form.description|linebreaksbr}}</div>
-            </div>
-            {% if form.collect_email %}
-            <div class="margin-top-bottom box question-box">
-                <h1 class="question-title txtClr">Email address: <span class="require-star">*</span></h1>
-                <input type="email" name="email-address" class="short-answer" placeholder="Your email address" required>
-            </div>
-            {% endif %}
-            {% for question in form.questions.all %}
-            <div class="margin-top-bottom box question-box">
-                <h1 class="question-title txtClr">{{question.question}} {% if question.required %}<span class="require-star">*</span>{% endif %}</h1>
-                {% if question.question_type == "short" %}
-                    <input type="text" name="{{question.id}}" maxlength="100" class="short-answer" placeholder = "Your answer" {% if question.required %} required {% endif %}>
-                    <br><small style="color: red;">Max. 100 charactors only</small>
-                {% elif question.question_type == "paragraph" %}
-                    <textarea name="{{question.id}}" maxlength="5000" placeholder="Your answer" class="long-answer textarea-adjust" {% if question.required %} required {% endif %}></textarea>
-                    <small style="color: red;">Max. 5000 charactors only</small>
-                {% elif question.question_type == "multiple choice" %}
-                    {% for choice in question.choices.all %}
-                    <div class="multiple-choice">
-                        <input type="radio" name="{{question.id}}" id="{{choice.id}}" {% if question.required %} required {% endif %} value="{{choice.id}}">
-                        <label for="{{choice.id}}" class="txtClr">{{choice.choice}}</label>
-                    </div>
-                    {% endfor %}
-                {% elif question.question_type == "checkbox" %}
-                    {% for choice in question.choices.all %}
-                        <div class="multiple-choice">
-                            <input type="checkbox" name="{{question.id}}" id="{{choice.id}}" {% if question.required %} required {% endif %} value="{{choice.id}}">
-                            <label for="{{choice.id}}" class="txtClr">{{choice.choice}}</label>
-                        </div>
-                    {% endfor %}
-                {% elif question.question_type == "dropdown" %}
-                    <select class="question-type-select input-question-type" name="{{question.id}}" {% if question.required %} required {% endif %} data-id="{{question.id}}" data-origin_type = "{{question.question_type}}">
-                        <option disabled selected>Choose</option>
-                        {% for choice in question.choices.all %}
-                        <option value="{{choice.id}}" >{{choice.choice}}</option>
-                        {% endfor %}
-                    </select>
-                {% elif question.question_type == "date" %}
-                    <input type="date" name="{{question.id}}" class="short-answer" placeholder = "Your answer" {% if question.required %} required {% endif %}>
-                {% elif question.question_type == "time" %}
-                    <input type="time" name="{{question.id}}" class="short-answer" placeholder = "Your answer" {% if question.required %} required {% endif %}>
-                {% elif question.question_type == "fileupload" %}
-                    <input type ="file" name="{{question.id}}" class="short-answer" {% if question.required %} required {% endif %} multiple placeholder="file" />
-                {% endif %}
-                
-            </div>
-            {% endfor %}
-            <div class="margin-top-bottom">
-                <input type="submit" value="Submit" class="btn btn-submit">
-            </div>
-        </form>
-        {% if user == form.creator %}
-            <a href="{% url 'edit_form' form.code %}">
-                <img src="{% static 'Icon/question.png' %}" alt="Edit Question" title="Edit this form" class="edit-form-link">
-            </a>
-        {% endif %}
-    </div> -->
+    
 </main>
 {% endblock %}

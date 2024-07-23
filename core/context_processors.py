@@ -1,6 +1,6 @@
 
 from django.db.models import Count
-from teacher.models import *
+from core.models import *
 
 def topCategories(request):
     course = PurchasedCourse.objects.values("course")

@@ -1,5 +1,5 @@
 from calendar import HTMLCalendar
-from .models import*
+from core.models import*
 from django.forms import ModelForm, DateInput
 
 

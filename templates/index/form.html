@@ -50,7 +50,7 @@
             
 
             {% if question.question_type == "multiple choice" %}
-            <div class="choices" data-id="{{question.id}}">
+            {% comment %} <div class="choices" data-id="{{question.id}}">
                 {% for choice in question.choices.all %}
                     <div class="choice">
                         <input type="radio" id="{{choice.id}}" disabled>
@@ -65,7 +65,26 @@
                     <label for = "add-choice" class="add-option" data-question="{{question.id}}" data-type = "{{question.question_type}}">Add option</label>
                 </div>
                 
+            </div> {% endcomment %}
+            <div class="choices" data-id="{{ question.id }}">
+                {% for choice in question.choices.all %}
+                    <div class="choice">
+                        <input type="radio" id="{{ choice.id }}" disabled>
+                        <label for="{{ choice.id }}">
+                            <input type="text" value="{{ choice.choice }}" class="edit-choice" data-id="{{ choice.id }}">
+                        </label>
+                        <span class="remove-option" title="Remove" data-id="{{ choice.id }}">&times;</span>
+                    </div>
+                {% endfor %}
+                
+                {% if question.choices.count < 4 %}
+                    <div class="choice">
+                        <input type="radio" id="add-choice" disabled />
+                        <label for="add-choice" class="add-option" data-question="{{ question.id }}" data-type="{{ question.question_type }}">Add option</label>
+                    </div>
+                {% endif %}
             </div>
+            
             {% elif question.question_type == "checkbox" %}
             <div class="choices" data-id="{{question.id}}">
                 {% for choice in question.choices.all %}
@@ -119,14 +138,6 @@
                 <input type ="time" class="time" disabled placeholder="Time" />
             </div>
             {% endif %}
-            <div class="choice-option">
-                <input type="checkbox" class="required-checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked{% endif %}>
-                <label for="required-{{question.id}}" class="required">Required</label>
-                <div class="float-right">
-                    <img src="{% static 'Icon/dustbin.png' %}" alt="Delete question icon" class="question-option-icon delete-question" title="Delete question"
-                    data-id="{{question.id}}">
-                </div>
-            </div>
             <div class="d-flex justify-content-between">
                 <div class="answer-key" id="answer-key{{question.id}}">
                    <span>Answer Key -</span>&emsp;
@@ -144,6 +155,14 @@
                </div>
                
            </div>
+           <div class="choice-option">
+                <input type="checkbox" class="required-checkbox" id="required-{{question.id}}" data-id="{{question.id}}" {% if question.required %}checked{% endif %}>
+                <label for="required-{{question.id}}" class="required">Required</label>
+                <div class="float-right">
+                    <img src="{% static 'Icon/dustbin.png' %}" alt="Delete question icon" class="question-option-icon delete-question" title="Delete question"
+                    data-id="{{question.id}}">
+                </div>
+            </div>
             
         </div>
         {% endfor %}
@@ -162,4 +181,58 @@
         </div>
     </div>
 </main>
+
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+       
+       function updateAddQuestionButton(questionIndex) {
+           
+           const answerKeyRadioButtons = document.querySelectorAll(`[data-id="${questionIndex}"][answer-key]`);
+   
+           
+           const addQuestionButton = document.getElementById('add-question');
+   
+           let anyRadioButtonChecked = false;
+           answerKeyRadioButtons.forEach(function(radioButton) {
+               if (radioButton.checked) {
+                   anyRadioButtonChecked = true;
+               }
+           });
+           addQuestionButton.disabled = !anyRadioButtonChecked;
+       }
+   
+      
+       document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
+           radioButton.addEventListener('change', function() {
+               
+               const questionIndex = radioButton.dataset.id;
+               
+               updateAddQuestionButton(questionIndex);
+           });
+       });
+   
+       
+       document.getElementById('add-question').addEventListener('click', function() {
+           
+           const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
+           if (!anyRadioButtonChecked) {
+                   alert("Please select an answer key for each question before adding a new question.");
+               }
+       });
+   
+       
+       document.querySelectorAll('.question-box').forEach(function(questionBox) {
+           
+           const questionIndex = questionBox.dataset.id;
+           
+           updateAddQuestionButton(questionIndex);
+       });
+   });
+   
+</script> 
+
+
 {% endblock %}

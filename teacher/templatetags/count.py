@@ -1,7 +1,7 @@
 
 from django import template
 register = template.Library()
-from teacher.models import*
+from core.models import*
 
 @register.filter
 def count(array):

@@ -112,7 +112,7 @@
         
     })
 
-    function createForm(topicId){
+    {% comment %} function createForm(topicId){
         const csrf = Cookies.get('csrftoken');
         fetch('/teacher/form/create', {
             method: "POST",
@@ -127,9 +127,37 @@
             console.log(result);
             window.location = `/teacher/form/${result["code"]}/edit`
         })
+    } {% endcomment %}
+    function createForm(button) {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/form/create', {
+            method: "POST",
+            headers: {'X-CSRFToken': csrf, 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                title: "",
+                topic_id: button.value
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.code) {
+                console.log(result);
+                window.location = `/teacher/form/${result.code}/edit`;
+            } else {
+                console.error(result);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
+    
 
-    function createQuiz(topicId){
+
+
+
+
+
+
+    {% comment %} function createQuiz(topicId){
         const csrf = Cookies.get('csrftoken');
         fetch('/teacher/quiz/create', {
             method: "POST",
@@ -144,7 +172,32 @@
             console.log(result);
             window.location = `/teacher/quiz/${result["code"]}/edit`
         })
+    } {% endcomment %}
+    function createQuiz(buttonElement) {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/quiz/create', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf
+            },
+            body: JSON.stringify({
+                title: "",
+                topic_id: buttonElement.value
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+            window.location = `/teacher/quiz/${result["code"]}/edit`;
+        });
     }
+    
+
+
+
+
+
   
     function openLoader() {
         document.getElementById("spinner").classList.add('show');
@@ -162,7 +215,7 @@
             toast.onmouseleave = Swal.resumeTimer;
         }
     });
-    function deleteTopic(id){
+    {% comment %} function deleteTopic(id){
         const csrf = Cookies.get('csrftoken');
         fetch('/teacher/delete_topic', {
             method: "POST",
@@ -180,7 +233,48 @@
                 title: "Topic Deleted",
             });
         });
+    }  {% endcomment %}
+
+    function deleteTopic(id) {
+        const csrf = Cookies.get('csrftoken');
+        fetch('/teacher/delete_topic', {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': csrf,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                tid: id
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result); // Log the result to see what the server returns
+            if (result.status) {
+                document.getElementById(`tc-${id}`).remove();
+                AlertToast.fire({
+                    icon: "success",
+                    title: "Topic Deleted",
+                });
+            } else {
+                AlertToast.fire({
+                    icon: "error",
+                    title: "Error Deleting Topic",
+                    text: result.message || "An unknown error occurred"
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            AlertToast.fire({
+                icon: "error",
+                title: "Error Deleting Topic",
+                text: error.message || "An unknown error occurred"
+            });
+        });
     }
+    
+    
 
 </script>
 {% endblock content %}

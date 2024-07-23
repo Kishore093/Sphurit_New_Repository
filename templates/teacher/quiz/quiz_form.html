@@ -98,92 +98,13 @@
 </main>
 <script>
 
-   {% comment %}  
-    document.addEventListener("DOMContentLoaded", function () {
-        // Function to enable/disable "Add question" button based on whether an answer key is selected
-        function updateAddQuestionButton() {
-            // Get all answer key radio buttons
-            const answerKeyRadioButtons = document.querySelectorAll('[answer-key]');
-
-            // Get the "Add question" button
-            const addQuestionButton = document.getElementById('add-question');
-
-            let anyRadioButtonChecked = false;
-            answerKeyRadioButtons.forEach(function(radioButton) {
-                if (radioButton.checked) {
-                    anyRadioButtonChecked = true;
-                }
-            });
-            addQuestionButton.disabled = !anyRadioButtonChecked;
-        }
-
-        // Add event listener to each answer key radio button
-        document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
-            radioButton.addEventListener('change', updateAddQuestionButton);
-        });
-
-        // Function to handle click event on "Add question" button
-        document.getElementById('add-question').addEventListener('click', function() {
-            // Check if any answer key radio button is checked
-            const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
-            if (!anyRadioButtonChecked) {
-                alert("Please select an answer key before adding a question.");
-            }
-        });
-
-        // Initial call to updateAddQuestionButton to set the initial state of the "Add question" button
-        updateAddQuestionButton();
-    }); {% endcomment %}
-    {% comment %} document.addEventListener("DOMContentLoaded", function () {
-        // Function to enable/disable "Add question" button based on whether an answer key is selected for any question
-        function updateAddQuestionButton() {
-            // Get all answer key radio buttons for all questions
-            const answerKeyRadioButtons = document.querySelectorAll('[answer-key]');
-    
-            // Get the "Add question" button
-            const addQuestionButton = document.getElementById('add-question');
-    
-            let anyRadioButtonChecked = false;
-            answerKeyRadioButtons.forEach(function(radioButton) {
-                if (radioButton.checked) {
-                    anyRadioButtonChecked = true;
-                }
-            });
-            addQuestionButton.disabled = !anyRadioButtonChecked;
-        }
-    
-        // Add event listener to each answer key radio button for all questions
-        document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
-            radioButton.addEventListener('change', updateAddQuestionButton);
-        });
-    
-        // Function to handle click event on "Add question" button
-        document.getElementById('add-question').addEventListener('click', function() {
-            // Check if any answer key radio button is checked for any question
-            const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
-            if (!anyRadioButtonChecked) {
-               
-                alert("Please select an answer-key key before adding a question.");
-            }else if(anyRadioButtonChecked){
-                alert(" answer-keyselect");
-            }       
-            else{
-                alert(" before adding a question.");
-            }
-        });
-    
-        // Initial call to updateAddQuestionButton to set the initial state of the "Add question" button
-        updateAddQuestionButton();
-    });
-     {% endcomment %}
-
      document.addEventListener("DOMContentLoaded", function () {
-        // Function to enable/disable "Add question" button based on whether an answer key is selected for each question
+        
         function updateAddQuestionButton(questionIndex) {
-            // Get the answer key radio buttons for the current question
+            
             const answerKeyRadioButtons = document.querySelectorAll(`[data-id="${questionIndex}"][answer-key]`);
     
-            // Get the "Add question" button
+            
             const addQuestionButton = document.getElementById('add-question');
     
             let anyRadioButtonChecked = false;
@@ -195,30 +116,30 @@
             addQuestionButton.disabled = !anyRadioButtonChecked;
         }
     
-        // Add event listener to each answer key radio button for all questions
+       
         document.querySelectorAll('[answer-key]').forEach(function(radioButton) {
             radioButton.addEventListener('change', function() {
-                // Get the index of the current question
+                
                 const questionIndex = radioButton.dataset.id;
-                // Call updateAddQuestionButton with the current question index
+                
                 updateAddQuestionButton(questionIndex);
             });
         });
     
-        // Function to handle click event on "Add question" button
+        
         document.getElementById('add-question').addEventListener('click', function() {
-            // Check if any answer key radio button is checked for any question
+            
             const anyRadioButtonChecked = Array.from(document.querySelectorAll('[answer-key]')).some(radioButton => radioButton.checked);
             if (!anyRadioButtonChecked) {
                     alert("Please select an answer key for each question before adding a new question.");
                 }
         });
     
-        // Initial call to updateAddQuestionButton for each question to set the initial state of the "Add question" button
+        
         document.querySelectorAll('.question-box').forEach(function(questionBox) {
-            // Get the index of the current question
+            
             const questionIndex = questionBox.dataset.id;
-            // Call updateAddQuestionButton with the current question index
+            
             updateAddQuestionButton(questionIndex);
         });
     });

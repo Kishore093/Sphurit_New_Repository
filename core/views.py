@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime
 from django.db import transaction
-from teacher.models import*
+from core.models import*
 from .backends import*
 from xhtml2pdf import pisa
 from .serializer import*
@@ -428,7 +428,7 @@ def VerifyOtp(request):
                     user.is_active = True
                     user.save()
                     form = login(request, user)
-                    SendRegistrationMail(email=user.email)
+                    #SendRegistrationMail(email=user.email)
                     request.session['mobile']=""
                     request.session['email']=""
                     request.session['notp']=""

@@ -2,104 +2,162 @@
 {% load datetime %}
 {% load filter %}
 {% for obj in topics %}
-    <h2 class="accordion-header" id="heading{{obj.id }}">
-        <div class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{obj.id }}" aria-expanded="true" aria-controls="collapse{{obj.id }}">
-            <div class="col-lg-12 col-md-12 mt-auto d-flex justify-content-between" >
-                <h6>{{obj.topic_name}}</h6>
+      {% comment %} <h2 class="accordion-header" id="heading{{ obj.id }}">
+        <div class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ obj.id }}" aria-expanded="true" aria-controls="collapse{{ obj.id }}">
+            <div class="col-lg-12 col-md-12 mt-auto d-flex justify-content-between">
+                <h6>{{ obj.topic_name }}</h6>
                 <a onclick="deleteTopic('{{ obj.id }}')" type="button" class="btn btn-sm btn-outline-danger deleteTopicbtn" style="margin-top: auto; margin-bottom: auto; margin-right: 1rem;">
                     <i class="bi bi-trash"></i>
                 </a>
             </div>
         </div>
-    </h2>
-    <div id="collapse{{obj.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{obj.id }}" data-bs-parent="#topic_accordion">
-        <div class="accordion-body px-3 bg-grey">
-            <div class="row justify-content-between">
-                <div class="col-lg-3 col-md-4" style="text-align: -webkit-center;">
-                    <a href='{{site_domain}}/teacher/add_topic_video/{{ obj.id }}' type="button" class="btn" style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;">
-                        <div class="topic-res-card" style="position: relative;">
+    </h2> {% endcomment %}
+    <div id="tc-{{ obj.id }}">
+        <h2 class="accordion-header" id="heading{{ obj.id }}">
+            <div class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ obj.id }}" aria-expanded="true" aria-controls="collapse{{ obj.id }}">
+                <div class="col-lg-12 col-md-12 mt-auto d-flex justify-content-between">
+                    <h6>{{ obj.topic_name }}</h6>
+                    <a onclick="deleteTopic('{{ obj.id }}')" type="button" class="btn btn-sm btn-outline-danger deleteTopicbtn" style="margin-top: auto; margin-bottom: auto; margin-right: 1rem;">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </h2>
+        <div id="collapse{{obj.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{obj.id }}" data-bs-parent="#topic_accordion">
+            <div class="accordion-body px-3 bg-grey">
+                <div class="row justify-content-between">
+                    <div class="col-lg-3 col-md-4" style="text-align: -webkit-center;">
+                        <a href='{{site_domain}}/teacher/add_topic_video/{{ obj.id }}' type="button" class="btn" style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <div class="topic-res-card" style="position: relative;">
+                                {% if obj.topic_video_thumbnail %}
+                                    <img src="{{ obj.thumbnail_url }}" height="50" width="50" alt="video" style="object-fit: cover;">
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <i class="fa fa-edit" style="color: white;"></i>
+                                    </div>
+                                {% else %}
+                                    <img src="{% static 'img/addvideo.png' %}" height="50" width="50" alt="video" style="object-fit: cover;">
+                                {% endif %}
+                            </div>
                             {% if obj.topic_video_thumbnail %}
-                                <img src="{{ obj.thumbnail_url }}" height="50" width="50" alt="video" style="object-fit: cover;">
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-                                    <i class="fa fa-edit" style="color: white;"></i>
-                                </div>
+                                <h6 class="mt-2">Edit Video</h6>
                             {% else %}
-                                <img src="{% static 'img/addvideo.png' %}" height="50" width="50" alt="video" style="object-fit: cover;">
+                                <h6 class="mt-2">Add Video</h6>
                             {% endif %}
-                        </div>
-                        {% if obj.topic_video_thumbnail %}
-                            <h6 class="mt-2">Edit Video</h6>
-                        {% else %}
-                            <h6 class="mt-2">Add Video</h6>
+                        </a>
+                    </div>
+    
+                    {% comment %} <div class="col-lg-3 col-md-4 text-center">
+                        {% if obj.topic_assignments.all|is_quiz:True %}
+                        {% for q in obj.topic_assignments.all|is_quiz:True %}
+                        {% if forloop.first %}
+                        <a href="{{site_domain}}/teacher/quiz/{{q.code}}/edit" class="btn" value="{{ obj.id }}" onclick="createQuiz(this)" id="create-blank-form{{ obj.id }}">
+                            <div class="topic-res-card position-relative text-center">
+                                {% if obj.topic_assignments.all|is_quiz:True %}
+                                    <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
+                                {% else %}
+                                    <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="quiz">
+                                {% endif %}
+                            </div>
+                            <h6 class="mt-2">Edit Quiz</h6>
+                        </a>
                         {% endif %}
-                    </a>
-                </div>
-
-                <div class="col-lg-3 col-md-4 text-center">
-                    {% if obj.topic_assignments.all|is_quiz:True %}
-                    {% for q in obj.topic_assignments.all|is_quiz:True %}
-                    {% if forloop.first %}
-                    <a href="{{site_domain}}/teacher/quiz/{{q.code}}/edit" class="btn" value="{{ obj.id }}" onclick="createQuiz(this)" id="create-blank-form{{ obj.id }}">
-                        <div class="topic-res-card position-relative text-center">
-                            {% if obj.topic_assignments.all|is_quiz:True %}
+                        {% endfor %}               
+                        {% else %}
+                        <button type="button" class="btn" value="{{ obj.id }}" onclick="createQuiz(this)" id="create-blank-form{{ obj.id }}">
+                            <div class="topic-res-card position-relative text-center">
+                                {% if obj.topic_assignments.all|is_quiz:True %}
+                                    <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
+                                {% else %}
+                                    <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="quiz">
+                                {% endif %}
+                            </div>
+                            <h6 class="mt-2">Add Quiz</h6>
+                        </button>
+                        {% endif %}
+    
+                    </div>
+                    {% endcomment %}
+                    <div class="col-lg-3 col-md-4 text-center">
+                        {% if obj.topic_assignments.all|is_quiz:True %}
+                        {% for q in obj.topic_assignments.all|is_quiz:True %}
+                        {% if forloop.first %}
+                        <a href="{{site_domain}}/teacher/quiz/{{q.code}}/edit" class="btn" id="edit-quiz-{{ q.code }}">
+                            <div class="topic-res-card position-relative text-center">
                                 <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                            {% else %}
+                            </div>
+                            <h6 class="mt-2">Edit Quiz</h6>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                        <button type="button" class="btn" value="{{ obj.id }}" onclick="createQuiz(this)" id="create-blank-form{{ obj.id }}">
+                            <div class="topic-res-card position-relative text-center">
                                 <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="quiz">
-                            {% endif %}
-                        </div>
-                        <h6 class="mt-2">Edit Quiz</h6>
-                    </a>
-                    {% endif %}
-                    {% endfor %}               
-                    {% else %}
-                    <button type="button" class="btn" value="{{ obj.id }}" onclick="createQuiz(this)" id="create-blank-form{{ obj.id }}">
-                        <div class="topic-res-card position-relative text-center">
-                            {% if obj.topic_assignments.all|is_quiz:True %}
+                            </div>
+                            <h6 class="mt-2">Add Quiz</h6>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+    
+                    {% comment %} <div class="col-lg-3 col-md-4 text-center">
+                        {% if obj.topic_assignments.all|is_quiz:False %}
+                        {% for a in obj.topic_assignments.all|is_quiz:False %}
+                        {% if forloop.first %}
+                        <a href="{{site_domain}}/teacher/form/{{a.code}}/edit" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
+                            <div class="topic-res-card position-relative">
+                                {% if obj.topic_assignments.all|is_quiz:False %}
                                 <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                            {% else %}
-                                <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="quiz">
-                            {% endif %}
-                        </div>
-                        <h6 class="mt-2">Add Quiz</h6>
-                    </button>
-                    {% endif %}
-
-                </div>
-
-
-                <div class="col-lg-3 col-md-4 text-center">
-                    {% if obj.topic_assignments.all|is_quiz:False %}
-                    {% for a in obj.topic_assignments.all|is_quiz:False %}
-                    {% if forloop.first %}
-                    <a href="{{site_domain}}/teacher/form/{{a.code}}/edit" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
-                        <div class="topic-res-card position-relative">
-                            {% if obj.topic_assignments.all|is_quiz:False %}
-                            <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                            {% else %}
-                            <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
-                            {% endif %}
-                        </div>
-                        <h6 class="mt-2">Edit Assignment</h6>
-                    </a>
-                    {% endif %}
-                    {% endfor %}               
-                    {% else %}
-                        
-                    <button type="button" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
-                        <div class="topic-res-card position-relative">
-                            {% if obj.topic_assignments.all|is_quiz:False %}
-                            <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                            {% else %}
-                            <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
-                            {% endif %}
-                        </div>
-                        <h6 class="mt-2">Add Assignment</h6>
-                    </button>
-                    {% endif %}                                      
+                                {% else %}
+                                <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
+                                {% endif %}
+                            </div>
+                            <h6 class="mt-2">Edit Assignment</h6>
+                        </a>
+                        {% endif %}
+                        {% endfor %}               
+                        {% else %}
+                            
+                        <button type="button" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
+                            <div class="topic-res-card position-relative">
+                                {% if obj.topic_assignments.all|is_quiz:False %}
+                                <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
+                                {% else %}
+                                <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
+                                {% endif %}
+                            </div>
+                            <h6 class="mt-2">Add Assignment</h6>
+                        </button>
+                        {% endif %}                                      
+                    </div> {% endcomment %}
+                    <div class="col-lg-3 col-md-4 text-center">
+                        {% if obj.topic_assignments.all|is_quiz:False %}
+                            {% for a in obj.topic_assignments.all|is_quiz:False %}
+                                {% if forloop.first %}
+                                    <a href="{{site_domain}}/teacher/form/{{a.code}}/edit" class="btn"  id="create-blank-form{{ obj.id }}">
+                                        <div class="topic-res-card position-relative">
+                                            <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
+                                        </div>
+                                        <h6 class="mt-2">Edit Assignment</h6>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}               
+                        {% else %}
+                            <button type="button" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
+                                <div class="topic-res-card position-relative">
+                                    <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
+                                </div>
+                                <h6 class="mt-2">Add Assignment</h6>
+                            </button>
+                        {% endif %}                                      
+                    </div>
+                    
+                    
                 </div>
             </div>
         </div>
     </div>
+    
 
 
 {% endfor %}

@@ -4,8 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
 from django.contrib import admin 
-from .models import *
-from teacher.models import*
+from core.models import*
 admin.site.unregister(Group)
 
 

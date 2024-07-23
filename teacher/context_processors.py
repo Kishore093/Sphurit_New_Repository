@@ -1,9 +1,9 @@
 
 from collections import UserDict
 from itertools import chain
-from .models import *
+from core.models import *
 from django.db.models import Sum
-from .models import WalletTransaction
+from core.models import WalletTransaction
 import datetime
 # import razorpay
 # from razorpay.resources import Payment

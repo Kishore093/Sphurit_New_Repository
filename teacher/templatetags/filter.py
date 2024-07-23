@@ -1,6 +1,6 @@
 from django import template
 register = template.Library()
-from teacher.models import*
+#from teacher.models import*
 from core.models import*
 from chats.models import*
 

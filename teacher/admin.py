@@ -2,10 +2,10 @@ from django.db.models import Count
 from django.contrib import admin
 from django.urls import reverse
 
-from .models import*
+from core.models import*
 from django.utils.html import format_html
 from django.db.models import Sum
-from .models import HitCount, Course
+from core.models import HitCount, Course
 
 # Register your models here.
 # admin.site.register(Choices)
