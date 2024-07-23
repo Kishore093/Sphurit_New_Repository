@@ -77,7 +77,7 @@
                     </div>
                 {% endfor %}
                 
-                {% if question.choices.count < 4 %}
+                {% if question.choices.count < 3 %}
                     <div class="choice">
                         <input type="radio" id="add-choice" disabled />
                         <label for="add-choice" class="add-option" data-question="{{ question.id }}" data-type="{{ question.question_type }}">Add option</label>
