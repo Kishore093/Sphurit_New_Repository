@@ -914,6 +914,12 @@ class Answer(models.Model):
     def extension(self):
         name, extension = os.path.splitext(self.file.name)
         return extension
+    
+    
+    
+    
+
+
 
 class Form(models.Model):
     code = models.CharField(max_length=30)

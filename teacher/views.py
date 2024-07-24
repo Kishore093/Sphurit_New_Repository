@@ -1408,28 +1408,6 @@ def single_response(request, code, response_code):
     })
 
 
-# custom google form views
-# def create_form(request):
-    
-#     if not request.user.is_authenticated:
-#         return HttpResponseRedirect(reverse("user_login"))
-    
-#     if request.method == "POST":
-#         data = json.loads(request.body)
-#         title = data["title"]
-#         topic = Topic.objects.get(id = data["topic_id"])
-#         code = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(30))
-#         choices = Choices(choice = "Option 1")
-#         choices.save()
-#         question = Questions(question_type = "multiple choice", question= "", required= False)
-#         question.save()
-#         question.choices.add(choices)
-#         question.save()
-#         form = Form(code = code, title = title, creator=request.user, topic=topic)
-#         form.save()
-#         form.questions.add(question)
-#         form.save()
-#         return JsonResponse({"message": "Sucess", "code": code})
 def create_form(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("user_login"))
@@ -1821,11 +1799,11 @@ def delete_question(request, code, question):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("user_login"))
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
-    #Checking if form creator is user
+    
     if formInfo.creator != request.user:
         return HttpResponseRedirect(reverse("403"))
     if request.method == "DELETE":
@@ -1834,8 +1812,11 @@ def delete_question(request, code, question):
         else: question = question[0]
         for i in question.choices.all():
             i.delete()
-            question.delete()
+        question.delete()
+
         return JsonResponse({"message": "Success"})
+    
+
 
 # def score(request, code):
 #     if not request.user.is_authenticated:
@@ -2082,7 +2063,6 @@ def feedback(request, code):
 
 def preview_form(request, code):
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
@@ -2095,7 +2075,7 @@ def preview_form(request, code):
 
 def view_form(request, code):
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
@@ -2106,7 +2086,7 @@ def view_form(request, code):
         responseInfo = Responses.objects.filter(response_to=formInfo,responder=request.user)
         total_score = 0
         score = 0
-        # responseInfo = Responses.objects.filter(response_code = response_code)
+        
         if responseInfo.count() == 0:
             return HttpResponseRedirect(reverse('404'))
         else: responseInfo = responseInfo[0]
@@ -2155,7 +2135,7 @@ def get_client_ip(request):
 
 def submit_form(request, code):
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
@@ -2168,7 +2148,7 @@ def submit_form(request, code):
         response.save()
         
         for i in request.POST:
-            #Excluding csrf token
+            
             if i == "csrfmiddlewaretoken" or i == "email-address":
                 continue
             question = formInfo.questions.get(id = i)
@@ -2198,7 +2178,7 @@ def responses(request, code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("user_login"))
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
@@ -2219,7 +2199,7 @@ def responses(request, code):
         keys = choiceAnswered[answr].values()
         for choice in choiceAnswered[answr]:
             filteredResponsesSummary[answr][choice] = choiceAnswered[answr][choice]
-    #Checking if form creator is user
+    
     if formInfo.creator != request.user:
         return HttpResponseRedirect(reverse("403"))
     return render(request, "index/responses.html", {
@@ -2252,6 +2232,7 @@ def exportcsv(request,code):
     writer = csv.writer(http_response)
     header = ['Response Code', 'Responder', 'Responder Email','Responder_ip']
     
+    
     for question in questions:
         header.append(question.question)
     
@@ -2282,11 +2263,11 @@ def exportcsv(request,code):
 
 def response(request, code, response_code):
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
-    #Checking if form creator is user
+    
     if not formInfo.allow_view_score:
         if formInfo.creator != request.user:
             return HttpResponseRedirect(reverse("403"))

@@ -112,22 +112,7 @@
         
     })
 
-    {% comment %} function createForm(topicId){
-        const csrf = Cookies.get('csrftoken');
-        fetch('/teacher/form/create', {
-            method: "POST",
-            headers: {'X-CSRFToken': csrf},
-            body: JSON.stringify({
-                title: "",
-                topic_id: topicId.value
-            })
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            window.location = `/teacher/form/${result["code"]}/edit`
-        })
-    } {% endcomment %}
+    
     function createForm(button) {
         const csrf = Cookies.get('csrftoken');
         fetch('/teacher/form/create', {
@@ -157,22 +142,7 @@
 
 
 
-    {% comment %} function createQuiz(topicId){
-        const csrf = Cookies.get('csrftoken');
-        fetch('/teacher/quiz/create', {
-            method: "POST",
-            headers: {'X-CSRFToken': csrf},
-            body: JSON.stringify({
-                title: "",
-                topic_id: topicId.value
-            })
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result);
-            window.location = `/teacher/quiz/${result["code"]}/edit`
-        })
-    } {% endcomment %}
+    
     function createQuiz(buttonElement) {
         const csrf = Cookies.get('csrftoken');
         fetch('/teacher/quiz/create', {

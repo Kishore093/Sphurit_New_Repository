@@ -99,37 +99,6 @@
                         {% endif %}
                     </div>
                     
-    
-                    {% comment %} <div class="col-lg-3 col-md-4 text-center">
-                        {% if obj.topic_assignments.all|is_quiz:False %}
-                        {% for a in obj.topic_assignments.all|is_quiz:False %}
-                        {% if forloop.first %}
-                        <a href="{{site_domain}}/teacher/form/{{a.code}}/edit" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
-                            <div class="topic-res-card position-relative">
-                                {% if obj.topic_assignments.all|is_quiz:False %}
-                                <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                                {% else %}
-                                <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
-                                {% endif %}
-                            </div>
-                            <h6 class="mt-2">Edit Assignment</h6>
-                        </a>
-                        {% endif %}
-                        {% endfor %}               
-                        {% else %}
-                            
-                        <button type="button" class="btn" value="{{ obj.id }}" onclick="createForm(this)" id="create-blank-form{{ obj.id }}">
-                            <div class="topic-res-card position-relative">
-                                {% if obj.topic_assignments.all|is_quiz:False %}
-                                <img src="{% static 'img/Editicon.png' %}" height="50" width="50" alt="quiz">
-                                {% else %}
-                                <img src="{% static 'img/AddImage.png' %}" height="50" width="50" alt="assignment">
-                                {% endif %}
-                            </div>
-                            <h6 class="mt-2">Add Assignment</h6>
-                        </button>
-                        {% endif %}                                      
-                    </div> {% endcomment %}
                     <div class="col-lg-3 col-md-4 text-center">
                         {% if obj.topic_assignments.all|is_quiz:False %}
                             {% for a in obj.topic_assignments.all|is_quiz:False %}

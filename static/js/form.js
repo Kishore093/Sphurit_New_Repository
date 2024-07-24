@@ -315,6 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
     }
     deleteQuestion()
+    
     const changeType = () => {
         document.querySelectorAll(".input-question-type").forEach(ele => {
             ele.addEventListener('input', function(){
