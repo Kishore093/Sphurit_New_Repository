@@ -2590,6 +2590,7 @@ def chapter_quizzes(request, chapter_id, topic_id=None):
             if correct_answers.exists():
                 for answer in correct_answers:
                      print(answer.choice)
+                     print(answer.choice)
                 # print()  # Add an empty line between questions
 
     return render(request, 'admin/chapter_quizzes.html', {'chapter': chapter, 'topic': topic, 'quizzes': quizzes})
