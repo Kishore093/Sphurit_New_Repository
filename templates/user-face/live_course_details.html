@@ -120,7 +120,7 @@
                                         </div>
                                         
                                     
-                                </div>
+                                    </div>
                             </div>
 
                             <script>
@@ -226,105 +226,105 @@
 
 <script>
     function enrollNow(args){
-        var oid = "";
-        if("{{request.user.is_authenticated}}" == "True"){
-            fetch("{% url 'initEnrollPayment' %}", {
-                method: "POST",
-                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-                body: JSON.stringify({
-                    "amount":args.p,
-                    "currency":"INR"
+            var oid = "";
+            if("{{request.user.is_authenticated}}" == "True"){
+                fetch("{% url 'initEnrollPayment' %}", {
+                    method: "POST",
+                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                    body: JSON.stringify({
+                        "amount":args.p,
+                        "currency":"INR"
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(result => {
-                console.log(result);
-                var optionData = result['result']
-                var options = {
-                    "key": result['RAZOR_KEY_ID'], 
-                    "amount": optionData['amount'], 
-                    "currency": optionData['currency'],
-                    "name": "Course Enrollment",
-                    "description": "Course Enrollment",
-                    "image": "{% static 'img/icons/logo1.png'%}",
-                    "order_id": optionData['id'], 
-                    "handler": function (response){
-                        if(response.razorpay_payment_id){
-                            console.log(response.razorpay_payment_id);
-                            oid = response.razorpay_order_id;
-                            fetch("{% url 'verifySignature' %}", {
-                                method: "POST",
-                                headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-                                body: JSON.stringify({
-                                    "razorpay_paymentId":response.razorpay_payment_id,
-                                    "razorpay_orderId":response.razorpay_order_id,
-                                    "razorpay_signature":response.razorpay_signature
+                .then(response => response.json())
+                .then(result => {
+                    console.log(result);
+                    var optionData = result['result']
+                    var options = {
+                        "key": result['RAZOR_KEY_ID'], 
+                        "amount": optionData['amount'], 
+                        "currency": optionData['currency'],
+                        "name": "Course Enrollment",
+                        "description": "Course Enrollment",
+                        "image": "{% static 'img/icons/logo1.png'%}",
+                        "order_id": optionData['id'], 
+                        // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+                        "handler": function (response){
+                            if(response.razorpay_payment_id){
+                                console.log(response.razorpay_payment_id);
+                                oid = response.razorpay_order_id;
+                                fetch("{% url 'verifySignature' %}", {
+                                    method: "POST",
+                                    headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                    body: JSON.stringify({
+                                        "razorpay_paymentId":response.razorpay_payment_id,
+                                        "razorpay_orderId":response.razorpay_order_id,
+                                        "razorpay_signature":response.razorpay_signature
+                                    })
                                 })
-                            })
-                            .then(response => response.json())
-                            .then(result => {
-                                console.log(result);
-                                if(result['result']){
-                                    fetch("{% url 'purchaseCourse' %}", {
-                                        method: "POST",
-                                        headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-                                        body: JSON.stringify({
-                                            "course_id":args.id,
-                                            "order_id":oid
+                                .then(response => response.json())
+                                .then(result => {
+                                    console.log(result);
+                                    if(result['result']){
+                                        fetch("{% url 'purchaseCourse' %}", {
+                                            method: "POST",
+                                            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+                                            body: JSON.stringify({
+                                                "course_id":args.id,
+                                                "order_id":oid
+                                            })
                                         })
-                                    })
-                                    .then(response => response.json())
-                                    .then(result => {
-                                        console.log(result);
-                                        const swalWithBootstrapButtons = Swal.mixin({
-                                            customClass: {
-                                                confirmButton: "btn btn-success",
-                                                cancelButton: "btn btn-danger"
-                                            },
-                                            buttonsStyling: false
-                                        });
-                                        swalWithBootstrapButtons.fire({
-                                        title: "Payment Successful.",
-                                        text: "Thanks for purchesed the course!",
-                                        icon: "success",
-                                        showCancelButton: false,
-                                        confirmButtonText: "Ok",
-                                        reverseButtons: true
-                                        }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            window.location = "{% url 'user_dashboard' %}";
-                                        }
-                                        });
-                                    })
-                                }
-                            })
-                        }else{
-                            console.log(response);
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            console.log(result);
+                                            const swalWithBootstrapButtons = Swal.mixin({
+                                                customClass: {
+                                                    confirmButton: "btn btn-success",
+                                                    cancelButton: "btn btn-danger"
+                                                },
+                                                buttonsStyling: false
+                                            });
+                                            swalWithBootstrapButtons.fire({
+                                            title: "Payment Successful.",
+                                            text: "Thanks for purchesed the course!",
+                                            icon: "success",
+                                            showCancelButton: false,
+                                            confirmButtonText: "Ok",
+                                            reverseButtons: true
+                                            }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                window.location = "{% url 'user_dashboard' %}";
+                                            }
+                                            });
+                                        })
+                                    }
+                                })
+                            }else{
+                                console.log(response);
+                            }
+                        },
+                        "prefill": {
+                            "name": "{{ request.user.full_name }}",
+                            "email": "{{ request.user.email }}",
+                            "contact": "{{ request.user.mobile }}"
+                        },
+                        "notes": {
+                            "address": "Sphurit"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
                         }
-                    },
-                    "prefill": {
-                        "name": "{{ request.user.full_name }}",
-                        "email": "{{ request.user.email }}",
-                        "contact": "{{ request.user.mobile }}"
-                    },
-                    "notes": {
-                        "address": "Sphurit"
-                    },
-                    "theme": {
-                        "color": "#3399cc"
-                    }
-                };
-                var rzp1 = new Razorpay(options);
+                    };
+                    var rzp1 = new Razorpay(options);
+        
+                    rzp1.open();
+                    rzp1.on('payment.failed', function (response){});
+                });
+            }
+            else{
+                window.location = "{% url 'user_login' %}";
+            }
     
-                rzp1.open();
-                rzp1.on('payment.failed', function (response){});
-            });
         }
-        else{
-            
-            window.location = "{% url 'user_login' %}";
-        }
-
-    }
-</sc>
+</script>
 {% endblock content %}

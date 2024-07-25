@@ -177,7 +177,7 @@
         <div class="col-lg-8 p-0 m-0">
             <div class="card">
                 <div class="card-body">
-                    <video src="{{course.course_video.url}}" height="415" controls id="video-player"></video>
+                    <video src="{{course.course_video.url}}" height="415" width="100%" controls id="video-player"></video>
                     <p class="small fw-bold " id="selected_lecture">{{ course.course_name }}</p>
                     <div class="row d-flex">
                         <div class="col-1">
@@ -254,11 +254,12 @@
                                         <a href="" class="btn btn-primary btn-sm {% if course.id|get_course_progress:request.user != 100.0 %}disabled{% endif %}"><i class="bi bi-cloud-arrow-down"></i>&emsp13; Download Certificate</a>
                                     </div>
                                     <div class="bg-image position-relative">
-                                        <img height="200" class="w-100" src="https://media.istockphoto.com/id/1268162605/vector/blue-gold-color-creative-style-certificate-template-with-badge-vector-template.jpg?s=1024x1024&w=is&k=20&c=qz33V8u533A_f2VACrjNxIbnzD2lbtuCub6GpJHlltU=" alt="">
-                                        <div class="" style="position: absolute; top: 35%; left: 45%;">
+                                        <img height="200" class="w-100" src="{% static 'img/certificate.jpeg' %}" alt="">
+                                        <div style="position: absolute; top: 35%; left: 45%;">
                                             <h1><i class="bi bi-cloud-arrow-down position-absolute text-dark"></i></h1>
                                         </div>
                                     </div>
+                                    
                                 </div>
                             </div>
                             

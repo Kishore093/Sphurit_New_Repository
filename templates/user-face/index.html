@@ -197,7 +197,7 @@
                         {% for item in course|slice:":3" %}
                         <div class="col-lg-3 col-md-4 p-2 align-items-stretch course_box_body">
                             <div class="card rounded border  border-box">
-                                <div class="card-bod cd">
+                                <div class="card-bod cd mb-2">
                                     <img class="card-img-top" src="{{ item.img_url }}" alt="" >
                                     <div class="">
                                         {% if item.id|is_purchased:request.user %}

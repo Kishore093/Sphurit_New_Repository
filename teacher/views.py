@@ -2133,6 +2133,10 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+
+
+
+
 def submit_form(request, code):
     formInfo = Form.objects.filter(code = code)
     
@@ -2174,6 +2178,10 @@ def submit_form(request, code):
         # updateChapterProgress(cid=formInfo.topic.chapter.id,uid=request.user.id)
         return redirect('view_form', code=code)
 
+
+
+
+
 def responses(request, code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("user_login"))
@@ -2214,7 +2222,7 @@ def retrieve_checkbox_choices(response, question):
 
     answers = Answer.objects.filter(answer_to=question, response=response)
     for answer in answers:
-        selected_choice_ids = answer.answer.split(',')  # Split the string into individual choice IDs
+        selected_choice_ids = answer.answer.split(',')  
         selected_choices = Choices.objects.filter(pk__in=selected_choice_ids)
         checkbox_answers.append([choice.choice for choice in selected_choices])
 
@@ -2309,7 +2317,7 @@ def response(request, code, response_code):
 
 def edit_response(request, code, response_code):
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
@@ -2329,11 +2337,11 @@ def edit_response(request, code, response_code):
         if formInfo.collect_email:
             response.responder_email = request.POST["email-address"]
             response.save()
-        #Deleting all existing answers
+        
         for i in response.response.all():
             i.delete()
         for i in request.POST:
-            #Excluding csrf token and email address
+            
             if i == "csrfmiddlewaretoken" or i == "email-address":
                 continue
             question = formInfo.questions.get(id = i)
@@ -2358,11 +2366,11 @@ def delete_responses(request, code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("user_login"))
     formInfo = Form.objects.filter(code = code)
-    #Checking if form exists
+    
     if formInfo.count() == 0:
         return HttpResponseRedirect(reverse('404'))
     else: formInfo = formInfo[0]
-    #Checking if form creator is user
+    
     if formInfo.creator != request.user:
         return HttpResponseRedirect(reverse("403"))
     if request.method == "DELETE":
@@ -2372,7 +2380,7 @@ def delete_responses(request, code):
                 i.delete()
             response.delete()
         return JsonResponse({"message": "Success"})
-# end custom google form views
+
 
 
 
@@ -2380,31 +2388,11 @@ class CalendarView(generic.ListView):
     model = Event
     template_name = 'teacher/calendar.html'
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-
-    #     # use today's date for the calendar
-    #     d = get_date(self.request.GET.get('month', None))
-
-    #     # Instantiate our calendar class with today's year and date
-    #     calc = Calendar(d.year, d.month)
-    #     colored_day = '\033[92m' + str(d.day) + '\033[0m'
-
-    #     # Call the formatmonth method, which returns our calendar as a table
-    #     html_cal = calc.formatmonth(withyear=True)
-    #     context['calendar'] = mark_safe(html_cal)
-    #     d = get_date(self.request.GET.get('month', None))
-    #     context['prev_month'] = prev_month(d)
-    #     context['next_month'] = next_month(d)
-    #     context['form'] = EventForm()
-    #     return context
-    
-
     def get(self, request, *args, **kwargs):
         events = Event.objects.get_all_events(user=request.user)
         events_month = Event.objects.get_running_events(user=request.user)
         event_list = []
-        # start: '2020-09-16T16:00:00'
+        
         for event in events:
             event_list.append(
                 {   "id": event.id,
@@ -2589,7 +2577,6 @@ def chapter_quizzes(request, chapter_id, topic_id=None):
             correct_answers = question.choices.filter(is_answer=True)
             if correct_answers.exists():
                 for answer in correct_answers:
-                     print(answer.choice)
                      print(answer.choice)
                 # print()  # Add an empty line between questions
 

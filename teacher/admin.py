@@ -8,7 +8,7 @@ from django.db.models import Sum
 from core.models import HitCount, Course
 
 # Register your models here.
-# admin.site.register(Choices)
+admin.site.register(Choices)
 admin.site.register(Answer)
 
 
